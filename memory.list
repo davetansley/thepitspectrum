@@ -1,0 +1,40 @@
+# file opened: main.asm
+ 1    0000                  DEVICE ZXSPECTRUM48
+ 2    0000
+ 3    0000                  org $8000
+ 4    8000
+ 5    8000                  ; We want a black screen.
+ 6    8000              main:
+ 7    8000 CD 6B 0D         call $0D6B
+ 8    8003 3E 47            ld a,71             ; white ink (7) on black paper (0),
+ 9    8005                                      ; bright (64).
+10    8005 32 8D 5C         ld (23693),a        ; set our screen colours.
+11    8008 AF               xor a               ; quick way to load accumulator with zero.
+12    8009 CD 9B 22         call 8859           ; set permanent border colours.
+13    800C CD AF 0D         call 3503           ; ROM routine - clears screen, opens chan 2.
+14    800F
+15    800F
+16    800F
+17    800F                  include "leveldata\level01.asm"
+# file opened: leveldata/level01.asm
+# file closed: leveldata/level01.asm
+18    800F                  include "graphics\udgs.asm"
+# file opened: graphics/udgs.asm
+# file closed: graphics/udgs.asm
+19    800F
+20    800F              ;===========================================================================
+21    800F              ; Stack.
+22    800F              ;===========================================================================
+23    800F
+24    800F              ; Stack: this area is reserved for the stack
+25    800F              STACK_SIZE: equ 100    ; in words
+26    800F
+27    800F              ; Reserve stack space
+28    800F 00 00            defw 0  ; WPMEM, 2
+29    8011              stack_bottom:
+30    8011 00 00 00...      defs    STACK_SIZE*2, 0
+31    80D9              stack_top:
+32    80D9 00 00            defw 0  ; WPMEM, 2
+33    80DB
+34    80DB                     SAVESNA "ThePit.sna", main
+# file closed: main.asm
