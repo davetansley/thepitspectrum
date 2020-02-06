@@ -1,22 +1,50 @@
     DEVICE ZXSPECTRUM48
 
-    org $8000
+    ORG $8000    
 
-    ; We want a black screen.
-main:
-    call $0D6B
-    ld a,71             ; white ink (7) on black paper (0),
-                        ; bright (64).
-    ld (23693),a        ; set our screen colours.
-    xor a               ; quick way to load accumulator with zero.
-    call 8859           ; set permanent border colours.
-    call 3503           ; ROM routine - clears screen, opens chan 2.
+;===========================================================================
+; Persistent watchpoint.
+; Change WPMEMx (remove the 'x' from WPMEMx) below to activate.
+; If you do so the program will hit a breakpoint when it tries to
+; write to the first byte of the 3rd line.
+; When program breaks in the fill_memory sub routine please hover over hl
+; to see that it contains 0x5804 or COLOR_SCREEN+64.
+;===========================================================================
+
+; WPMEMx 0x5840, 1, w
 
 
+;===========================================================================
+; Include modules
+;===========================================================================
+    include "init.asm"
     include "utilities.asm"
+    include "strings.asm"
+    include "screen\screen.asm"
 
     include "leveldata\level01.asm"
-    include "graphics\udgs.asm"
+    include "graphics\sprites.asm"
+
+;===========================================================================
+; main routine - the code execution starts here.
+; Sets up the new interrupt routine, the memory
+; banks and jumps to the start loop.
+;===========================================================================
+main:
+    ; Disable interrupts
+    di
+ 
+    ; Setup stack
+    ld sp,stack_top
+
+    call init_start
+    call screen_draw
+
+mloop:    
+
+    halt   
+    jp mloop
+    
 
 ;===========================================================================
 ; Stack. 
