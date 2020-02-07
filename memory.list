@@ -20,9 +20,9 @@
  19   8000              ;===========================================================================
  20   8000                  include "init.asm"
 # file opened: init.asm
-  1+  8000              ; ###########################################################################
+  1+  8000              ;
   2+  8000              ; Set up at start up
-  3+  8000              ; ###########################################################################
+  3+  8000              ;
   4+  8000              init_start:
   5+  8000              ; We want a black screen.
   6+  8000 CD 6B 0D         call $0D6B
@@ -34,522 +34,688 @@
  12+  800C CD AF 0D         call 3503           ; ROM routine - clears screen, opens chan 2.
  13+  800F
  14+  800F C9               ret
+ 15+  8010
+ 16+  8010              ;
+ 17+  8010              ;   Start coord
+ 18+  8010              ;   vert, horiz
+ 19+  8010              start_coord:
+ 20+  8010 18 30            defb 24,48
+ 21+  8012
+ 22+  8012              ;
+ 23+  8012              ;   Data for players
+ 24+  8012              ;   horiz,vert,dir (0 up, 1 down, 2 left, 3 right), frame
+ 25+  8012              player_one:
+ 26+  8012 00 00 00 00      defb    0,0,0,0
 # file closed: init.asm
- 21   8010                  include "utilities.asm"
+ 21   8016                  include "utilities.asm"
 # file opened: utilities.asm
-  1+  8010              ; ##########################################################################
-  2+  8010              ; Print a character
-  3+  8010              ; Inputs:
-  4+  8010              ; b - x coord
-  5+  8010              ; c - y coord
-  6+  8010              ; d - character
-  7+  8010              ; e - colour
-  8+  8010              ; ##########################################################################
-  9+  8010              utilities_print_char:
- 10+  8010 7B               ld a,e
- 11+  8011 32 8F 5C         ld (23695),a        ; set our temporary screen colours.
- 12+  8014 3E 16            ld a,22
- 13+  8016 D7               rst 16              ; Calls the Sinclair PRINT AT routine
- 14+  8017 78               ld a,b              ; Gets the X co-ordinate
- 15+  8018 3D               dec a
- 16+  8019 D7               rst 16
- 17+  801A 79               ld a,c              ; and the Y co-ordinate
- 18+  801B D7               rst 16              ; So, essentially PRINT AT X,Y; like in BASIC
- 19+  801C 7A               ld a,d              ; ASCII code for udg.
- 20+  801D D7               rst 16              ; draw block.
- 21+  801E C9               ret
+  1+  8016              ; ##########################################################################
+  2+  8016              ; Print a character
+  3+  8016              ; Inputs:
+  4+  8016              ; b - x coord
+  5+  8016              ; c - y coord
+  6+  8016              ; d - character
+  7+  8016              ; e - colour
+  8+  8016              ; ##########################################################################
+  9+  8016              utilities_print_char:
+ 10+  8016 7B               ld a,e
+ 11+  8017 32 8F 5C         ld (23695),a        ; set our temporary screen colours.
+ 12+  801A 3E 16            ld a,22
+ 13+  801C D7               rst 16              ; Calls the Sinclair PRINT AT routine
+ 14+  801D 78               ld a,b              ; Gets the X co-ordinate
+ 15+  801E 3D               dec a
+ 16+  801F D7               rst 16
+ 17+  8020 79               ld a,c              ; and the Y co-ordinate
+ 18+  8021 D7               rst 16              ; So, essentially PRINT AT X,Y; like in BASIC
+ 19+  8022 7A               ld a,d              ; ASCII code for udg.
+ 20+  8023 D7               rst 16              ; draw block.
+ 21+  8024 C9               ret
 # file closed: utilities.asm
- 22   801F                  include "strings.asm"
+ 22   8025                  include "strings.asm"
 # file opened: strings.asm
-  1+  801F              bottom_line:
-  2+  801F 2E 2E 2E 2E      defb '..........'   ; a string of spaces
-  2+  8023 2E 2E 2E 2E
-  2+  8027 2E 2E
+  1+  8025              bottom_line:
+  2+  8025 2E 2E 2E 2E      defb '..........'   ; a string of spaces
+  2+  8029 2E 2E 2E 2E
+  2+  802D 2E 2E
 # file closed: strings.asm
- 23   8029                  include "screen\screen.asm"
+ 23   802F                  include "screen\screen.asm"
 # file opened: screen/screen.asm
-  1+  8029              ; ##########################################################################
-  2+  8029              ; Draw the screen
-  3+  8029              ; Inputs:
-  4+  8029              ; none
-  5+  8029              ; ##########################################################################
-  6+  8029              screen_draw:
-  7+  8029 0E 00            ld c,0                      ; horiz
-  8+  802B 06 00            ld b,0                      ; vert, 0 at top
-  9+  802D DD 21 CF 80      ld ix,level01               ; point ix at level data
- 10+  8031 FD 21 00 58      ld iy,22528                 ; point iy at attr data
- 11+  8035              screen_draw0:
- 12+  8035 DD 7E 00         ld a,(ix)                   ; load the block number
- 13+  8038 C5               push bc                     ; store bc, contains loop count
- 14+  8039 CD C7 80         call screen_getattr         ; get the memory location for this cell's attr into hl
- 15+  803C 7E               ld a,(hl)                   ; get the attr value at the address
- 16+  803D FD 77 00         ld (iy),a                   ; load the attr into memory
- 17+  8040 DD 7E 00         ld a,(ix)                   ; load the block number
- 18+  8043 CD BC 80         call screen_getblock        ; get the block data into hl
- 19+  8046 CD B0 80         call screen_showchar        ; show this character here
- 20+  8049 C1               pop bc                      ; get the loop counter back
- 21+  804A DD 23            inc ix                      ; increment level location
- 22+  804C FD 23            inc iy                      ; increment attr location
- 23+  804E 0C               inc c                       ; increment horiz
- 24+  804F 79               ld a,c
- 25+  8050 FE 20            cp 32                       ; check if horiz has reach edge of screen
- 26+  8052 C2 35 80         jp nz,screen_draw0          ; if not, loop
- 27+  8055 0E 00            ld c,0                      ; if so, reset horiz
- 28+  8057 04               inc b                       ; increment vertical
- 29+  8058 78               ld a,b
- 30+  8059 FE 18            cp 24                       ; check if at bottom
- 31+  805B C2 35 80         jp nz,screen_draw0          ; if not, loop
- 32+  805E CD 62 80         call screen_initrocks       ; draw rocks
- 33+  8061 C9               ret
- 34+  8062
- 35+  8062              ; ##########################################################################
- 36+  8062              ; Draw initial rock positions
- 37+  8062              ; Inputs:
- 38+  8062              ; ##########################################################################
- 39+  8062              screen_initrocks:
- 40+  8062 DD 21 6F 84      ld ix,level01rocks          ; load the location of the rock into ix
- 41+  8066 06 04            ld b,4                      ; length of data
- 42+  8068              screen_initrocks0:
- 43+  8068 C5               push bc
- 44+  8069 DD 4E 00         ld c,(ix)                   ; get the horiz coord
- 45+  806C DD 23            inc ix                      ; move to next
- 46+  806E DD 46 00         ld b,(ix)                   ; get the vert coord
- 47+  8071 DD 23            inc ix
- 48+  8073 CD 9E 80         call screen_getcellattradress ; get the memory address of b,c attr into de
- 49+  8076 3E 09            ld a,9                      ; load the block number for rock
- 50+  8078 D5               push de
- 51+  8079 CD C7 80         call screen_getattr         ; get the memory location for this cell's attr into hl
- 52+  807C D1               pop de
- 53+  807D 7E               ld a,(hl)                   ; get the attr value at the address
- 54+  807E 12               ld (de),a                   ; load the attr into memory
- 55+  807F 3E 09            ld a,9                      ; load the block number for rock
- 56+  8081 CD BC 80         call screen_getblock        ; get the block data into hl
- 57+  8084 CD B0 80         call screen_showchar        ; show this character here
- 58+  8087 DD 23            inc ix                      ; move past state
- 59+  8089 C1               pop bc
- 60+  808A 10 DC            djnz screen_initrocks0      ; decrease b and check if zero
- 61+  808C C9               ret
- 62+  808D
- 63+  808D
- 64+  808D              ; ##########################################################################
- 65+  808D              ; Return character cell address of block at (b, c).
- 66+  808D              ; Inputs:
- 67+  808D              ; bc: coords
- 68+  808D              ; Outputs:
- 69+  808D              ; de: memory location
- 70+  808D              ; ##########################################################################
- 71+  808D              screen_getcelladdress:
- 72+  808D 78               ld a,b      ; vertical position.
- 73+  808E E6 18            and 24      ; which segment, 0, 1 or 2?
- 74+  8090 C6 40            add a,64    ; 64*256 = 16384, Spectrum's screen memory.
- 75+  8092 57               ld d,a      ; this is our high byte.
- 76+  8093 78               ld a,b      ; what was that vertical position again?
- 77+  8094 E6 07            and 7       ; which row within segment?
- 78+  8096 0F               rrca        ; multiply row by 32.
- 79+  8097 0F               rrca
- 80+  8098 0F               rrca
- 81+  8099 5F               ld e,a      ; low byte.
- 82+  809A 79               ld a,c      ; add on y coordinate.
- 83+  809B 83               add a,e     ; mix with low byte.
- 84+  809C 5F               ld e,a      ; address of screen position in de.
- 85+  809D C9               ret
- 86+  809E
- 87+  809E              ; ##########################################################################
- 88+  809E              ; Calculate address of attribute for character at (b, c).
- 89+  809E              ; Inputs:
- 90+  809E              ; bc: coords
- 91+  809E              ; Outputs:
- 92+  809E              ; de: memory location
- 93+  809E              ; ##########################################################################
- 94+  809E              screen_getcellattradress:
- 95+  809E 78               ld a,b      ; x position.
- 96+  809F 0F               rrca        ; multiply by 32.
- 97+  80A0 0F               rrca
- 98+  80A1 0F               rrca
- 99+  80A2 5F               ld e,a      ; store away in l.
-100+  80A3 E6 03            and 3       ; mask bits for high byte.
-101+  80A5 C6 58            add a,88    ; 88*256=22528, start of attributes.
-102+  80A7 57               ld d,a      ; high byte done.
-103+  80A8 7B               ld a,e      ; get x*32 again.
-104+  80A9 E6 E0            and 224     ; mask low byte.
-105+  80AB 5F               ld e,a      ; put in l.
-106+  80AC 79               ld a,c      ; get y displacement.
-107+  80AD 83               add a,e     ; add to low byte.
-108+  80AE 5F               ld e,a      ; hl=address of attributes.
-109+  80AF C9               ret
-110+  80B0
-111+  80B0              ; ##########################################################################
-112+  80B0              ; ; Display character hl at (b, c).
-113+  80B0              ; Inputs:
-114+  80B0              ; hl: block address
-115+  80B0              ; de: screen address
-116+  80B0              ; bc: coords
-117+  80B0              ; ##########################################################################
-118+  80B0              screen_showchar:
-119+  80B0 CD 8D 80         call screen_getcelladdress ; find screen address for char.
-120+  80B3 06 08            ld b,8              ; number of pixels high.
-121+  80B5              screen_showchar0:
-122+  80B5 7E               ld a,(hl)           ; source graphic.
-123+  80B6 12               ld (de),a           ; transfer to screen.
-124+  80B7 23               inc hl              ; next piece of data.
-125+  80B8 14               inc d               ; next pixel line.
-126+  80B9 10 FA            djnz screen_showchar0 ; repeat
-127+  80BB C9               ret
-128+  80BC
-129+  80BC
-130+  80BC              ; ##########################################################################
-131+  80BC              ; Get cell graphic.
-132+  80BC              ; Inputs:
-133+  80BC              ; a: block
-134+  80BC              ; Outputs:
-135+  80BC              ; hl: memory
-136+  80BC              ; ##########################################################################
-137+  80BC              screen_getblock:
-138+  80BC 07               rlca                        ; multiply block number by eight.
-139+  80BD 07               rlca
-140+  80BE 07               rlca
-141+  80BF 5F               ld e,a                      ; displacement to graphic address.
-142+  80C0 16 00            ld d,0                      ; no high byte.
-143+  80C2 21 7B 84         ld hl,sprites               ; address of character blocks.
-144+  80C5 19               add hl,de                   ; point to block.
-145+  80C6 C9               ret
-146+  80C7
-147+  80C7              ; ##########################################################################
-148+  80C7              ; Get cell attribute.
-149+  80C7              ; Inputs:
-150+  80C7              ; a: block
-151+  80C7              ; Outputs:
-152+  80C7              ; hl: memory
-153+  80C7              ; ##########################################################################
-154+  80C7              screen_getattr:
-155+  80C7 5F               ld e,a                      ; displacement to attribute address.
-156+  80C8 16 00            ld d,0                      ; no high byte.
-157+  80CA 21 CB 84         ld hl,sprite_attrs          ; address of block attributes.
-158+  80CD 19               add hl,de                   ; point to attribute.
-159+  80CE C9               ret
-160+  80CF
+  1+  802F              screen_offset:
+  2+  802F 00               defb 0                      ; the number of rows to offset the screen
+  3+  8030
+  4+  8030              ;
+  5+  8030              ; Draw the screen
+  6+  8030              ; Inputs:
+  7+  8030              ; none
+  8+  8030              ; Notes:
+  9+  8030              ; The value held at screen_offset tells the screen how many rows to scroll down. Set to five to bottom out.
+ 10+  8030              screen_draw:
+ 11+  8030 0E 00            ld c,0                      ; horiz
+ 12+  8032 06 00            ld b,0                      ; vert, 0 at top
+ 13+  8034 DD 21 78 81      ld ix,level01               ; point ix at level data
+ 14+  8038 3A 2F 80         ld a,(screen_offset)        ; load offset, will be in blocks, we want multiples of 32, so x32
+ 15+  803B 0F               rrca
+ 16+  803C 0F               rrca
+ 17+  803D 0F               rrca
+ 18+  803E 5F               ld e,a
+ 19+  803F 16 00            ld d,0
+ 20+  8041 DD 19            add ix,de                   ; add the offset
+ 21+  8043 FD 21 00 58      ld iy,22528                 ; point iy at attr data
+ 22+  8047                  ;add iy,de                   ; add the offset
+ 23+  8047              screen_draw0:
+ 24+  8047 DD 7E 00         ld a,(ix)                   ; load the block number
+ 25+  804A C5               push bc                     ; store bc, contains loop count
+ 26+  804B CD ED 80         call screen_getattr         ; get the memory location for this cell's attr into hl
+ 27+  804E 7E               ld a,(hl)                   ; get the attr value at the address
+ 28+  804F FD 77 00         ld (iy),a                   ; load the attr into memory
+ 29+  8052 DD 7E 00         ld a,(ix)                   ; load the block number
+ 30+  8055 CD E2 80         call screen_getblock        ; get the block data into hl
+ 31+  8058 CD D6 80         call screen_showchar        ; show this character here
+ 32+  805B C1               pop bc                      ; get the loop counter back
+ 33+  805C DD 23            inc ix                      ; increment level location
+ 34+  805E FD 23            inc iy                      ; increment attr location
+ 35+  8060 0C               inc c                       ; increment horiz
+ 36+  8061 79               ld a,c
+ 37+  8062 FE 20            cp 32                       ; check if horiz has reach edge of screen
+ 38+  8064 C2 47 80         jp nz,screen_draw0          ; if not, loop
+ 39+  8067 0E 00            ld c,0                      ; if so, reset horiz
+ 40+  8069 04               inc b                       ; increment vertical
+ 41+  806A 78               ld a,b
+ 42+  806B FE 18            cp 24                       ; check if at bottom
+ 43+  806D C2 47 80         jp nz,screen_draw0          ; if not, loop
+ 44+  8070 CD 7E 80         call screen_initrocks       ; draw rocks
+ 45+  8073 21 7E 85         ld hl,player_sprite       ; load hl with the location of the player sprite data
+ 46+  8076 ED 4B 10 80      ld bc,(start_coord)         ; load bc with the start coords
+ 47+  807A CD 04 81         call sprites_drawsprite     ; call the routine to draw the sprite
+ 48+  807D C9               ret
+ 49+  807E
+ 50+  807E              ;
+ 51+  807E              ; Draw initial rock positions
+ 52+  807E              ; Inputs:
+ 53+  807E              ;
+ 54+  807E              screen_initrocks:
+ 55+  807E DD 21 18 85      ld ix,level01rocks          ; load the location of the rock into ix
+ 56+  8082 06 04            ld b,4                      ; length of data
+ 57+  8084              screen_initrocks0:
+ 58+  8084 C5               push bc
+ 59+  8085 3A 2F 80         ld a,(screen_offset)        ; load the offset
+ 60+  8088 47               ld b,a
+ 61+  8089 DD 4E 00         ld c,(ix)                   ; get the horiz coord
+ 62+  808C DD 23            inc ix                      ; move to next
+ 63+  808E DD 7E 00         ld a,(ix)                   ; get the vert coord
+ 64+  8091 DD 23            inc ix
+ 65+  8093 B8               cp b
+ 66+  8094 DA AD 80         jp c, screen_initrocks1     ; if the carry flag is not set, a>b, so don't draw rock
+ 67+  8097 90               sub b                       ; subtract offset from vert coord
+ 68+  8098 47               ld b,a                      ; load a back to b for use as the coord
+ 69+  8099 CD C4 80         call screen_getcellattradress ; get the memory address of b,c attr into de
+ 70+  809C 3E 09            ld a,9                      ; load the block number for rock
+ 71+  809E D5               push de
+ 72+  809F CD ED 80         call screen_getattr         ; get the memory location for this cell's attr into hl
+ 73+  80A2 D1               pop de
+ 74+  80A3 7E               ld a,(hl)                   ; get the attr value at the address
+ 75+  80A4 12               ld (de),a                   ; load the attr into memory
+ 76+  80A5 3E 09            ld a,9                      ; load the block number for rock
+ 77+  80A7 CD E2 80         call screen_getblock        ; get the block data into hl
+ 78+  80AA CD D6 80         call screen_showchar        ; show this character here
+ 79+  80AD              screen_initrocks1:
+ 80+  80AD DD 23            inc ix                      ; move past state
+ 81+  80AF C1               pop bc
+ 82+  80B0 10 D2            djnz screen_initrocks0      ; decrease b and check if zero
+ 83+  80B2 C9               ret
+ 84+  80B3
+ 85+  80B3
+ 86+  80B3              ;
+ 87+  80B3              ; Return character cell address offset of block at (b, c) ready for addition to buffer memory.
+ 88+  80B3              ; Inputs:
+ 89+  80B3              ; bc: coords
+ 90+  80B3              ; Outputs:
+ 91+  80B3              ; de: memory location
+ 92+  80B3              ;
+ 93+  80B3              screen_getcelladdress:
+ 94+  80B3 78               ld a,b      ; vertical position.
+ 95+  80B4 E6 18            and 24      ; which segment, 0, 1 or 2?
+ 96+  80B6 C6 40            add a,64    ; 64*256 = 16384, Spectrum's screen memory.
+ 97+  80B8 57               ld d,a      ; this is our high byte.
+ 98+  80B9 78               ld a,b      ; what was that vertical position again?
+ 99+  80BA E6 07            and 7       ; which row within segment?
+100+  80BC 0F               rrca        ; multiply row by 32.
+101+  80BD 0F               rrca
+102+  80BE 0F               rrca
+103+  80BF 5F               ld e,a      ; low byte.
+104+  80C0 79               ld a,c      ; add on y coordinate.
+105+  80C1 83               add a,e     ; mix with low byte.
+106+  80C2 5F               ld e,a      ; address of screen position in de.
+107+  80C3 C9               ret
+108+  80C4
+109+  80C4              ;
+110+  80C4              ; Calculate address of attribute for character at (b, c).
+111+  80C4              ; Inputs:
+112+  80C4              ; bc: coords
+113+  80C4              ; Outputs:
+114+  80C4              ; de: memory location
+115+  80C4              ;
+116+  80C4              screen_getcellattradress:
+117+  80C4 78               ld a,b      ; x position.
+118+  80C5 0F               rrca        ; multiply by 32.
+119+  80C6 0F               rrca
+120+  80C7 0F               rrca
+121+  80C8 5F               ld e,a      ; store away in l.
+122+  80C9 E6 03            and 3       ; mask bits for high byte.
+123+  80CB C6 58            add a,88    ; 88*256=22528, start of attributes.
+124+  80CD 57               ld d,a      ; high byte done.
+125+  80CE 7B               ld a,e      ; get x*32 again.
+126+  80CF E6 E0            and 224     ; mask low byte.
+127+  80D1 5F               ld e,a      ; put in l.
+128+  80D2 79               ld a,c      ; get y displacement.
+129+  80D3 83               add a,e     ; add to low byte.
+130+  80D4 5F               ld e,a      ; hl=address of attributes.
+131+  80D5 C9               ret
+132+  80D6
+133+  80D6              ;
+134+  80D6              ; ; Display character hl at (b, c).
+135+  80D6              ; Inputs:
+136+  80D6              ; hl: block address
+137+  80D6              ; bc: coords
+138+  80D6              ;
+139+  80D6              screen_showchar:
+140+  80D6 CD B3 80         call screen_getcelladdress ; find screen address offset for char.
+141+  80D9 06 08            ld b,8              ; number of pixels high.
+142+  80DB              screen_showchar0:
+143+  80DB 7E               ld a,(hl)           ; source graphic.
+144+  80DC 12               ld (de),a           ; transfer to screen.
+145+  80DD 23               inc hl              ; next piece of data.
+146+  80DE 14               inc d               ; next pixel line.
+147+  80DF 10 FA            djnz screen_showchar0 ; repeat
+148+  80E1 C9               ret
+149+  80E2
+150+  80E2
+151+  80E2              ;
+152+  80E2              ; Get cell graphic.
+153+  80E2              ; Inputs:
+154+  80E2              ; a: block
+155+  80E2              ; Outputs:
+156+  80E2              ; hl: memory
+157+  80E2              ;
+158+  80E2              screen_getblock:
+159+  80E2 07               rlca                        ; multiply block number by eight.
+160+  80E3 07               rlca
+161+  80E4 07               rlca
+162+  80E5 5F               ld e,a                      ; displacement to graphic address.
+163+  80E6 16 00            ld d,0                      ; no high byte.
+164+  80E8 21 24 85         ld hl,sprites               ; address of character blocks.
+165+  80EB 19               add hl,de                   ; point to block.
+166+  80EC C9               ret
+167+  80ED
+168+  80ED              ;
+169+  80ED              ; Get cell attribute.
+170+  80ED              ; Inputs:
+171+  80ED              ; a: block
+172+  80ED              ; Outputs:
+173+  80ED              ; hl: memory
+174+  80ED              ;
+175+  80ED              screen_getattr:
+176+  80ED 5F               ld e,a                      ; displacement to attribute address.
+177+  80EE 16 00            ld d,0                      ; no high byte.
+178+  80F0 21 74 85         ld hl,sprite_attrs          ; address of block attributes.
+179+  80F3 19               add hl,de                   ; point to attribute.
+180+  80F4 C9               ret
+181+  80F5
 # file closed: screen/screen.asm
- 24   80CF
- 25   80CF                  include "leveldata\level01.asm"
+ 24   80F5                  include "screen\sprites.asm"
+# file opened: screen/sprites.asm
+  1+  80F5              ;
+  2+  80F5              ; This is the sprite routine and expects coordinates in (c ,b) form,
+  3+  80F5              ; where c is the vertical coord from the top of the screen (0-176), and
+  4+  80F5              ; b is the horizontal coord from the left of the screen (0 to 240).
+  5+  80F5              ; Sprite data is stored as you'd expect in its unshifted form as this
+  6+  80F5              ; routine takes care of all the shifting itself. This means that sprite
+  7+  80F5              ; handling isn't particularly fast but the graphics only take 1/8th of the
+  8+  80F5              ; space they would require in pre-shifted form.
+  9+  80F5              ; Inputs:
+ 10+  80F5              ; hl - sprite data
+ 11+  80F5              ; bc - screen coords
+ 12+  80F5              ;
+ 13+  80F5              sprites_drawsprite7:
+ 14+  80F5 EE 07            xor 7               ; complement last 3 bits.
+ 15+  80F7 3C               inc a               ; add one for luck!
+ 16+  80F8              sprites_drawsprite3:
+ 17+  80F8                  ;rl d                ; rotate left...
+ 18+  80F8 CB 11            rl c                ; ...into middle byte...
+ 19+  80FA CB 12            rl d                ; ...and finally into left character cell.
+ 20+  80FC 3D               dec a               ; count shifts we've done.
+ 21+  80FD 20 F9            jr nz,sprites_drawsprite3 ; return until all shifts complete.
+ 22+  80FF                                      ; Line of sprite image is now in e + c + d, we need it in form c + d + e.
+ 23+  80FF 79               ld a,c              ; left edge of image is currently in e.
+ 24+  8100 4A               ld c,d              ; put right edge there instead.
+ 25+  8101 57               ld d,a              ; and the left edge back into c.
+ 26+  8102 18 23            jr sprites_drawsprite0   ; we've done the switch so transfer to screen.
+ 27+  8104              sprites_drawsprite:
+ 28+  8104 ED 43 75 81      ld (dispx),bc       ; store coords in dispx for now.
+ 29+  8108 CD 58 81         call sprites_scadd  ; calculate screen address.
+ 30+  810B 3E 08            ld a,8              ; height of sprite in pixels.
+ 31+  810D              sprites_drawsprite1:
+ 32+  810D 08               ex af,af'           ; store loop counter.
+ 33+  810E D5               push de             ; store screen address.
+ 34+  810F 4E               ld c,(hl)           ; first sprite graphic.
+ 35+  8110 23               inc hl              ; increment poiinter to sprite data.
+ 36+  8111                  ;ld d,(hl)           ; next bit of sprite image.
+ 37+  8111                  ;inc hl              ; point to next row of sprite data.
+ 38+  8111 22 77 81         ld (sprtmp),hl      ; store it for later.
+ 39+  8114 16 00            ld d,0              ; blank right byte for now.
+ 40+  8116 78               ld a,b              ; b holds y position.
+ 41+  8117 E6 07            and 7               ; how are we straddling character cells?
+ 42+  8119 28 0C            jr z,sprites_drawsprite0 ; we're not straddling them, don't bother shifting.
+ 43+  811B FE 05            cp 5                ; 5 or more right shifts needed?
+ 44+  811D 30 D6            jr nc,sprites_drawsprite7 ; yes, shift from left as it's quicker.
+ 45+  811F A7               and a               ; oops, carry flag is set so clear it.
+ 46+  8120              sprites_drawsprite2:
+ 47+  8120 CB 19            rr c                ; rotate left byte right...
+ 48+  8122                  ;rr d                ; ...through middle byte...
+ 49+  8122 CB 1A            rr d                ; ...into right byte.
+ 50+  8124 3D               dec a               ; one less shift to do.
+ 51+  8125 20 F9            jr nz,sprites_drawsprite2 ; return until all shifts complete.
+ 52+  8127              sprites_drawsprite0:
+ 53+  8127 E1               pop hl              ; pop screen address from stack.
+ 54+  8128 7E               ld a,(hl)           ; what's there already.
+ 55+  8129 A9               xor c               ; merge in image data.
+ 56+  812A 77               ld (hl),a           ; place onto screen.
+ 57+  812B                  ;inc l               ; next character cell to right please.
+ 58+  812B                  ;ld a,(hl)           ; what's there already.
+ 59+  812B                  ;xor d               ; merge with middle bit of image.
+ 60+  812B                  ;ld (hl),a           ; put back onto screen.
+ 61+  812B 2C               inc l               ; next bit of screen area.
+ 62+  812C 7E               ld a,(hl)           ; what's already there.
+ 63+  812D AA               xor d               ; right edge of sprite image data.
+ 64+  812E 77               ld (hl),a           ; plonk it on screen.
+ 65+  812F 3A 75 81         ld a,(dispx)        ; vertical coordinate.
+ 66+  8132 3C               inc a               ; next line down.
+ 67+  8133 32 75 81         ld (dispx),a        ; store new position.
+ 68+  8136 E6 3F            and 63              ; are we moving to next third of screen?
+ 69+  8138 28 10            jr z,sprites_drawsprite4 ; yes so find next segment.
+ 70+  813A E6 07            and 7               ; moving into character cell below?
+ 71+  813C 28 13            jr z,sprites_drawsprite5 ; yes, find next row.
+ 72+  813E 2D               dec l               ; left 2 bytes.
+ 73+  813F                  ;dec l               ; not straddling 256-byte boundary here.
+ 74+  813F 24               inc h               ; next row of this character cell.
+ 75+  8140              sprites_drawsprite6:
+ 76+  8140 EB               ex de,hl            ; screen address in de.
+ 77+  8141 2A 77 81         ld hl,(sprtmp)      ; restore graphic address.
+ 78+  8144 08               ex af,af'           ; restore loop counter.
+ 79+  8145 3D               dec a               ; decrement it.
+ 80+  8146 C2 0D 81         jp nz,sprites_drawsprite1 ; not reached bottom of sprite yet to repeat.
+ 81+  8149 C9               ret                 ; job done.
+ 82+  814A              sprites_drawsprite4:
+ 83+  814A 11 1F 00         ld de,31            ; next segment is 30 bytes on.
+ 84+  814D 19               add hl,de           ; add to screen address.
+ 85+  814E C3 40 81         jp sprites_drawsprite6   ; repeat.
+ 86+  8151              sprites_drawsprite5:
+ 87+  8151 11 1F F9         ld de,63775         ; minus 1762.
+ 88+  8154 19               add hl,de           ; subtract 1762 from physical screen address.
+ 89+  8155 C3 40 81         jp sprites_drawsprite6   ; rejoin loop.
+ 90+  8158
+ 91+  8158              ;
+ 92+  8158              ; This routine returns a screen address for (c, b) in de.
+ 93+  8158              ; Inputs:
+ 94+  8158              ; de - coords
+ 95+  8158              ;
+ 96+  8158              sprites_scadd:
+ 97+  8158 79               ld a,c              ; get vertical position.
+ 98+  8159 E6 07            and 7               ; line 0-7 within character square.
+ 99+  815B C6 40            add a,64            ; 64 * 256 = 16384 (Start of screen display)
+100+  815D 57               ld d,a              ; line * 256.
+101+  815E 79               ld a,c              ; get vertical again.
+102+  815F 0F               rrca                ; multiply by 32.
+103+  8160 0F               rrca
+104+  8161 0F               rrca
+105+  8162 E6 18            and 24              ; high byte of segment displacement.
+106+  8164 82               add a,d             ; add to existing screen high byte.
+107+  8165 57               ld d,a              ; that's the high byte sorted.
+108+  8166 79               ld a,c              ; 8 character squares per segment.
+109+  8167 07               rlca                ; 8 pixels per cell, mulplied by 4 = 32.
+110+  8168 07               rlca                ; cell x 32 gives position within segment.
+111+  8169 E6 E0            and 224             ; make sure it's a multiple of 32.
+112+  816B 5F               ld e,a              ; vertical coordinate calculation done.
+113+  816C 78               ld a,b              ; y coordinate.
+114+  816D 0F               rrca                ; only need to divide by 8.
+115+  816E 0F               rrca
+116+  816F 0F               rrca
+117+  8170 E6 1F            and 31              ; squares 0 - 31 across screen.
+118+  8172 83               add a,e             ; add to total so far.
+119+  8173 5F               ld e,a              ; hl = address of screen.
+120+  8174 C9               ret
+121+  8175
+122+  8175 00           dispx   defb 0           ; general-use coordinates.
+123+  8176 00           dispy   defb 0
+124+  8177 00           sprtmp  defb 0           ; sprite temporary address.
+125+  8178
+# file closed: screen/sprites.asm
+ 25   8178
+ 26   8178                  include "leveldata\level01.asm"
 # file opened: leveldata/level01.asm
-  1+  80CF              ; ###############################################################
-  2+  80CF              ; Data for level 1
-  3+  80CF              ; ###############################################################
-  4+  80CF              level01:
-  5+  80CF 00 00 05 05      defb 0,0,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,3,5,5,5,5,5,5,5,5,5,5,5,0
-  5+  80D3 05 05 05 05
-  5+  80D7 05 05 05 05
-  5+  80DB 05 05 02 01
-  5+  80DF 01 01 01 03
-  5+  80E3 05 05 05 05
-  5+  80E7 05 05 05 05
-  5+  80EB 05 05 05 00
-  6+  80EF 00 00 05 05      defb 0,0,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,1,1,1,3,5,5,5,5,5,5,5,5,5,0
-  6+  80F3 05 05 05 05
-  6+  80F7 05 05 05 05
-  6+  80FB 02 01 01 01
-  6+  80FF 01 01 01 01
-  6+  8103 01 03 05 05
-  6+  8107 05 05 05 05
-  6+  810B 05 05 05 00
-  7+  810F 00 00 05 05      defb 0,0,5,5,5,5,5,5,5,5,2,1,1,1,1,1,1,1,1,1,1,1,1,3,5,5,5,5,5,5,5,0
-  7+  8113 05 05 05 05
-  7+  8117 05 05 02 01
-  7+  811B 01 01 01 01
-  7+  811F 01 01 01 01
-  7+  8123 01 01 01 03
-  7+  8127 05 05 05 05
-  7+  812B 05 05 05 00
-  8+  812F 00 00 01 01      defb 0,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,5,5,5,5,5,5,0
-  8+  8133 01 01 00 01
-  8+  8137 01 01 01 01
-  8+  813B 01 01 01 01
-  8+  813F 01 01 01 01
-  8+  8143 01 01 01 01
-  8+  8147 03 05 05 05
-  8+  814B 05 05 05 00
-  9+  814F 00 00 01 01      defb 0,0,1,1,4,4,0,4,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0
-  9+  8153 04 04 00 04
-  9+  8157 04 04 01 01
-  9+  815B 01 01 01 01
-  9+  815F 01 01 01 01
-  9+  8163 01 01 01 01
-  9+  8167 01 01 01 01
-  9+  816B 01 00 01 00
- 10+  816F 00 00 01 04      defb 0,0,1,4,0,0,0,4,4,4,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0
- 10+  8173 00 00 00 04
- 10+  8177 04 04 04 04
- 10+  817B 01 01 01 01
- 10+  817F 01 01 01 01
- 10+  8183 01 01 01 01
- 10+  8187 01 00 00 00
- 10+  818B 00 00 01 00
- 11+  818F 00 00 01 04      defb 0,0,1,4,0,1,1,1,1,1,4,4,4,4,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0
- 11+  8193 00 01 01 01
- 11+  8197 01 01 04 04
- 11+  819B 04 04 01 01
- 11+  819F 01 01 01 01
- 11+  81A3 01 00 00 00
- 11+  81A7 00 00 01 01
- 11+  81AB 01 01 01 00
- 12+  81AF 00 00 01 04      defb 0,0,1,4,0,0,0,4,4,1,4,4,4,4,4,4,4,4,0,0,0,0,4,4,4,4,4,4,4,4,1,0
- 12+  81B3 00 00 00 04
- 12+  81B7 04 01 04 04
- 12+  81BB 04 04 04 04
- 12+  81BF 04 04 00 00
- 12+  81C3 00 00 04 04
- 12+  81C7 04 04 04 04
- 12+  81CB 04 04 01 00
- 13+  81CF 00 00 01 01      defb 0,0,1,1,1,4,1,1,1,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,1,0
- 13+  81D3 01 04 01 01
- 13+  81D7 01 01 04 04
- 13+  81DB 04 04 04 04
- 13+  81DF 04 04 00 04
- 13+  81E3 04 04 04 04
- 13+  81E7 04 04 04 04
- 13+  81EB 04 04 01 00
- 14+  81EF 00 00 01 00      defb 0,0,1,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,0,0,0,1,0
- 14+  81F3 00 00 00 00
- 14+  81F7 00 04 04 04
- 14+  81FB 04 04 04 04
- 14+  81FF 04 04 00 04
- 14+  8203 04 04 04 04
- 14+  8207 04 04 00 00
- 14+  820B 00 00 01 00
- 15+  820F 00 00 01 07      defb 0,0,1,7,7,7,7,7,7,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,4,4,0,1,0
- 15+  8213 07 07 07 07
- 15+  8217 07 01 04 04
- 15+  821B 04 04 04 04
- 15+  821F 04 04 00 04
- 15+  8223 04 04 04 04
- 15+  8227 04 04 00 04
- 15+  822B 04 00 01 00
- 16+  822F 00 00 01 00      defb 0,0,1,0,0,0,0,0,0,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,4,4,0,1,0
- 16+  8233 00 00 00 00
- 16+  8237 00 01 04 04
- 16+  823B 04 04 04 04
- 16+  823F 04 04 00 04
- 16+  8243 04 04 04 04
- 16+  8247 04 04 00 04
- 16+  824B 04 00 01 00
- 17+  824F 00 00 01 00      defb 0,0,1,0,0,0,0,0,0,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,4,4,0,1,0
- 17+  8253 00 00 00 00
- 17+  8257 00 01 04 04
- 17+  825B 04 04 04 04
- 17+  825F 04 04 00 04
- 17+  8263 04 04 04 04
- 17+  8267 04 04 00 04
- 17+  826B 04 00 01 00
- 18+  826F 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,1,0
- 18+  8273 06 06 06 06
- 18+  8277 06 01 04 00
- 18+  827B 00 00 00 00
- 18+  827F 00 00 00 00
- 18+  8283 00 00 00 00
- 18+  8287 00 00 00 04
- 18+  828B 04 00 01 00
- 19+  828F 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
- 19+  8293 06 06 06 06
- 19+  8297 06 01 04 00
- 19+  829B 04 04 04 04
- 19+  829F 04 04 00 04
- 19+  82A3 04 04 00 04
- 19+  82A7 04 04 04 04
- 19+  82AB 04 00 01 00
- 20+  82AF 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
- 20+  82B3 06 06 06 06
- 20+  82B7 06 01 04 00
- 20+  82BB 04 04 04 04
- 20+  82BF 04 04 00 04
- 20+  82C3 04 04 00 04
- 20+  82C7 04 04 04 04
- 20+  82CB 04 00 01 00
- 21+  82CF 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
- 21+  82D3 06 06 06 06
- 21+  82D7 06 01 04 00
- 21+  82DB 04 04 04 04
- 21+  82DF 04 04 00 04
- 21+  82E3 04 04 00 04
- 21+  82E7 04 04 04 04
- 21+  82EB 04 00 01 00
- 22+  82EF 00 00 01 01      defb 0,0,1,1,1,1,1,1,1,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
- 22+  82F3 01 01 01 01
- 22+  82F7 01 01 04 00
- 22+  82FB 04 04 04 04
- 22+  82FF 04 04 00 04
- 22+  8303 04 04 00 04
- 22+  8307 04 04 04 04
- 22+  830B 04 00 01 00
- 23+  830F 00 00 01 04      defb 0,0,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,0,4,4,4,0,0,0,0,4,4,4,4,1,0
- 23+  8313 04 04 04 04
- 23+  8317 04 04 04 00
- 23+  831B 04 04 04 04
- 23+  831F 04 04 00 04
- 23+  8323 04 04 00 00
- 23+  8327 00 00 04 04
- 23+  832B 04 04 01 00
- 24+  832F 00 00 01 04      defb 0,0,1,4,4,4,0,0,0,0,0,0,4,4,4,4,4,4,0,4,4,4,4,4,4,0,4,4,4,4,1,0
- 24+  8333 04 04 00 00
- 24+  8337 00 00 00 00
- 24+  833B 04 04 04 04
- 24+  833F 04 04 00 04
- 24+  8343 04 04 04 04
- 24+  8347 04 00 04 04
- 24+  834B 04 04 01 00
- 25+  834F 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,0,4,4,4,4,1,0
- 25+  8353 04 04 00 04
- 25+  8357 04 04 04 04
- 25+  835B 04 04 04 04
- 25+  835F 04 04 00 04
- 25+  8363 04 04 04 04
- 25+  8367 04 00 04 04
- 25+  836B 04 04 01 00
- 26+  836F 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,0,4,4,4,4,1,0
- 26+  8373 04 04 00 04
- 26+  8377 04 04 01 01
- 26+  837B 01 01 01 01
- 26+  837F 01 01 01 01
- 26+  8383 01 01 01 01
- 26+  8387 04 00 04 04
- 26+  838B 04 04 01 00
- 27+  838F 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,4,4,4,4,1,0
- 27+  8393 04 04 00 04
- 27+  8397 04 04 01 00
- 27+  839B 00 00 00 00
- 27+  839F 00 00 00 00
- 27+  83A3 00 00 00 01
- 27+  83A7 04 00 04 04
- 27+  83AB 04 04 01 00
- 28+  83AF 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,4,4,4,4,1,0
- 28+  83B3 04 04 00 04
- 28+  83B7 04 04 01 00
- 28+  83BB 00 00 00 00
- 28+  83BF 00 00 00 00
- 28+  83C3 00 00 00 01
- 28+  83C7 04 00 04 04
- 28+  83CB 04 04 01 00
- 29+  83CF 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,4,4,4,4,1,0
- 29+  83D3 04 04 00 04
- 29+  83D7 04 04 01 00
- 29+  83DB 00 00 00 00
- 29+  83DF 00 00 00 00
- 29+  83E3 00 00 00 01
- 29+  83E7 04 00 04 04
- 29+  83EB 04 04 01 00
- 30+  83EF 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,1,0
- 30+  83F3 04 04 00 04
- 30+  83F7 04 04 04 00
- 30+  83FB 00 00 00 00
- 30+  83FF 00 00 00 00
- 30+  8403 00 00 00 04
- 30+  8407 04 04 04 04
- 30+  840B 04 04 01 00
- 31+  840F 00 00 01 04      defb 0,0,1,4,4,4,4,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,4,4,4,4,4,1,0
- 31+  8413 04 04 04 04
- 31+  8417 04 04 01 00
- 31+  841B 00 00 00 00
- 31+  841F 00 00 00 00
- 31+  8423 00 00 00 01
- 31+  8427 04 04 04 04
- 31+  842B 04 04 01 00
- 32+  842F 00 00 01 04      defb 0,0,1,4,4,4,4,4,4,4,1,0,8,0,1,0,8,0,0,1,0,8,0,1,4,4,4,4,4,4,1,0
- 32+  8433 04 04 04 04
- 32+  8437 04 04 01 00
- 32+  843B 08 00 01 00
- 32+  843F 08 00 00 01
- 32+  8443 00 08 00 01
- 32+  8447 04 04 04 04
- 32+  844B 04 04 01 00
- 33+  844F 00 00 01 01      defb 0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
- 33+  8453 01 01 01 01
- 33+  8457 01 01 01 01
- 33+  845B 01 01 01 01
- 33+  845F 01 01 01 01
- 33+  8463 01 01 01 01
- 33+  8467 01 01 01 01
- 33+  846B 01 01 01 00
- 34+  846F
- 35+  846F              ; ###############################################################
- 36+  846F              ; Rock data: horiz, vert, state
- 37+  846F              ; ###############################################################
- 38+  846F              level01rocks:
- 39+  846F 09 04 00         defb 9,4,0
- 40+  8472 0C 07 00         defb 12,7,0
- 41+  8475 10 07 00         defb 16,7,0
- 42+  8478 0B 09 00         defb 11,9,0
+  1+  8178              ; ###############################################################
+  2+  8178              ; Data for level 1
+  3+  8178              ; ###############################################################
+  4+  8178              level01:
+  5+  8178 00 00 05 05      defb 0,0,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,3,5,5,5,5,5,5,5,5,5,5,5,0
+  5+  817C 05 05 05 05
+  5+  8180 05 05 05 05
+  5+  8184 05 05 02 01
+  5+  8188 01 01 01 03
+  5+  818C 05 05 05 05
+  5+  8190 05 05 05 05
+  5+  8194 05 05 05 00
+  6+  8198 00 00 05 05      defb 0,0,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,1,1,1,3,5,5,5,5,5,5,5,5,5,0
+  6+  819C 05 05 05 05
+  6+  81A0 05 05 05 05
+  6+  81A4 02 01 01 01
+  6+  81A8 01 01 01 01
+  6+  81AC 01 03 05 05
+  6+  81B0 05 05 05 05
+  6+  81B4 05 05 05 00
+  7+  81B8 00 00 05 05      defb 0,0,5,5,5,5,5,5,5,5,2,1,1,1,1,1,1,1,1,1,1,1,1,3,5,5,5,5,5,5,5,0
+  7+  81BC 05 05 05 05
+  7+  81C0 05 05 02 01
+  7+  81C4 01 01 01 01
+  7+  81C8 01 01 01 01
+  7+  81CC 01 01 01 03
+  7+  81D0 05 05 05 05
+  7+  81D4 05 05 05 00
+  8+  81D8 00 00 01 01      defb 0,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,5,5,5,5,5,5,0
+  8+  81DC 01 01 00 01
+  8+  81E0 01 01 01 01
+  8+  81E4 01 01 01 01
+  8+  81E8 01 01 01 01
+  8+  81EC 01 01 01 01
+  8+  81F0 03 05 05 05
+  8+  81F4 05 05 05 00
+  9+  81F8 00 00 01 01      defb 0,0,1,1,4,4,0,4,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0
+  9+  81FC 04 04 00 04
+  9+  8200 04 04 01 01
+  9+  8204 01 01 01 01
+  9+  8208 01 01 01 01
+  9+  820C 01 01 01 01
+  9+  8210 01 01 01 01
+  9+  8214 01 00 01 00
+ 10+  8218 00 00 01 04      defb 0,0,1,4,0,0,0,4,4,4,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0
+ 10+  821C 00 00 00 04
+ 10+  8220 04 04 04 04
+ 10+  8224 01 01 01 01
+ 10+  8228 01 01 01 01
+ 10+  822C 01 01 01 01
+ 10+  8230 01 00 00 00
+ 10+  8234 00 00 01 00
+ 11+  8238 00 00 01 04      defb 0,0,1,4,0,1,1,1,1,1,4,4,4,4,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0
+ 11+  823C 00 01 01 01
+ 11+  8240 01 01 04 04
+ 11+  8244 04 04 01 01
+ 11+  8248 01 01 01 01
+ 11+  824C 01 00 00 00
+ 11+  8250 00 00 01 01
+ 11+  8254 01 01 01 00
+ 12+  8258 00 00 01 04      defb 0,0,1,4,0,0,0,4,4,1,4,4,4,4,4,4,4,4,0,0,0,0,4,4,4,4,4,4,4,4,1,0
+ 12+  825C 00 00 00 04
+ 12+  8260 04 01 04 04
+ 12+  8264 04 04 04 04
+ 12+  8268 04 04 00 00
+ 12+  826C 00 00 04 04
+ 12+  8270 04 04 04 04
+ 12+  8274 04 04 01 00
+ 13+  8278 00 00 01 01      defb 0,0,1,1,1,4,1,1,1,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,1,0
+ 13+  827C 01 04 01 01
+ 13+  8280 01 01 04 04
+ 13+  8284 04 04 04 04
+ 13+  8288 04 04 00 04
+ 13+  828C 04 04 04 04
+ 13+  8290 04 04 04 04
+ 13+  8294 04 04 01 00
+ 14+  8298 00 00 01 00      defb 0,0,1,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,0,0,0,1,0
+ 14+  829C 00 00 00 00
+ 14+  82A0 00 04 04 04
+ 14+  82A4 04 04 04 04
+ 14+  82A8 04 04 00 04
+ 14+  82AC 04 04 04 04
+ 14+  82B0 04 04 00 00
+ 14+  82B4 00 00 01 00
+ 15+  82B8 00 00 01 07      defb 0,0,1,7,7,7,7,7,7,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,4,4,0,1,0
+ 15+  82BC 07 07 07 07
+ 15+  82C0 07 01 04 04
+ 15+  82C4 04 04 04 04
+ 15+  82C8 04 04 00 04
+ 15+  82CC 04 04 04 04
+ 15+  82D0 04 04 00 04
+ 15+  82D4 04 00 01 00
+ 16+  82D8 00 00 01 00      defb 0,0,1,0,0,0,0,0,0,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,4,4,0,1,0
+ 16+  82DC 00 00 00 00
+ 16+  82E0 00 01 04 04
+ 16+  82E4 04 04 04 04
+ 16+  82E8 04 04 00 04
+ 16+  82EC 04 04 04 04
+ 16+  82F0 04 04 00 04
+ 16+  82F4 04 00 01 00
+ 17+  82F8 00 00 01 00      defb 0,0,1,0,0,0,0,0,0,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,0,4,4,0,1,0
+ 17+  82FC 00 00 00 00
+ 17+  8300 00 01 04 04
+ 17+  8304 04 04 04 04
+ 17+  8308 04 04 00 04
+ 17+  830C 04 04 04 04
+ 17+  8310 04 04 00 04
+ 17+  8314 04 00 01 00
+ 18+  8318 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,1,0
+ 18+  831C 06 06 06 06
+ 18+  8320 06 01 04 00
+ 18+  8324 00 00 00 00
+ 18+  8328 00 00 00 00
+ 18+  832C 00 00 00 00
+ 18+  8330 00 00 00 04
+ 18+  8334 04 00 01 00
+ 19+  8338 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
+ 19+  833C 06 06 06 06
+ 19+  8340 06 01 04 00
+ 19+  8344 04 04 04 04
+ 19+  8348 04 04 00 04
+ 19+  834C 04 04 00 04
+ 19+  8350 04 04 04 04
+ 19+  8354 04 00 01 00
+ 20+  8358 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
+ 20+  835C 06 06 06 06
+ 20+  8360 06 01 04 00
+ 20+  8364 04 04 04 04
+ 20+  8368 04 04 00 04
+ 20+  836C 04 04 00 04
+ 20+  8370 04 04 04 04
+ 20+  8374 04 00 01 00
+ 21+  8378 00 00 01 06      defb 0,0,1,6,6,6,6,6,6,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
+ 21+  837C 06 06 06 06
+ 21+  8380 06 01 04 00
+ 21+  8384 04 04 04 04
+ 21+  8388 04 04 00 04
+ 21+  838C 04 04 00 04
+ 21+  8390 04 04 04 04
+ 21+  8394 04 00 01 00
+ 22+  8398 00 00 01 01      defb 0,0,1,1,1,1,1,1,1,1,4,0,4,4,4,4,4,4,0,4,4,4,0,4,4,4,4,4,4,0,1,0
+ 22+  839C 01 01 01 01
+ 22+  83A0 01 01 04 00
+ 22+  83A4 04 04 04 04
+ 22+  83A8 04 04 00 04
+ 22+  83AC 04 04 00 04
+ 22+  83B0 04 04 04 04
+ 22+  83B4 04 00 01 00
+ 23+  83B8 00 00 01 04      defb 0,0,1,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,0,4,4,4,0,0,0,0,4,4,4,4,1,0
+ 23+  83BC 04 04 04 04
+ 23+  83C0 04 04 04 00
+ 23+  83C4 04 04 04 04
+ 23+  83C8 04 04 00 04
+ 23+  83CC 04 04 00 00
+ 23+  83D0 00 00 04 04
+ 23+  83D4 04 04 01 00
+ 24+  83D8 00 00 01 04      defb 0,0,1,4,4,4,0,0,0,0,0,0,4,4,4,4,4,4,0,4,4,4,4,4,4,0,4,4,4,4,1,0
+ 24+  83DC 04 04 00 00
+ 24+  83E0 00 00 00 00
+ 24+  83E4 04 04 04 04
+ 24+  83E8 04 04 00 04
+ 24+  83EC 04 04 04 04
+ 24+  83F0 04 00 04 04
+ 24+  83F4 04 04 01 00
+ 25+  83F8 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,0,4,4,4,4,1,0
+ 25+  83FC 04 04 00 04
+ 25+  8400 04 04 04 04
+ 25+  8404 04 04 04 04
+ 25+  8408 04 04 00 04
+ 25+  840C 04 04 04 04
+ 25+  8410 04 00 04 04
+ 25+  8414 04 04 01 00
+ 26+  8418 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,0,4,4,4,4,1,0
+ 26+  841C 04 04 00 04
+ 26+  8420 04 04 01 01
+ 26+  8424 01 01 01 01
+ 26+  8428 01 01 01 01
+ 26+  842C 01 01 01 01
+ 26+  8430 04 00 04 04
+ 26+  8434 04 04 01 00
+ 27+  8438 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,4,4,4,4,1,0
+ 27+  843C 04 04 00 04
+ 27+  8440 04 04 01 00
+ 27+  8444 00 00 00 00
+ 27+  8448 00 00 00 00
+ 27+  844C 00 00 00 01
+ 27+  8450 04 00 04 04
+ 27+  8454 04 04 01 00
+ 28+  8458 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,4,4,4,4,1,0
+ 28+  845C 04 04 00 04
+ 28+  8460 04 04 01 00
+ 28+  8464 00 00 00 00
+ 28+  8468 00 00 00 00
+ 28+  846C 00 00 00 01
+ 28+  8470 04 00 04 04
+ 28+  8474 04 04 01 00
+ 29+  8478 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,4,4,4,4,1,0
+ 29+  847C 04 04 00 04
+ 29+  8480 04 04 01 00
+ 29+  8484 00 00 00 00
+ 29+  8488 00 00 00 00
+ 29+  848C 00 00 00 01
+ 29+  8490 04 00 04 04
+ 29+  8494 04 04 01 00
+ 30+  8498 00 00 01 04      defb 0,0,1,4,4,4,0,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,1,0
+ 30+  849C 04 04 00 04
+ 30+  84A0 04 04 04 00
+ 30+  84A4 00 00 00 00
+ 30+  84A8 00 00 00 00
+ 30+  84AC 00 00 00 04
+ 30+  84B0 04 04 04 04
+ 30+  84B4 04 04 01 00
+ 31+  84B8 00 00 01 04      defb 0,0,1,4,4,4,4,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,4,4,4,4,4,1,0
+ 31+  84BC 04 04 04 04
+ 31+  84C0 04 04 01 00
+ 31+  84C4 00 00 00 00
+ 31+  84C8 00 00 00 00
+ 31+  84CC 00 00 00 01
+ 31+  84D0 04 04 04 04
+ 31+  84D4 04 04 01 00
+ 32+  84D8 00 00 01 04      defb 0,0,1,4,4,4,4,4,4,4,1,0,8,0,1,0,8,0,0,1,0,8,0,1,4,4,4,4,4,4,1,0
+ 32+  84DC 04 04 04 04
+ 32+  84E0 04 04 01 00
+ 32+  84E4 08 00 01 00
+ 32+  84E8 08 00 00 01
+ 32+  84EC 00 08 00 01
+ 32+  84F0 04 04 04 04
+ 32+  84F4 04 04 01 00
+ 33+  84F8 00 00 01 01      defb 0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
+ 33+  84FC 01 01 01 01
+ 33+  8500 01 01 01 01
+ 33+  8504 01 01 01 01
+ 33+  8508 01 01 01 01
+ 33+  850C 01 01 01 01
+ 33+  8510 01 01 01 01
+ 33+  8514 01 01 01 00
+ 34+  8518
+ 35+  8518              ; ###############################################################
+ 36+  8518              ; Rock data: horiz, vert, state
+ 37+  8518              ; ###############################################################
+ 38+  8518              level01rocks:
+ 39+  8518 09 04 00         defb 9,4,0
+ 40+  851B 0C 07 00         defb 12,7,0
+ 41+  851E 10 07 00         defb 16,7,0
+ 42+  8521 0B 09 00         defb 11,9,0
 # file closed: leveldata/level01.asm
- 26   847B                  include "graphics\sprites.asm"
-# file opened: graphics/sprites.asm
-  1+  847B              ; Tiles graphics.
-  2+  847B              sprites:
-  3+  847B 00 00 00 00      defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 0, space
-  3+  847F 00 00 00 00
-  4+  8483 FF FF FF FF      defb    255,255,255,255,255,255,255,255   ; 1, cyan block
-  4+  8487 FF FF FF FF
-  5+  848B 01 03 07 0F      defb	  1,  3,  7, 15, 31, 63,127,255   ; 2, slope left
-  5+  848F 1F 3F 7F FF
-  6+  8493 80 C0 E0 F0      defb    128,192,224,240,248,252,254,255   ; 3, slope right
-  6+  8497 F8 FC FE FF
-  7+  849B 55 AA 55 AA      defb    85,170, 85,170, 85,170, 85,170    ; 4, dirt
-  7+  849F 55 AA 55 AA
-  8+  84A3 FF FF FF FF      defb    255,255,255,255,255,255,255,255   ; 5, sky block
-  8+  84A7 FF FF FF FF
-  9+  84AB FF FF FF FF      defb    255,255,255,255,255,255,255,255   ; 6, slime block
-  9+  84AF FF FF FF FF
- 10+  84B3 FF FF 00 00      defb    255,255,  0,  0,  0,  0,  0,  0   ; 7, trapdoor
- 10+  84B7 00 00 00 00
- 11+  84BB 18 2C 4E 8F      defb    24, 44, 78,143,241,114, 52, 24    ; 8, gem
- 11+  84BF F1 72 34 18
- 12+  84C3 1C 7E FF 7F      defb    28,126,255,127,254,252,127, 62    ; 9, rock
- 12+  84C7 FE FC 7F 3E
- 13+  84CB
- 14+  84CB              sprite_attrs:
- 15+  84CB 00               defb    000 ; 0, space
- 16+  84CC 65               defb    101 ; 1, cyan block
- 17+  84CD 4D               defb    077 ; 2, slope left
- 18+  84CE 4D               defb    077 ; 3, slope right
- 19+  84CF 46               defb    070 ; 4, dirt
- 20+  84D0 41               defb    065 ; 5, sky
- 21+  84D1 4C               defb    076 ; 6, slime
- 22+  84D2 42               defb    066 ; 7, trapdoor
- 23+  84D3 46               defb    070 ; 8, gem
- 24+  84D4 42               defb    066 ; 9, rock
-# file closed: graphics/sprites.asm
- 27   84D5
- 28   84D5              ;===========================================================================
- 29   84D5              ; main routine - the code execution starts here.
- 30   84D5              ; Sets up the new interrupt routine, the memory
- 31   84D5              ; banks and jumps to the start loop.
- 32   84D5              ;===========================================================================
- 33   84D5              main:
- 34   84D5                  ; Disable interrupts
- 35   84D5 F3               di
- 36   84D6
- 37   84D6                  ; Setup stack
- 38   84D6 31 AD 85         ld sp,stack_top
- 39   84D9
- 40   84D9 CD 00 80         call init_start
- 41   84DC CD 29 80         call screen_draw
- 42   84DF
- 43   84DF              mloop:
- 44   84DF
- 45   84DF 76               halt
- 46   84E0 C3 DF 84         jp mloop
- 47   84E3
- 48   84E3
- 49   84E3              ;===========================================================================
- 50   84E3              ; Stack.
- 51   84E3              ;===========================================================================
- 52   84E3
- 53   84E3              ; Stack: this area is reserved for the stack
- 54   84E3              STACK_SIZE: equ 100    ; in words
- 55   84E3
- 56   84E3              ; Reserve stack space
- 57   84E3 00 00            defw 0  ; WPMEM, 2
- 58   84E5              stack_bottom:
- 59   84E5 00 00 00...      defs    STACK_SIZE*2, 0
- 60   85AD              stack_top:
- 61   85AD 00 00            defw 0  ; WPMEM, 2
- 62   85AF
- 63   85AF                     SAVESNA "ThePit.sna", main
+ 27   8524                  include "graphics\graphics.asm"
+# file opened: graphics/graphics.asm
+  1+  8524              ; Tiles graphics.
+  2+  8524              sprites:
+  3+  8524 00 00 00 00      defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 0, space
+  3+  8528 00 00 00 00
+  4+  852C FF FF FF FF      defb    255,255,255,255,255,255,255,255   ; 1, cyan block
+  4+  8530 FF FF FF FF
+  5+  8534 01 03 07 0F      defb	  1,  3,  7, 15, 31, 63,127,255   ; 2, slope left
+  5+  8538 1F 3F 7F FF
+  6+  853C 80 C0 E0 F0      defb    128,192,224,240,248,252,254,255   ; 3, slope right
+  6+  8540 F8 FC FE FF
+  7+  8544 55 AA 55 AA      defb    85,170, 85,170, 85,170, 85,170    ; 4, dirt
+  7+  8548 55 AA 55 AA
+  8+  854C FF FF FF FF      defb    255,255,255,255,255,255,255,255   ; 5, sky block
+  8+  8550 FF FF FF FF
+  9+  8554 FF FF FF FF      defb    255,255,255,255,255,255,255,255   ; 6, slime block
+  9+  8558 FF FF FF FF
+ 10+  855C FF FF 00 00      defb    255,255,  0,  0,  0,  0,  0,  0   ; 7, trapdoor
+ 10+  8560 00 00 00 00
+ 11+  8564 18 2C 4E 8F      defb    24, 44, 78,143,241,114, 52, 24    ; 8, gem
+ 11+  8568 F1 72 34 18
+ 12+  856C 1C 7E FF 7F      defb    28,126,255,127,254,252,127, 62    ; 9, rock
+ 12+  8570 FE FC 7F 3E
+ 13+  8574
+ 14+  8574              sprite_attrs:
+ 15+  8574 47               defb    071 ; 0, space
+ 16+  8575 65               defb    101 ; 1, cyan block
+ 17+  8576 4D               defb    077 ; 2, slope left
+ 18+  8577 4D               defb    077 ; 3, slope right
+ 19+  8578 46               defb    070 ; 4, dirt
+ 20+  8579 41               defb    065 ; 5, sky
+ 21+  857A 4C               defb    076 ; 6, slime
+ 22+  857B 42               defb    066 ; 7, trapdoor
+ 23+  857C 46               defb    070 ; 8, gem
+ 24+  857D 42               defb    066 ; 9, rock
+ 25+  857E
+ 26+  857E              player_sprite:
+ 27+  857E 10 38 10 3F      defb    16, 56, 16, 63, 60, 56,104, 76  ; 0, default pose
+ 27+  8582 3C 38 68 4C
+ 28+  8586
+# file closed: graphics/graphics.asm
+ 28   8586
+ 29   8586              ;===========================================================================
+ 30   8586              ; main routine - the code execution starts here.
+ 31   8586              ; Sets up the new interrupt routine, the memory
+ 32   8586              ; banks and jumps to the start loop.
+ 33   8586              ;===========================================================================
+ 34   8586              main:
+ 35   8586                  ; Disable interrupts
+ 36   8586                  ;di
+ 37   8586
+ 38   8586                  ; Setup stack
+ 39   8586 31 5D 86         ld sp,stack_top
+ 40   8589
+ 41   8589 CD 00 80         call init_start
+ 42   858C CD 30 80         call screen_draw
+ 43   858F
+ 44   858F              mloop:
+ 45   858F
+ 46   858F 76               halt
+ 47   8590 C3 8F 85         jp mloop
+ 48   8593
+ 49   8593
+ 50   8593              ;===========================================================================
+ 51   8593              ; Stack.
+ 52   8593              ;===========================================================================
+ 53   8593
+ 54   8593              ; Stack: this area is reserved for the stack
+ 55   8593              STACK_SIZE: equ 100    ; in words
+ 56   8593
+ 57   8593              ; Reserve stack space
+ 58   8593 00 00            defw 0  ; WPMEM, 2
+ 59   8595              stack_bottom:
+ 60   8595 00 00 00...      defs    STACK_SIZE*2, 0
+ 61   865D              stack_top:
+ 62   865D 00 00            defw 0  ; WPMEM, 2
+ 63   865F
+ 64   865F                     SAVESNA "ThePit.sna", main
 # file closed: main.asm

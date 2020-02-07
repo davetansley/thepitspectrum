@@ -21,9 +21,10 @@
     include "utilities.asm"
     include "strings.asm"
     include "screen\screen.asm"
+    include "screen\sprites.asm"
 
     include "leveldata\level01.asm"
-    include "graphics\sprites.asm"
+    include "graphics\graphics.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -32,17 +33,17 @@
 ;===========================================================================
 main:
     ; Disable interrupts
-    di
+    ;di
  
     ; Setup stack
     ld sp,stack_top
 
     call init_start
     call screen_draw
-
+    
 mloop:    
 
-    halt   
+    halt 
     jp mloop
     
 

@@ -1,6 +1,6 @@
-; ###########################################################################
+;
 ; Set up at start up
-; ###########################################################################
+;
 init_start:
 ; We want a black screen.
     call $0D6B
@@ -12,3 +12,15 @@ init_start:
     call 3503           ; ROM routine - clears screen, opens chan 2.
     
     ret
+
+;
+;   Start coord
+;   vert, horiz
+start_coord:
+    defb 24,48  
+
+;
+;   Data for players
+;   horiz,vert,dir (0 up, 1 down, 2 left, 3 right), frame
+player_one:
+    defb    0,0,0,0

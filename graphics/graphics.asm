@@ -9,10 +9,10 @@ sprites:
     defb    255,255,255,255,255,255,255,255   ; 6, slime block
     defb    255,255,  0,  0,  0,  0,  0,  0   ; 7, trapdoor
     defb    24, 44, 78,143,241,114, 52, 24    ; 8, gem
-    defb    28,126,255,127,254,252,127, 62    ; 9, rock
+    defb    28,126,255,127,254,252,127, 62    ; 9, rock	
     
 sprite_attrs:
-    defb    000 ; 0, space
+    defb    071 ; 0, space
     defb    101 ; 1, cyan block
     defb    077 ; 2, slope left
     defb    077 ; 3, slope right
@@ -22,3 +22,6 @@ sprite_attrs:
     defb    066 ; 7, trapdoor
     defb    070 ; 8, gem
     defb    066 ; 9, rock
+
+player_sprite:
+    defb    16, 56, 16, 63, 60, 56,104, 76  ; 0, default pose
