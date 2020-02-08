@@ -1,11 +1,11 @@
 string_score1: 
-    defb 5,0,'SCORE1',254 
+    defb 4,0,'SCORE1',254 
 string_scorenumbers1:
-    defb 5,1,'000000',254  
+    defb 4,1,'000000',254  
 string_company:
-    defb 15,0,'ENV',254
+    defb 14,0,'ENV',254
 string_credits:
-    defb 13,1,'CREDITS 1',254
+    defb 12,1,'CREDITS 1',254
 string_score2: 
     defb 23,0,'SCORE2',254 
 string_scorenumbers2:

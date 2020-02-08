@@ -114,6 +114,14 @@ screen_buffertoattrs:
     ldir
     ret
 
+screen_setscorecolours:
+    ld hl,score_colours
+    ld de,22528                     ; attrs here                      
+    ld bc,64
+    ldir
+    ret
+
+
 ; Draw the screen
 ; Inputs:
 ; none
@@ -168,6 +176,7 @@ screen_setuptext:
     call string_print
     ld hl, string_scorenumbers2
     call string_print
+    call screen_setscorecolours
     ret
 ;
 ; Draw initial rock positions
