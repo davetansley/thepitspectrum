@@ -677,45 +677,59 @@
  24+  857D 42               defb    066 ; 9, rock
  25+  857E
  26+  857E              player_sprite:
- 27+  857E 10 38 10 3F      defb    16, 56, 16, 63, 60, 56,104, 76  ; 0, default pose
+ 27+  857E 10 38 10 3F      defb   	 16, 56, 16, 63, 60, 56,104, 76 ; 0 right 1
  27+  8582 3C 38 68 4C
- 28+  8586
+ 28+  8586 10 38 10 3F  	defb	 16, 56, 16, 63, 60, 56,108, 64 ; 1 right 2
+ 28+  858A 3C 38 6C 40
+ 29+  858E 08 1C 08 FC  	defb	  8, 28,  8,252, 60, 28, 22, 50 ; 2 left 1
+ 29+  8592 3C 1C 16 32
+ 30+  8596 08 1C 08 FC  	defb	  8, 28,  8,252, 60, 28, 54,  2 ; 3 left 2
+ 30+  859A 3C 1C 36 02
+ 31+  859E 40 E0 40 FC  	defb	 64,224, 64,252,240,240,152,192 ; 4 shoot right
+ 31+  85A2 F0 F0 98 C0
+ 32+  85A6 02 07 02 3F  	defb	 2,  7,  2, 63, 15, 15, 25,  3  ; 4 shoot left
+ 32+  85AA 0F 0F 19 03
+ 33+  85AE 10 39 92 FC  	defb	 16, 57,146,252, 56, 61,195,128 ; 5 up/down 1
+ 33+  85B2 38 3D C3 80
+ 34+  85B6 08 9C 49 3F  	defb	  8,156, 73, 63, 28,188,195,  1 ; 6 up/down 2
+ 34+  85BA 1C BC C3 01
+ 35+  85BE
 # file closed: graphics/graphics.asm
- 28   8586
- 29   8586              ;===========================================================================
- 30   8586              ; main routine - the code execution starts here.
- 31   8586              ; Sets up the new interrupt routine, the memory
- 32   8586              ; banks and jumps to the start loop.
- 33   8586              ;===========================================================================
- 34   8586              main:
- 35   8586                  ; Disable interrupts
- 36   8586                  ;di
- 37   8586
- 38   8586                  ; Setup stack
- 39   8586 31 5D 86         ld sp,stack_top
- 40   8589
- 41   8589 CD 00 80         call init_start
- 42   858C CD 30 80         call screen_draw
- 43   858F
- 44   858F              mloop:
- 45   858F
- 46   858F 76               halt
- 47   8590 C3 8F 85         jp mloop
- 48   8593
- 49   8593
- 50   8593              ;===========================================================================
- 51   8593              ; Stack.
- 52   8593              ;===========================================================================
- 53   8593
- 54   8593              ; Stack: this area is reserved for the stack
- 55   8593              STACK_SIZE: equ 100    ; in words
- 56   8593
- 57   8593              ; Reserve stack space
- 58   8593 00 00            defw 0  ; WPMEM, 2
- 59   8595              stack_bottom:
- 60   8595 00 00 00...      defs    STACK_SIZE*2, 0
- 61   865D              stack_top:
- 62   865D 00 00            defw 0  ; WPMEM, 2
- 63   865F
- 64   865F                     SAVESNA "ThePit.sna", main
+ 28   85BE
+ 29   85BE              ;===========================================================================
+ 30   85BE              ; main routine - the code execution starts here.
+ 31   85BE              ; Sets up the new interrupt routine, the memory
+ 32   85BE              ; banks and jumps to the start loop.
+ 33   85BE              ;===========================================================================
+ 34   85BE              main:
+ 35   85BE                  ; Disable interrupts
+ 36   85BE                  ;di
+ 37   85BE
+ 38   85BE                  ; Setup stack
+ 39   85BE 31 92 86         ld sp,stack_top
+ 40   85C1
+ 41   85C1 CD 00 80         call init_start
+ 42   85C4 CD 30 80         call screen_draw
+ 43   85C7
+ 44   85C7              mloop:
+ 45   85C7
+ 46   85C7 76               halt
+ 47   85C8                  ;jp mloop
+ 48   85C8
+ 49   85C8
+ 50   85C8              ;===========================================================================
+ 51   85C8              ; Stack.
+ 52   85C8              ;===========================================================================
+ 53   85C8
+ 54   85C8              ; Stack: this area is reserved for the stack
+ 55   85C8              STACK_SIZE: equ 100    ; in words
+ 56   85C8
+ 57   85C8              ; Reserve stack space
+ 58   85C8 00 00            defw 0  ; WPMEM, 2
+ 59   85CA              stack_bottom:
+ 60   85CA 00 00 00...      defs    STACK_SIZE*2, 0
+ 61   8692              stack_top:
+ 62   8692 00 00            defw 0  ; WPMEM, 2
+ 63   8694
+ 64   8694                     SAVESNA "ThePit.sna", main
 # file closed: main.asm
