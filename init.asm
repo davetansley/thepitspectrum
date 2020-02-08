@@ -15,9 +15,10 @@ init_start:
 
 ;
 ;   Start coord
-;   vert, horiz
+;   vert c, horiz b 
 start_coord:
-    defb 24,48  
+    defb 24,48
+
 
 ;
 ;   Data for players

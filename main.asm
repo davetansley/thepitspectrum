@@ -42,10 +42,34 @@ main:
     call screen_draw
     
 mloop:    
-
+    di
+    call screen_buffertoscreen
+    ei           ; enable interupts
     halt 
-    ;jp mloop
+    ld bc,65022         ; port for keyboard row.
+    in a,(c)            ; read keyboard.
+    ld b,a              ; store result in b register.
+    rr b                ; check outermost key.
+    call nc,mpl         ; player left.
+    rr b                ; check next key.
+    call nc,mpr         ; player right.
+
+    jp mloop
     
+mpl:
+    ld a,(screen_offset)
+    cp 7
+    ret z
+    inc a
+    ld (screen_offset),a
+    ret
+mpr:
+    ld a,(screen_offset)
+    cp 0
+    ret z
+    dec a
+    ld (screen_offset),a
+    ret
 
 ;===========================================================================
 ; Stack. 
