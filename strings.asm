@@ -1,15 +1,17 @@
 string_score1: 
-    defb 4,0,'SCORE1',254 
+    defb 4,0,'SCORE1',255 
 string_scorenumbers1:
-    defb 4,1,'000000',254  
+    defb 4,1,'000000',255  
 string_company:
-    defb 14,0,'ENV',254
+    defb 14,0,'ENV',255
 string_credits:
-    defb 12,1,'CREDITS 1',254
+    defb 12,1,'CREDITS 1',255
 string_score2: 
-    defb 23,0,'SCORE2',254 
+    defb 23,0,'SCORE2',255
 string_scorenumbers2:
-    defb 23,1,'000000',254  
+    defb 23,1,'000000',255  
+string_titlescreen_copyright:
+    defb 4,22, 127,' 1982 AW ZILEC ELC LTD',255
 
 ;
 ; Prints specified string

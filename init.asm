@@ -18,10 +18,3 @@ init_start:
 ;   vert c, horiz b 
 start_coord:
     defb 24,48
-
-
-;
-;   Data for players
-;   horiz,vert,dir (0 up, 1 down, 2 left, 3 right), frame
-player_one:
-    defb    0,0,0,0

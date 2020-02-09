@@ -41,3 +41,12 @@ utilities_multiply:
         add hl,de   ;--         --
     djnz $-5      ;13*7+8     99
     ret             ;10         10
+
+utilities_waitforkey:
+    ld hl,23560         ; LAST K system variable.
+    ld (hl),0           ; put null value there.
+utilities_waitforkey0: 
+    ld a,(hl)           ; new value of LAST K.
+    cp 0                ; is it still zero?
+    jr z,utilities_waitforkey0           ; yes, so no key pressed.
+    ret                 ; key was pressed.

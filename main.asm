@@ -22,9 +22,14 @@
     include "strings.asm"
     include "screen\screen.asm"
     include "screen\sprites.asm"
+    include "screen\titlescreen.asm"
 
     include "leveldata\level01.asm"
     include "graphics\graphics.asm"
+
+    include "game\control.asm"
+    include "game\game.asm"
+    include "game\player.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -38,38 +43,25 @@ main:
     ; Setup stack
     ld sp,stack_top
 
+    ; Draw the title screen
+    call titlescreen_show
+
     call init_start
     call screen_draw
-    
+    call player_init
+    call player_drawplayer      ; draw player
+
 mloop:    
-    di
-    call screen_buffertoscreen
-    ei           ; enable interupts
     halt 
-    ld bc,65022         ; port for keyboard row.
-    in a,(c)            ; read keyboard.
-    ld b,a              ; store result in b register.
-    rr b                ; check outermost key.
-    call nc,mpl         ; player left.
-    rr b                ; check next key.
-    call nc,mpr         ; player right.
+    di
+    call screen_buffertoscreen  ; copy buffer to screen
+    ei                          ; enable interupts
+    
+    call player_drawplayer      ; delete player
+    call control_keyboard       ; check keyboard
+    call player_drawplayer      ; draw player
 
     jp mloop
-    
-mpl:
-    ld a,(screen_offset)
-    cp 7
-    ret z
-    inc a
-    ld (screen_offset),a
-    ret
-mpr:
-    ld a,(screen_offset)
-    cp 0
-    ret z
-    dec a
-    ld (screen_offset),a
-    ret
 
 ;===========================================================================
 ; Stack. 

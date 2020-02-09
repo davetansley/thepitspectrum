@@ -156,9 +156,6 @@ screen_draw0:
     jp nz,screen_draw0          ; if not, loop
     call screen_initrocks       ; draw rocks
 
-    ld hl,player_sprite       ; load hl with the location of the player sprite data
-    ld bc,(start_coord)         ; load bc with the start coords
-    call sprites_drawsprite     ; call the routine to draw the sprite
     call screen_setuptext       ; draws text on the screen
     ret
 
@@ -175,6 +172,8 @@ screen_setuptext:
     ld hl, string_score2
     call string_print
     ld hl, string_scorenumbers2
+    call string_print
+    ld hl, string_credits
     call string_print
     call screen_setscorecolours
     ret
@@ -256,6 +255,56 @@ screen_getcellattradress:
     ret
 
 ;
+; Calculate buffer address of attribute for character at (b, c).
+; Inputs:
+; bc: coords
+; Outputs:
+; de: memory location
+;
+screen_getscreenattradress:
+    ld de,22528 ; memory is at base + horiz (c) + vert*32 (b)
+    ld l,c      ; x position.
+    ld h,0      ; 0 h
+    add hl,de
+    ld de,hl    ; horiz done
+    ld a,b      ; do vert  
+    push de
+    push bc
+    ld de,32  
+    call utilities_multiply
+    pop bc
+    pop de
+    add hl,de
+    ld de,hl    ; vert done
+    ret
+
+;
+; Gets the attr memory location for a screen coord 
+; Will overwrite bc
+; Inputs:
+; bc - screen coords
+; Outputs:
+; de - memory location
+; bc - character coords
+;
+screen_getattraddressfromscreencoords:
+    ld a,b                          ; get the player block coords of current block
+    and 248                         ; find closest multiple of eight
+    rrca
+    rrca
+    rrca                ; divide by 8
+    ld b,a
+    ld a,c
+    ld c,b                         ; swap b and c
+    and 248
+    rrca
+    rrca
+    rrca                ; divide by 8
+    ld b,a
+    call screen_getcellattradress   ; work out memory location of current block attributes, memory in de
+    ret
+
+;
 ; Get buffer address for a character at b,c - b vert
 ; Buffer memory is stored as sequential block
 ; Char at 0,0 is stored 0,32,64...; 0,1 is stored at 1,33,65 
@@ -273,7 +322,6 @@ screen_getbufferaddress:
     add hl,de               ; add to base
     ld de,hl
     ret
-
 
 ;
 ; Display character hl at (b, c) to buffer.
