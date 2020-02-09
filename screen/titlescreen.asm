@@ -20,6 +20,7 @@ titlescreen_drawtitle0:
     ld b,(ix)                   ; got vert
     inc ix
     call screen_getscreenattradress ; memory in de
+    inc de                      ; slide one to the right, since I'm too lazy to change the data
     ld a,19
     ld (de),a
     pop bc
