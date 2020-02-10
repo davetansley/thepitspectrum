@@ -30,6 +30,7 @@
     include "game\control.asm"
     include "game\game.asm"
     include "game\player.asm"
+    include "game\ship.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -49,7 +50,8 @@ main:
     call init_start
     call screen_draw
     call player_init
-    call player_drawplayer      ; draw player
+    
+    call ship_land              ; land the ship
 
 mloop:    
     halt 
