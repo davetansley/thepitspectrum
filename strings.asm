@@ -3,13 +3,13 @@ string_score1:
 string_scorenumbers1:
     defb 4,1,'000000',255  
 string_company:
-    defb 13,0,'CENTURI',255
+    defb 12,0,'CENTURI',255
 string_credits:
-    defb 12,1,'CREDITS 1',255
+    defb 12,1,'PLAYER 1',255
 string_score2: 
-    defb 23,0,'SCORE2',255
+    defb 22,0,'SCORE2',255
 string_scorenumbers2:
-    defb 23,1,'000000',255  
+    defb 22,1,'000000',255  
 string_titlescreen_copyright:
     defb 4,22, 127,' 1982 AW ZILEC ELC LTD',255
 
