@@ -3,7 +3,7 @@ string_score1:
 string_scorenumbers1:
     defb 4,1,'000000',255  
 string_company:
-    defb 14,0,'ENV',255
+    defb 13,0,'CENTURI',255
 string_credits:
     defb 12,1,'CREDITS 1',255
 string_score2: 
