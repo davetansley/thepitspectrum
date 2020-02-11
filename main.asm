@@ -38,9 +38,7 @@
 ; banks and jumps to the start loop.
 ;===========================================================================
 main:
-    ; Disable interrupts
-    ;di
- 
+    
     ; Setup stack
     ld sp,stack_top
 
@@ -50,9 +48,8 @@ main:
     call init_start
     call screen_draw
     call player_init
-    
     call ship_land              ; land the ship
-
+    
 mloop:    
     halt 
     di

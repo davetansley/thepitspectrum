@@ -1,3 +1,9 @@
+; EQU:
+; Data addresses used by the opcodes that point to uninitialized memory areas.
+L0038:       equ  0038h	; 56. Restart. Called by: L86DE[86DEh], L86DE[86E3h], L86DE[86E4h], L86DE[86E5h], L86DE[86E6h], L86DE[86E7h], L86DE[86E8h], L86DE[86E9h], L86DE[86EFh], L86DE[86F0h], L86DE[86F1h], L86DE[86F2h], L86DE[86F3h], L86DE[86F7h], L86DE[86FAh], L86DE[86FBh], L86DE[86FCh], L86DE[86FDh], L86DE[86FEh], L86DE[8703h], L86DE[8704h], L86DE[8705h], L86DE[8706h], L86DE[8707h], L86DE[8708h], L86DE[8709h], L86DE[870Fh], L86DE[8710h], L86DE[8711h], L86DE[8712h], L86DE[8713h], L86DE[8717h], L86DE[871Ah], L86DE[871Bh], L86DE[871Ch], L86DE[871Dh], L86DE[871Eh], L86DE[8723h], L86DE[8724h], L86DE[8725h], L86DE[8726h], L86DE[8727h], L86DE[8728h], L86DE[8729h], L86DE[872Fh], L86DE[8730h], L86DE[8731h], L86DE[8732h], L86DE[8733h], L86DE[8737h], L86DE[873Ah], L86DE[873Bh], L86DE[873Ch], L86DE[873Dh], L86DE[873Eh].
+L00AA:       equ  00AAh	; 170. Subroutine. Called by: L86DE[8740h].
+
+
              org 33B1h ; 33B1h
 
 
@@ -107,6 +113,113 @@
 3412 5C           defb 5Ch    	; 92, '\'
 3413 CD           defb CDh    	; 205,  -51
 3414 06           defb 06h    	; 6
+; ...
+; ...
+; ...
+
+
+             org 86DEh ; 86DEh
+
+
+; Label not accessed.
+86DE L86DE:
+86DE FF           RST  38h    
+86DF 00           NOP         
+86E0 20 55        JR   NZ,L8737 	; 8737h
+86E2 55           LD   D,L    
+86E3 FF           RST  38h    
+86E4 FF           RST  38h    
+86E5 FF           RST  38h    
+86E6 FF           RST  38h    
+86E7 FF           RST  38h    
+86E8 FF           RST  38h    
+86E9 FF           RST  38h    
+86EA 00           NOP         
+86EB 00           NOP         
+86EC 00           NOP         
+86ED 00           NOP         
+86EE 00           NOP         
+86EF FF           RST  38h    
+86F0 FF           RST  38h    
+86F1 FF           RST  38h    
+86F2 FF           RST  38h    
+86F3 FF           RST  38h    
+86F4 00           NOP         
+86F5 00           NOP         
+86F6 00           NOP         
+86F7 FF           RST  38h    
+86F8 AA           XOR  D      
+86F9 AA           XOR  D      
+86FA FF           RST  38h    
+86FB FF           RST  38h    
+86FC FF           RST  38h    
+86FD FF           RST  38h    
+86FE FF           RST  38h    
+86FF 02           LD   (BC),A 
+8700 00           NOP         
+8701 AA           XOR  D      
+8702 AA           XOR  D      
+8703 FF           RST  38h    
+8704 FF           RST  38h    
+8705 FF           RST  38h    
+8706 FF           RST  38h    
+8707 FF           RST  38h    
+8708 FF           RST  38h    
+8709 FF           RST  38h    
+870A 00           NOP         
+870B 00           NOP         
+870C 00           NOP         
+870D 00           NOP         
+870E 00           NOP         
+870F FF           RST  38h    
+8710 FF           RST  38h    
+8711 FF           RST  38h    
+8712 FF           RST  38h    
+8713 FF           RST  38h    
+8714 00           NOP         
+8715 00           NOP         
+8716 00           NOP         
+8717 FF           RST  38h    
+8718 55           LD   D,L    
+8719 55           LD   D,L    
+871A FF           RST  38h    
+871B FF           RST  38h    
+871C FF           RST  38h    
+871D FF           RST  38h    
+871E FF           RST  38h    
+871F 01 24 55     LD   BC,5524h 	; 21796
+8722 55           LD   D,L    
+8723 FF           RST  38h    
+8724 FF           RST  38h    
+8725 FF           RST  38h    
+8726 FF           RST  38h    
+8727 FF           RST  38h    
+8728 FF           RST  38h    
+8729 FF           RST  38h    
+872A 00           NOP         
+872B 00           NOP         
+872C 00           NOP         
+872D 00           NOP         
+872E 00           NOP         
+872F FF           RST  38h    
+8730 FF           RST  38h    
+8731 FF           RST  38h    
+8732 FF           RST  38h    
+8733 FF           RST  38h    
+8734 00           NOP         
+8735 00           NOP         
+8736 00           NOP         
+8737 L8737:
+8737 FF           RST  38h    
+8738 AA           XOR  D      
+8739 AA           XOR  D      
+873A FF           RST  38h    
+873B FF           RST  38h    
+873C FF           RST  38h    
+873D FF           RST  38h    
+873E FF           RST  38h    
+873F 00           NOP         
+8740 FC AA 00     CALL M,L00AA 	; 00AAh
 ; ...
 ; ...
 ; ...

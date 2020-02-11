@@ -52,20 +52,15 @@ sprites_drawsprite0:
     ld a,(hl)           ; what's there already.
     xor c               ; merge in image data.
     ld (hl),a           ; place onto screen.
-    inc l               ; next bit of screen area.
+    inc hl
     ld a,(hl)           ; what's already there.
     xor d               ; right edge of sprite image data.
     ld (hl),a           ; plonk it on screen.
     ld a,(dispx)        ; vertical coordinate.
     inc a               ; next line down.
     ld (dispx),a        ; store new position.
-    ;and 63              ; are we moving to next third of screen?
-    ;jr z,sprites_drawsprite4 ; yes so find next segment.
-    and 7               ; moving into character cell below?
-    jr z,sprites_drawsprite5 ; yes, find next row.
-    dec l               ; left 2 bytes.
-    ld e,32
-    ld d,0
+    dec hl               
+    ld de,32            ; add 32 to get to the next row
     add hl,de           ; add 32
 sprites_drawsprite6: 
     ex de,hl            ; screen address in de.
@@ -74,11 +69,6 @@ sprites_drawsprite6:
     dec a               ; decrement it.
     jp nz,sprites_drawsprite1 ; not reached bottom of sprite yet to repeat.
     ret                 ; job done.
-sprites_drawsprite5: 
-    ld e,31             ; add 32 to get to the next row, then subtract 1 to move to the previous cell
-    ld d,0
-    add hl,de
-    jp sprites_drawsprite6   ; rejoin loop.
 
 ;
 ; This routine returns a buffer address for (c, b) in de (c vert).
