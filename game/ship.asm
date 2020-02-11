@@ -23,7 +23,7 @@ ship_land:
     ld bc,(ship_initpos)
     ld (ship_initpos2),bc        ; save the initial position for later use
     ld e,0                      ; store a flag to track first time round
-    ld b,8                      ; move down 8 pixels
+    ld b,9                      ; move down 8 pixels
 ship_land0:
     push bc
     ld a,e
@@ -32,7 +32,7 @@ ship_land0:
     jp nz,ship_land1             ; don't draw over previous one if first time
     call ship_draw_full         ; delete old one
     call ship_change_frame      ; increment the frame
-    ld bc,(ship_initpos2) ; get the current coords
+    ld bc,(ship_initpos2)       ; get the current coords
     add c,1                     ; move down one pixels
     ld c,a
     ld (ship_initpos2),bc
@@ -42,13 +42,13 @@ ship_land1:
     pop de
     ld e,1
     pop bc
-    djnz ship_land0
+    djnz ship_land0             ; repeat for downward movement
     ; done moving down
     ; now move across
     call player_drawplayer      ; draw player
     call ship_draw_full         ; delete old one
     ld e,0                      ; store a flag to track first time round
-    ld b,20                      ; move down 8 pixels
+    ld b,20                      ; move back 20 pixels pixels
 ship_land3:
     push bc
     ld a,e
@@ -64,11 +64,11 @@ ship_land3:
     ld (ship_initpos2),bc
 ship_land2:
     call ship_draw_full         ; draw the ship
-    call ship_draw_screen
+    call ship_draw_screen       ; draw the frame to screen by clearing the buffer
     pop de
-    ld e,1
+    ld e,1                      ; set e to 1 to indicate >1 time
     pop bc
-    djnz ship_land3
+    djnz ship_land3             ; repeat for vertical movement
     ret
 
 ;

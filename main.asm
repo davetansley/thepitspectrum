@@ -31,6 +31,7 @@
     include "game\game.asm"
     include "game\player.asm"
     include "game\ship.asm"
+    include "game\tank.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -49,6 +50,7 @@ main:
     call screen_draw
     call player_init
     call ship_land              ; land the ship
+    call tank_init
     
 mloop:    
     halt 
@@ -59,6 +61,9 @@ mloop:
     call player_drawplayer      ; delete player
     call control_keyboard       ; check keyboard
     call player_drawplayer      ; draw player
+    call tank_process           ; prcoess the tank
+
+    call game_incrementframe    ; increment the game frame
 
     jp mloop
 

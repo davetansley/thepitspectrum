@@ -183,10 +183,11 @@ screen_setuptext:
 ;
 screen_initrocks:
     ld ix,level01rocks          ; load the location of the rock into ix
-    ld b,4                      ; length of data
 screen_initrocks0:
-    push bc
     ld c,(ix)                   ; get the horiz coord
+    ld a,c
+    cp 255
+    jp z,screen_initrocks2
     inc ix                      ; move to next
     ld b,(ix)                   ; get the vert coord
     inc ix
@@ -202,8 +203,8 @@ screen_initrocks0:
     call screen_showchar        ; show this character here
 screen_initrocks1:
     inc ix                      ; move past state
-    pop bc
-    djnz screen_initrocks0      ; decrease b and check if zero
+    jp screen_initrocks0      ; decrease b and check if zero
+screen_initrocks2:
     ret
 
 
