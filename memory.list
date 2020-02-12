@@ -1288,7 +1288,7 @@
  30+  AAB2 79               ld a,c                  ; load c into the acc
  31+  AAB3 FE 00            cp 0
  32+  AAB5 CA D5 AA         jp z,control_pl_moveup0 ; are we at the edge of the screen
- 33+  AAB8 FE 82            cp 130
+ 33+  AAB8 FE 62            cp 98
  34+  AABA CC 66 AB         call z, control_scroll_up
  35+  AABD CD 9A AB         call control_checkcanmove_up ; check we can move up, e will be 1 if we can
  36+  AAC0 F5               push af
