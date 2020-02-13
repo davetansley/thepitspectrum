@@ -1171,7 +1171,7 @@
  13+  A98F 00 00 00 00
  14+  A993
  15+  A993              sprite_attrs:
- 16+  A993 47               defb    071 ; 0, space
+ 16+  A993 46               defb    070 ; 0, space
  17+  A994 65               defb    101 ; 1, cyan block
  18+  A995 4D               defb    077 ; 2, slope left
  19+  A996 4D               defb    077 ; 3, slope right
@@ -1260,723 +1260,765 @@
   2+  AA86              ; Check the keyboard then move
   3+  AA86              ;
   4+  AA86              control_keyboard:
-  5+  AA86 01 FE FB         ld bc,64510         ; port for keyboard row q-t.
-  6+  AA89 ED 78            in a,(c)            ; read keyboard.
-  7+  AA8B 47               ld b,a              ; store result in b register.
-  8+  AA8C CB 18            rr b                ; check outermost key (q).
-  9+  AA8E D4 AD AA         call nc,control_pl_moveup         ; player up.
- 10+  AA91 01 FE FD         ld bc,65022         ; port for keyboard row a-f.
- 11+  AA94 ED 78            in a,(c)            ; read keyboard.
- 12+  AA96 47               ld b,a              ; store result in b register.
- 13+  AA97 CB 18            rr b                ; check outermost key (a).
- 14+  AA99 D4 DC AA         call nc,control_pl_movedown       ; player down.
- 15+  AA9C 01 FE DF         ld bc,57342         ; port for keyboard row y-p.
- 16+  AA9F ED 78            in a,(c)            ; read keyboard.
- 17+  AAA1 47               ld b,a              ; store result in b register.
- 18+  AAA2 CB 18            rr b                ; check outermost key (p).
- 19+  AAA4 D4 36 AB         call nc,control_pl_moveright       ; player left.
- 20+  AAA7 CB 18            rr b                ; check next key.
- 21+  AAA9 D4 09 AB         call nc,control_pl_moveleft       ; player right.
- 22+  AAAC C9               ret
- 23+  AAAD
- 24+  AAAD              ;
- 25+  AAAD              ; Moves the player up
- 26+  AAAD              ;
- 27+  AAAD              control_pl_moveup:
- 28+  AAAD C5               push bc
- 29+  AAAE ED 4B 4C AC      ld bc,(player)          ; get the current coords, b horiz, c vert
- 30+  AAB2 79               ld a,c                  ; load c into the acc
- 31+  AAB3 FE 00            cp 0
- 32+  AAB5 CA D5 AA         jp z,control_pl_moveup0 ; are we at the edge of the screen
- 33+  AAB8 FE 60            cp 96
- 34+  AABA CC 66 AB         call z, control_scroll_up
- 35+  AABD CD 9A AB         call control_checkcanmove_up ; check we can move up, e will be 1 if we can
- 36+  AAC0 F5               push af
- 37+  AAC1 7B               ld a,e                  ; put e in a
- 38+  AAC2 FE 00            cp 0
- 39+  AAC4 CA D4 AA         jp z,control_pl_moveup1 ; don't move if we can't
- 40+  AAC7 F1               pop af
- 41+  AAC8 D6 01            sub 1                   ; subtract 2
- 42+  AACA D6 01            sub 1
- 43+  AACC 4F               ld c,a                  ; load back to c
- 44+  AACD ED 43 4C AC      ld (player),bc          ; load back to player
- 45+  AAD1 C3 D5 AA         jp control_pl_moveup0
- 46+  AAD4              control_pl_moveup1:
- 47+  AAD4 F1               pop af                  ; restore af if needed
- 48+  AAD5              control_pl_moveup0:
- 49+  AAD5 3E 00            ld a,0
- 50+  AAD7 32 4E AC         ld (player+2),a        ; set direction to up
- 51+  AADA C1               pop bc
- 52+  AADB C9               ret
- 53+  AADC              ;
- 54+  AADC              ; Moves the player down
- 55+  AADC              ;
- 56+  AADC              control_pl_movedown:
- 57+  AADC C5               push bc
- 58+  AADD ED 4B 4C AC      ld bc,(player)          ; get the current coords, b horiz, c vert
- 59+  AAE1 79               ld a,c                  ; load c into the acc
- 60+  AAE2 FE E0            cp 224
- 61+  AAE4 CA 02 AB         jp z,control_pl_movedown0 ; are we at the edge of the screen
- 62+  AAE7 FE 90            cp 144
- 63+  AAE9 CC 5E AB         call z, control_scroll_down
- 64+  AAEC CD 6E AB         call control_checkcanmove_down ; check we can move down, e will be 1 if we can
- 65+  AAEF F5               push af
- 66+  AAF0 7B               ld a,e                  ; put e in a
- 67+  AAF1 FE 00            cp 0
- 68+  AAF3 CA 01 AB         jp z,control_pl_movedown1 ; don't move if we can't
- 69+  AAF6 F1               pop af
- 70+  AAF7 3C               inc a                   ; add 2
- 71+  AAF8 3C               inc a
- 72+  AAF9 4F               ld c,a                  ; load back to c
- 73+  AAFA ED 43 4C AC      ld (player),bc          ; load back to player
- 74+  AAFE C3 02 AB         jp control_pl_movedown0
- 75+  AB01              control_pl_movedown1:
- 76+  AB01 F1               pop af                  ; restore af if needed
- 77+  AB02              control_pl_movedown0:
- 78+  AB02 3E 00            ld a,0
- 79+  AB04 32 4E AC         ld (player+2),a        ; set direction to down
- 80+  AB07 C1               pop bc
- 81+  AB08 C9               ret
- 82+  AB09              ;
- 83+  AB09              ; Moves the player left
- 84+  AB09              ;
- 85+  AB09              control_pl_moveleft:
- 86+  AB09 C5               push bc
- 87+  AB0A ED 4B 4C AC      ld bc,(player)          ; get the current coords, b horiz, c vert
- 88+  AB0E 78               ld a,b                  ; load b into the acc
- 89+  AB0F FE 10            cp 16
- 90+  AB11 CA 2F AB         jp z,control_pl_moveleft0 ; are we at the edge of the screen
- 91+  AB14 CA 2F AB         jp z,control_pl_moveleft0 ; are we at the edge of the screen
- 92+  AB17 CD 03 AC         call control_checkcanmove_left ; check we can move down, e will be 1 if we can
- 93+  AB1A F5               push af
- 94+  AB1B 7B               ld a,e                  ; put e in a
- 95+  AB1C FE 00            cp 0
- 96+  AB1E CA 56 AB         jp z,control_pl_moveright1 ; don't move if we can't
- 97+  AB21 F1               pop af
- 98+  AB22 D6 01            sub 1                    ; subtract 2
- 99+  AB24 D6 01            sub 1
-100+  AB26 47               ld b,a                  ; load back to c
-101+  AB27 ED 43 4C AC      ld (player),bc          ; load back to player
-102+  AB2B C3 2F AB         jp control_pl_moveleft0
-103+  AB2E              control_pl_moveleft1:
-104+  AB2E F1               pop af
-105+  AB2F              control_pl_moveleft0:
-106+  AB2F 3E 01            ld a,1
-107+  AB31 32 4E AC         ld (player+2),a        ; set direction to left
-108+  AB34 C1               pop bc
-109+  AB35 C9               ret
-110+  AB36              ;
-111+  AB36              ; Moves the player right
-112+  AB36              ;
-113+  AB36              control_pl_moveright:
-114+  AB36 C5               push bc
-115+  AB37 ED 4B 4C AC      ld bc,(player)          ; get the current coords, b horiz, c vert
-116+  AB3B 78               ld a,b                  ; load b into the acc
-117+  AB3C FE F0            cp 240
-118+  AB3E CA 57 AB         jp z,control_pl_moveright0 ; are we at the edge of the screen
-119+  AB41 CD D3 AB         call control_checkcanmove_right ; check we can move down, e will be 1 if we can
-120+  AB44 F5               push af
-121+  AB45 7B               ld a,e                  ; put e in a
-122+  AB46 FE 00            cp 0
-123+  AB48 CA 56 AB         jp z,control_pl_moveright1 ; don't move if we can't
-124+  AB4B F1               pop af
-125+  AB4C 3C               inc a                   ; add 2
-126+  AB4D 3C               inc a
-127+  AB4E 47               ld b,a                  ; load back to b
-128+  AB4F ED 43 4C AC      ld (player),bc          ; load back to player
-129+  AB53 C3 57 AB         jp control_pl_moveright0
-130+  AB56              control_pl_moveright1:
-131+  AB56 F1               pop af                  ; restore af if needed
-132+  AB57              control_pl_moveright0:
-133+  AB57 3E 02            ld a,2
-134+  AB59 32 4E AC         ld (player+2),a        ; set direction to right
-135+  AB5C C1               pop bc
-136+  AB5D C9               ret
-137+  AB5E
-138+  AB5E              ;
-139+  AB5E              ; Scrolls the screen down
-140+  AB5E              ;
-141+  AB5E              control_scroll_down:
-142+  AB5E F5               push af
-143+  AB5F 3E 07            ld a,7
-144+  AB61 32 74 A1         ld (screen_offset),a
-145+  AB64 F1               pop af
-146+  AB65 C9               ret
-147+  AB66
-148+  AB66              ;
-149+  AB66              ; Scrolls the screen up
-150+  AB66              ;
-151+  AB66              control_scroll_up:
-152+  AB66 F5               push af
-153+  AB67 3E 00            ld a,0
-154+  AB69 32 74 A1         ld (screen_offset),a
-155+  AB6C F1               pop af
-156+  AB6D C9               ret
-157+  AB6E
-158+  AB6E              ;
-159+  AB6E              ; Checks if the player can move down
-160+  AB6E              ; Inputs:
-161+  AB6E              ; bc - player coords, b horiz, c vert
-162+  AB6E              ; Outputs:
-163+  AB6E              ; de - 1 can move
-164+  AB6E              control_checkcanmove_down:
-165+  AB6E F5               push af
-166+  AB6F C5               push bc
-167+  AB70 CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-168+  AB73 21 20 00         ld hl,32                        ; look at cell directly underneath (add 32)
-169+  AB76 19               add hl,de                       ; memory location of cell beneath now in hl
-170+  AB77 1E 00            ld e,0                          ; zero de
-171+  AB79 16 00            ld d,0
-172+  AB7B 7E               ld a,(hl)                       ; get attr of cell below
-173+  AB7C FE 47            cp 71
-174+  AB7E C2 97 AB         jp nz, control_checkcanmove_down1 ; don't set flag if not black
-175+  AB81 C1               pop bc                          ; get bc back briefly
-176+  AB82 78               ld a,b                         ; screen coord
-177+  AB83 C5               push bc                         ; put it back for later
-178+  AB84 E6 07            and 7                           ; and with 7
-179+  AB86 FE 00            cp 0
-180+  AB88 CA 92 AB         jp z, control_checkcanmove_down0   ; is multiple of 8 so no need to check next block
-181+  AB8B 23               inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
-182+  AB8C 7E               ld a,(hl)                       ; get attr of cell below
-183+  AB8D FE 47            cp 71
-184+  AB8F C2 97 AB         jp nz, control_checkcanmove_down1 ; don't set flag if not black
-185+  AB92              control_checkcanmove_down0:
-186+  AB92 1E 01            ld e,1
-187+  AB94 CD 76 AC         call player_justmoved
-188+  AB97              control_checkcanmove_down1:
-189+  AB97 C1               pop bc
-190+  AB98 F1               pop af
-191+  AB99 C9               ret
-192+  AB9A
-193+  AB9A              ;
-194+  AB9A              ; Checks if the player can move up
-195+  AB9A              ; Inputs:
-196+  AB9A              ; bc - player coords, b horiz, c vert
-197+  AB9A              ; Outputs:
-198+  AB9A              ; de - 1 can move
-199+  AB9A              control_checkcanmove_up:
-200+  AB9A F5               push af
-201+  AB9B C5               push bc
-202+  AB9C CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-203+  AB9F 62 6B            ld hl,de
-204+  ABA1 C1               pop bc                          ; get bc back briefly
-205+  ABA2 79               ld a,c                         ; screen coord
-206+  ABA3 C5               push bc                         ; put it back for later
-207+  ABA4 E6 07            and 7                           ; and with 7
-208+  ABA6 FE 00            cp 0                            ; need to check if the vert coord is multiple of 8, if it is, subtract 32 from memory address
-209+  ABA8 C2 B0 AB         jp nz,control_checkcanmove_up2
-210+  ABAB 11 20 00         ld de,32                        ; look at cell directly above (sub 32)
-211+  ABAE ED 52            sbc hl,de                       ; memory location of cell above now in hl
-212+  ABB0              control_checkcanmove_up2:
-213+  ABB0 1E 00            ld e,0                          ; zero de
-214+  ABB2 16 00            ld d,0
-215+  ABB4 7E               ld a,(hl)                       ; get attr of cell above
-216+  ABB5 FE 47            cp 71
-217+  ABB7 C2 D0 AB         jp nz, control_checkcanmove_up1 ; don't set flag if not black
-218+  ABBA C1               pop bc                          ; get bc back briefly
-219+  ABBB 78               ld a,b                         ; screen coord
-220+  ABBC C5               push bc                         ; put it back for later
-221+  ABBD E6 07            and 7                           ; and with 7
-222+  ABBF FE 00            cp 0
-223+  ABC1 CA CB AB         jp z, control_checkcanmove_up0   ; is multiple of 8 so no need to check next block
-224+  ABC4 23               inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
-225+  ABC5 7E               ld a,(hl)                       ; get attr of cell below
-226+  ABC6 FE 47            cp 71
-227+  ABC8 C2 D0 AB         jp nz, control_checkcanmove_up1 ; don't set flag if not black
-228+  ABCB              control_checkcanmove_up0:
-229+  ABCB 1E 01            ld e,1
-230+  ABCD CD 76 AC         call player_justmoved
-231+  ABD0              control_checkcanmove_up1:
-232+  ABD0 C1               pop bc
-233+  ABD1 F1               pop af
-234+  ABD2 C9               ret
-235+  ABD3
-236+  ABD3              ;
-237+  ABD3              ; Checks if the player can move right
-238+  ABD3              ; Inputs:
-239+  ABD3              ; bc - player coords, b horiz, c vert
-240+  ABD3              ; Outputs:
-241+  ABD3              ; de - 1 can move
-242+  ABD3              control_checkcanmove_right:
-243+  ABD3 F5               push af
-244+  ABD4 C5               push bc
-245+  ABD5 CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-246+  ABD8 23               inc hl                        ; look at cell directly to the right (add 1)
-247+  ABD9 1E 00            ld e,0                          ; zero de
-248+  ABDB 16 00            ld d,0
-249+  ABDD 7E               ld a,(hl)                       ; get attr of cell to the right
-250+  ABDE FE 47            cp 71
-251+  ABE0 C2 00 AC         jp nz, control_checkcanmove_right1 ; don't set flag if not black
-252+  ABE3 C1               pop bc                          ; get bc back briefly
-253+  ABE4 79               ld a,c                         ; screen coord
-254+  ABE5 C5               push bc                         ; put it back for later
-255+  ABE6 E6 07            and 7                           ; and with 7
-256+  ABE8 FE 00            cp 0
-257+  ABEA CA FB AB         jp z, control_checkcanmove_right0   ; is multiple of 8 so no need to check next block
-258+  ABED 11 20 00         ld de,32                          ; check the next cell down if stradling a block - if c/vert not multiple of 8
-259+  ABF0 19               add hl,de
-260+  ABF1 1E 00            ld e,0
-261+  ABF3 16 00            ld d,0                          ; zero de again
-262+  ABF5 7E               ld a,(hl)                       ; get attr of cell below
-263+  ABF6 FE 47            cp 71
-264+  ABF8 C2 00 AC         jp nz, control_checkcanmove_right1 ; don't set flag if not black
-265+  ABFB              control_checkcanmove_right0:
-266+  ABFB 1E 01            ld e,1
-267+  ABFD CD 76 AC         call player_justmoved
-268+  AC00              control_checkcanmove_right1:
-269+  AC00 C1               pop bc
-270+  AC01 F1               pop af
-271+  AC02 C9               ret
-272+  AC03
-273+  AC03              ;
-274+  AC03              ; Checks if the player can move left
-275+  AC03              ; Inputs:
-276+  AC03              ; bc - player coords, b horiz, c vert
-277+  AC03              ; Outputs:
-278+  AC03              ; de - 1 can move
-279+  AC03              control_checkcanmove_left:
-280+  AC03 F5               push af
-281+  AC04 C5               push bc
-282+  AC05 CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-283+  AC08 62 6B            ld hl,de
-284+  AC0A C1               pop bc                          ; get bc back briefly
-285+  AC0B 78               ld a,b                         ; screen coord
-286+  AC0C C5               push bc                         ; put it back for later
-287+  AC0D E6 07            and 7                           ; and with 7
-288+  AC0F FE 00            cp 0                            ; need to check if the horiz coord is multiple of 8, if it is, subtract 32 from memory address
-289+  AC11 C2 15 AC         jp nz,control_checkcanmove_left2
-290+  AC14 2B               dec hl                       ; memory location of cell left now in hl
-291+  AC15              control_checkcanmove_left2:
-292+  AC15 1E 00            ld e,0                          ; zero de
-293+  AC17 16 00            ld d,0
-294+  AC19 7E               ld a,(hl)                       ; get attr of cell to the right
-295+  AC1A FE 47            cp 71
-296+  AC1C C2 3C AC         jp nz, control_checkcanmove_left1 ; don't set flag if not black
-297+  AC1F C1               pop bc                          ; get bc back briefly
-298+  AC20 79               ld a,c                         ; screen coord
-299+  AC21 C5               push bc                         ; put it back for later
-300+  AC22 E6 07            and 7                           ; and with 7
-301+  AC24 FE 00            cp 0
-302+  AC26 CA 37 AC         jp z, control_checkcanmove_left0   ; is multiple of 8 so no need to check next block
-303+  AC29 11 20 00         ld de,32                          ; check the next cell down if stradling a block - if c/vert not multiple of 8
-304+  AC2C 19               add hl,de
-305+  AC2D 1E 00            ld e,0
-306+  AC2F 16 00            ld d,0                          ; zero de again
-307+  AC31 7E               ld a,(hl)                       ; get attr of cell below
-308+  AC32 FE 47            cp 71
-309+  AC34 C2 3C AC         jp nz, control_checkcanmove_left1 ; don't set flag if not black
-310+  AC37              control_checkcanmove_left0:
-311+  AC37 1E 01            ld e,1
-312+  AC39 CD 76 AC         call player_justmoved
-313+  AC3C              control_checkcanmove_left1:
-314+  AC3C C1               pop bc
-315+  AC3D F1               pop af
-316+  AC3E C9               ret
-317+  AC3F
-318+  AC3F
+  5+  AA86 21 94 AC         ld hl,player+5      ; first, check if the player has pixels left to move
+  6+  AA89 7E               ld a,(hl)
+  7+  AA8A FE 00            cp 0
+  8+  AA8C CA 93 AA         jp z, control_keyboard0
+  9+  AA8F CD BA AA         call control_automove
+ 10+  AA92 C9               ret
+ 11+  AA93              control_keyboard0:
+ 12+  AA93 01 FE FB         ld bc,64510         ; port for keyboard row q-t.
+ 13+  AA96 ED 78            in a,(c)            ; read keyboard.
+ 14+  AA98 47               ld b,a              ; store result in b register.
+ 15+  AA99 CB 18            rr b                ; check outermost key (q).
+ 16+  AA9B D4 E7 AA         call nc,control_pl_moveup         ; player up.
+ 17+  AA9E 01 FE FD         ld bc,65022         ; port for keyboard row a-f.
+ 18+  AAA1 ED 78            in a,(c)            ; read keyboard.
+ 19+  AAA3 47               ld b,a              ; store result in b register.
+ 20+  AAA4 CB 18            rr b                ; check outermost key (a).
+ 21+  AAA6 D4 14 AB         call nc,control_pl_movedown       ; player down.
+ 22+  AAA9 01 FE DF         ld bc,57342         ; port for keyboard row y-p.
+ 23+  AAAC ED 78            in a,(c)            ; read keyboard.
+ 24+  AAAE 47               ld b,a              ; store result in b register.
+ 25+  AAAF CB 18            rr b                ; check outermost key (p).
+ 26+  AAB1 D4 73 AB         call nc,control_pl_moveright       ; player left.
+ 27+  AAB4 CB 18            rr b                ; check next key.
+ 28+  AAB6 D4 40 AB         call nc,control_pl_moveleft       ; player right.
+ 29+  AAB9 C9               ret
+ 30+  AABA
+ 31+  AABA              ;
+ 32+  AABA              ; Auto move the player until pixels is zero
+ 33+  AABA              ;
+ 34+  AABA              control_automove:
+ 35+  AABA 5F               ld e,a              ; store the number of pixels left to move in e
+ 36+  AABB ED 4B 8F AC      ld bc,(player)      ; load the current coords into bc
+ 37+  AABF 21 91 AC         ld hl,player+2      ; get the direction
+ 38+  AAC2 7E               ld a,(hl)
+ 39+  AAC3 FE 00            cp 0                ; up or down?
+ 40+  AAC5 C8               ret z               ; don't need to do anything
+ 41+  AAC6 FE 01            cp 1                ; going left?
+ 42+  AAC8 CA D1 AA         jp z,control_automove0
+ 43+  AACB 78               ld a,b
+ 44+  AACC 3C               inc a               ; if we're going right, increment a twice for two pixels
+ 45+  AACD 3C               inc a
+ 46+  AACE C3 D4 AA         jp control_automove1
+ 47+  AAD1              control_automove0:
+ 48+  AAD1 78               ld a,b
+ 49+  AAD2 3D               dec a               ; if we're going left, decrement a twice
+ 50+  AAD3 3D               dec a
+ 51+  AAD4              control_automove1:
+ 52+  AAD4 ED 4B 8F AC      ld bc,(player)      ; load the current coords into bc
+ 53+  AAD8 47               ld b,a              ; done changing, so write back to b
+ 54+  AAD9 ED 43 8F AC      ld (player),bc      ; and back to player
+ 55+  AADD 7B               ld a,e              ; now get the pixel count back
+ 56+  AADE 3D               dec a               ; decrease by one
+ 57+  AADF 21 94 AC         ld hl,player+5
+ 58+  AAE2 77               ld (hl),a           ; copy back
+ 59+  AAE3 CD BA AC         call player_justmoved
+ 60+  AAE6 C9               ret
+ 61+  AAE7
+ 62+  AAE7              ;
+ 63+  AAE7              ; Moves the player up
+ 64+  AAE7              ;
+ 65+  AAE7              control_pl_moveup:
+ 66+  AAE7 C5               push bc
+ 67+  AAE8 ED 4B 8F AC      ld bc,(player)          ; get the current coords, b horiz, c vert
+ 68+  AAEC 79               ld a,c                  ; load c into the acc
+ 69+  AAED FE 00            cp 0
+ 70+  AAEF CA 0D AB         jp z,control_pl_moveup0 ; are we at the edge of the screen
+ 71+  AAF2 FE 60            cp 96
+ 72+  AAF4 CC A9 AB         call z, control_scroll_up
+ 73+  AAF7 CD DD AB         call control_checkcanmove_up ; check we can move up, e will be 1 if we can
+ 74+  AAFA F5               push af
+ 75+  AAFB 7B               ld a,e                  ; put e in a
+ 76+  AAFC FE 00            cp 0
+ 77+  AAFE CA 0C AB         jp z,control_pl_moveup1 ; don't move if we can't
+ 78+  AB01 F1               pop af
+ 79+  AB02 D6 01            sub 1                   ; subtract 1
+ 80+  AB04 4F               ld c,a                  ; load back to c
+ 81+  AB05 ED 43 8F AC      ld (player),bc          ; load back to player
+ 82+  AB09 C3 0D AB         jp control_pl_moveup0
+ 83+  AB0C              control_pl_moveup1:
+ 84+  AB0C F1               pop af                  ; restore af if needed
+ 85+  AB0D              control_pl_moveup0:
+ 86+  AB0D 3E 00            ld a,0
+ 87+  AB0F 32 91 AC         ld (player+2),a        ; set direction to up
+ 88+  AB12 C1               pop bc
+ 89+  AB13 C9               ret
+ 90+  AB14              ;
+ 91+  AB14              ; Moves the player down
+ 92+  AB14              ;
+ 93+  AB14              control_pl_movedown:
+ 94+  AB14 C5               push bc
+ 95+  AB15 ED 4B 8F AC      ld bc,(player)          ; get the current coords, b horiz, c vert
+ 96+  AB19 79               ld a,c                  ; load c into the acc
+ 97+  AB1A FE E0            cp 224
+ 98+  AB1C CA 39 AB         jp z,control_pl_movedown0 ; are we at the edge of the screen
+ 99+  AB1F FE 90            cp 144
+100+  AB21 CC A1 AB         call z, control_scroll_down
+101+  AB24 CD B1 AB         call control_checkcanmove_down ; check we can move down, e will be 1 if we can
+102+  AB27 F5               push af
+103+  AB28 7B               ld a,e                  ; put e in a
+104+  AB29 FE 00            cp 0
+105+  AB2B CA 38 AB         jp z,control_pl_movedown1 ; don't move if we can't
+106+  AB2E F1               pop af
+107+  AB2F 3C               inc a                   ; add 1
+108+  AB30 4F               ld c,a                  ; load back to c
+109+  AB31 ED 43 8F AC      ld (player),bc          ; load back to player
+110+  AB35 C3 39 AB         jp control_pl_movedown0
+111+  AB38              control_pl_movedown1:
+112+  AB38 F1               pop af                  ; restore af if needed
+113+  AB39              control_pl_movedown0:
+114+  AB39 3E 00            ld a,0
+115+  AB3B 32 91 AC         ld (player+2),a        ; set direction to down
+116+  AB3E C1               pop bc
+117+  AB3F C9               ret
+118+  AB40              ;
+119+  AB40              ; Moves the player left
+120+  AB40              ;
+121+  AB40              control_pl_moveleft:
+122+  AB40 C5               push bc
+123+  AB41 ED 4B 8F AC      ld bc,(player)          ; get the current coords, b horiz, c vert
+124+  AB45 78               ld a,b                  ; load b into the acc
+125+  AB46 FE 10            cp 16
+126+  AB48 CA 6C AB         jp z,control_pl_moveleft0 ; are we at the edge of the screen
+127+  AB4B CA 6C AB         jp z,control_pl_moveleft0 ; are we at the edge of the screen
+128+  AB4E CD 46 AC         call control_checkcanmove_left ; check we can move down, e will be 1 if we can
+129+  AB51 F5               push af
+130+  AB52 7B               ld a,e                  ; put e in a
+131+  AB53 FE 00            cp 0
+132+  AB55 CA 99 AB         jp z,control_pl_moveright1 ; don't move if we can't
+133+  AB58 21 94 AC         ld hl,player+5          ; need to store the amount of pixels still left to move in the player status
+134+  AB5B 3E 03            ld a,3
+135+  AB5D 77               ld (hl),a
+136+  AB5E F1               pop af
+137+  AB5F D6 01            sub 1                    ; subtract 2
+138+  AB61 D6 01            sub 1
+139+  AB63 47               ld b,a                  ; load back to c
+140+  AB64 ED 43 8F AC      ld (player),bc          ; load back to player
+141+  AB68 C3 6C AB         jp control_pl_moveleft0
+142+  AB6B              control_pl_moveleft1:
+143+  AB6B F1               pop af
+144+  AB6C              control_pl_moveleft0:
+145+  AB6C 3E 01            ld a,1
+146+  AB6E 32 91 AC         ld (player+2),a        ; set direction to left
+147+  AB71 C1               pop bc
+148+  AB72 C9               ret
+149+  AB73              ;
+150+  AB73              ; Moves the player right
+151+  AB73              ;
+152+  AB73              control_pl_moveright:
+153+  AB73 C5               push bc
+154+  AB74 ED 4B 8F AC      ld bc,(player)          ; get the current coords, b horiz, c vert
+155+  AB78 78               ld a,b                  ; load b into the acc
+156+  AB79 FE F0            cp 240
+157+  AB7B CA 9A AB         jp z,control_pl_moveright0 ; are we at the edge of the screen
+158+  AB7E CD 16 AC         call control_checkcanmove_right ; check we can move down, e will be 1 if we can
+159+  AB81 F5               push af
+160+  AB82 7B               ld a,e                  ; put e in a
+161+  AB83 FE 00            cp 0
+162+  AB85 CA 99 AB         jp z,control_pl_moveright1 ; don't move if we can't
+163+  AB88 21 94 AC         ld hl,player+5          ; need to store the amount of pixels still left to move in the player status
+164+  AB8B 3E 03            ld a,3
+165+  AB8D 77               ld (hl),a
+166+  AB8E F1               pop af
+167+  AB8F 3C               inc a                   ; add 2
+168+  AB90 3C               inc a
+169+  AB91 47               ld b,a                  ; load back to b
+170+  AB92 ED 43 8F AC      ld (player),bc          ; load back to player
+171+  AB96 C3 9A AB         jp control_pl_moveright0
+172+  AB99              control_pl_moveright1:
+173+  AB99 F1               pop af                  ; restore af if needed
+174+  AB9A              control_pl_moveright0:
+175+  AB9A 3E 02            ld a,2
+176+  AB9C 32 91 AC         ld (player+2),a        ; set direction to right
+177+  AB9F C1               pop bc
+178+  ABA0 C9               ret
+179+  ABA1
+180+  ABA1              ;
+181+  ABA1              ; Scrolls the screen down
+182+  ABA1              ;
+183+  ABA1              control_scroll_down:
+184+  ABA1 F5               push af
+185+  ABA2 3E 07            ld a,7
+186+  ABA4 32 74 A1         ld (screen_offset),a
+187+  ABA7 F1               pop af
+188+  ABA8 C9               ret
+189+  ABA9
+190+  ABA9              ;
+191+  ABA9              ; Scrolls the screen up
+192+  ABA9              ;
+193+  ABA9              control_scroll_up:
+194+  ABA9 F5               push af
+195+  ABAA 3E 00            ld a,0
+196+  ABAC 32 74 A1         ld (screen_offset),a
+197+  ABAF F1               pop af
+198+  ABB0 C9               ret
+199+  ABB1
+200+  ABB1              ;
+201+  ABB1              ; Checks if the player can move down
+202+  ABB1              ; Inputs:
+203+  ABB1              ; bc - player coords, b horiz, c vert
+204+  ABB1              ; Outputs:
+205+  ABB1              ; de - 1 can move
+206+  ABB1              control_checkcanmove_down:
+207+  ABB1 F5               push af
+208+  ABB2 C5               push bc
+209+  ABB3 CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
+210+  ABB6 21 20 00         ld hl,32                        ; look at cell directly underneath (add 32)
+211+  ABB9 19               add hl,de                       ; memory location of cell beneath now in hl
+212+  ABBA 1E 00            ld e,0                          ; zero de
+213+  ABBC 16 00            ld d,0
+214+  ABBE 7E               ld a,(hl)                       ; get attr of cell below
+215+  ABBF FE 46            cp 70
+216+  ABC1 C2 DA AB         jp nz, control_checkcanmove_down1 ; don't set flag if not black
+217+  ABC4 C1               pop bc                          ; get bc back briefly
+218+  ABC5 78               ld a,b                         ; screen coord
+219+  ABC6 C5               push bc                         ; put it back for later
+220+  ABC7 E6 07            and 7                           ; and with 7
+221+  ABC9 FE 00            cp 0
+222+  ABCB CA D5 AB         jp z, control_checkcanmove_down0   ; is multiple of 8 so no need to check next block
+223+  ABCE 23               inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
+224+  ABCF 7E               ld a,(hl)                       ; get attr of cell below
+225+  ABD0 FE 46            cp 70
+226+  ABD2 C2 DA AB         jp nz, control_checkcanmove_down1 ; don't set flag if not black
+227+  ABD5              control_checkcanmove_down0:
+228+  ABD5 1E 01            ld e,1
+229+  ABD7 CD BA AC         call player_justmoved
+230+  ABDA              control_checkcanmove_down1:
+231+  ABDA C1               pop bc
+232+  ABDB F1               pop af
+233+  ABDC C9               ret
+234+  ABDD
+235+  ABDD              ;
+236+  ABDD              ; Checks if the player can move up
+237+  ABDD              ; Inputs:
+238+  ABDD              ; bc - player coords, b horiz, c vert
+239+  ABDD              ; Outputs:
+240+  ABDD              ; de - 1 can move
+241+  ABDD              control_checkcanmove_up:
+242+  ABDD F5               push af
+243+  ABDE C5               push bc
+244+  ABDF CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
+245+  ABE2 62 6B            ld hl,de
+246+  ABE4 C1               pop bc                          ; get bc back briefly
+247+  ABE5 79               ld a,c                         ; screen coord
+248+  ABE6 C5               push bc                         ; put it back for later
+249+  ABE7 E6 07            and 7                           ; and with 7
+250+  ABE9 FE 00            cp 0                            ; need to check if the vert coord is multiple of 8, if it is, subtract 32 from memory address
+251+  ABEB C2 F3 AB         jp nz,control_checkcanmove_up2
+252+  ABEE 11 20 00         ld de,32                        ; look at cell directly above (sub 32)
+253+  ABF1 ED 52            sbc hl,de                       ; memory location of cell above now in hl
+254+  ABF3              control_checkcanmove_up2:
+255+  ABF3 1E 00            ld e,0                          ; zero de
+256+  ABF5 16 00            ld d,0
+257+  ABF7 7E               ld a,(hl)                       ; get attr of cell above
+258+  ABF8 FE 46            cp 70
+259+  ABFA C2 13 AC         jp nz, control_checkcanmove_up1 ; don't set flag if not black
+260+  ABFD C1               pop bc                          ; get bc back briefly
+261+  ABFE 78               ld a,b                         ; screen coord
+262+  ABFF C5               push bc                         ; put it back for later
+263+  AC00 E6 07            and 7                           ; and with 7
+264+  AC02 FE 00            cp 0
+265+  AC04 CA 0E AC         jp z, control_checkcanmove_up0   ; is multiple of 8 so no need to check next block
+266+  AC07 23               inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
+267+  AC08 7E               ld a,(hl)                       ; get attr of cell below
+268+  AC09 FE 46            cp 70
+269+  AC0B C2 13 AC         jp nz, control_checkcanmove_up1 ; don't set flag if not black
+270+  AC0E              control_checkcanmove_up0:
+271+  AC0E 1E 01            ld e,1
+272+  AC10 CD BA AC         call player_justmoved
+273+  AC13              control_checkcanmove_up1:
+274+  AC13 C1               pop bc
+275+  AC14 F1               pop af
+276+  AC15 C9               ret
+277+  AC16
+278+  AC16              ;
+279+  AC16              ; Checks if the player can move right
+280+  AC16              ; Inputs:
+281+  AC16              ; bc - player coords, b horiz, c vert
+282+  AC16              ; Outputs:
+283+  AC16              ; de - 1 can move
+284+  AC16              control_checkcanmove_right:
+285+  AC16 F5               push af
+286+  AC17 C5               push bc
+287+  AC18 CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
+288+  AC1B 23               inc hl                        ; look at cell directly to the right (add 1)
+289+  AC1C 1E 00            ld e,0                          ; zero de
+290+  AC1E 16 00            ld d,0
+291+  AC20 7E               ld a,(hl)                       ; get attr of cell to the right
+292+  AC21 FE 46            cp 70
+293+  AC23 C2 43 AC         jp nz, control_checkcanmove_right1 ; don't set flag if not black
+294+  AC26 C1               pop bc                          ; get bc back briefly
+295+  AC27 79               ld a,c                         ; screen coord
+296+  AC28 C5               push bc                         ; put it back for later
+297+  AC29 E6 07            and 7                           ; and with 7
+298+  AC2B FE 00            cp 0
+299+  AC2D CA 3E AC         jp z, control_checkcanmove_right0   ; is multiple of 8 so no need to check next block
+300+  AC30 11 20 00         ld de,32                          ; check the next cell down if stradling a block - if c/vert not multiple of 8
+301+  AC33 19               add hl,de
+302+  AC34 1E 00            ld e,0
+303+  AC36 16 00            ld d,0                          ; zero de again
+304+  AC38 7E               ld a,(hl)                       ; get attr of cell below
+305+  AC39 FE 46            cp 70
+306+  AC3B C2 43 AC         jp nz, control_checkcanmove_right1 ; don't set flag if not black
+307+  AC3E              control_checkcanmove_right0:
+308+  AC3E 1E 01            ld e,1
+309+  AC40 CD BA AC         call player_justmoved
+310+  AC43              control_checkcanmove_right1:
+311+  AC43 C1               pop bc
+312+  AC44 F1               pop af
+313+  AC45 C9               ret
+314+  AC46
+315+  AC46              ;
+316+  AC46              ; Checks if the player can move left
+317+  AC46              ; Inputs:
+318+  AC46              ; bc - player coords, b horiz, c vert
+319+  AC46              ; Outputs:
+320+  AC46              ; de - 1 can move
+321+  AC46              control_checkcanmove_left:
+322+  AC46 F5               push af
+323+  AC47 C5               push bc
+324+  AC48 CD EE A2         call screen_getattraddressfromscreencoords ; get the memory location of cell into de
+325+  AC4B 62 6B            ld hl,de
+326+  AC4D C1               pop bc                          ; get bc back briefly
+327+  AC4E 78               ld a,b                         ; screen coord
+328+  AC4F C5               push bc                         ; put it back for later
+329+  AC50 E6 07            and 7                           ; and with 7
+330+  AC52 FE 00            cp 0                            ; need to check if the horiz coord is multiple of 8, if it is, subtract 32 from memory address
+331+  AC54 C2 58 AC         jp nz,control_checkcanmove_left2
+332+  AC57 2B               dec hl                       ; memory location of cell left now in hl
+333+  AC58              control_checkcanmove_left2:
+334+  AC58 1E 00            ld e,0                          ; zero de
+335+  AC5A 16 00            ld d,0
+336+  AC5C 7E               ld a,(hl)                       ; get attr of cell to the right
+337+  AC5D FE 46            cp 70
+338+  AC5F C2 7F AC         jp nz, control_checkcanmove_left1 ; don't set flag if not black
+339+  AC62 C1               pop bc                          ; get bc back briefly
+340+  AC63 79               ld a,c                         ; screen coord
+341+  AC64 C5               push bc                         ; put it back for later
+342+  AC65 E6 07            and 7                           ; and with 7
+343+  AC67 FE 00            cp 0
+344+  AC69 CA 7A AC         jp z, control_checkcanmove_left0   ; is multiple of 8 so no need to check next block
+345+  AC6C 11 20 00         ld de,32                          ; check the next cell down if stradling a block - if c/vert not multiple of 8
+346+  AC6F 19               add hl,de
+347+  AC70 1E 00            ld e,0
+348+  AC72 16 00            ld d,0                          ; zero de again
+349+  AC74 7E               ld a,(hl)                       ; get attr of cell below
+350+  AC75 FE 46            cp 70
+351+  AC77 C2 7F AC         jp nz, control_checkcanmove_left1 ; don't set flag if not black
+352+  AC7A              control_checkcanmove_left0:
+353+  AC7A 1E 01            ld e,1
+354+  AC7C CD BA AC         call player_justmoved
+355+  AC7F              control_checkcanmove_left1:
+356+  AC7F C1               pop bc
+357+  AC80 F1               pop af
+358+  AC81 C9               ret
+359+  AC82
+360+  AC82
 # file closed: game/control.asm
- 31   AC3F                  include "game\game.asm"
+ 31   AC82                  include "game\game.asm"
 # file opened: game/game.asm
-  1+  AC3F              ;
-  2+  AC3F              ; The current frame count, incremented each frame
-  3+  AC3F              ;
-  4+  AC3F              game_framenumber:
-  5+  AC3F 00               defb    0
-  6+  AC40
-  7+  AC40              ;
-  8+  AC40              ; Increment frame number by 1
-  9+  AC40              ;
- 10+  AC40              game_incrementframe:
- 11+  AC40 3A 3F AC         ld a,(game_framenumber)
- 12+  AC43 3C               inc a
- 13+  AC44 32 3F AC         ld (game_framenumber),a
- 14+  AC47 C9               ret
- 15+  AC48
- 16+  AC48              ;
- 17+  AC48              ; Returns current frame
- 18+  AC48              ; Outputs:
- 19+  AC48              ; a - current frame
- 20+  AC48              ;
- 21+  AC48              game_getcurrentframe:
- 22+  AC48 3A 3F AC         ld a,(game_framenumber)
- 23+  AC4B C9               ret
+  1+  AC82              ;
+  2+  AC82              ; The current frame count, incremented each frame
+  3+  AC82              ;
+  4+  AC82              game_framenumber:
+  5+  AC82 00               defb    0
+  6+  AC83
+  7+  AC83              ;
+  8+  AC83              ; Increment frame number by 1
+  9+  AC83              ;
+ 10+  AC83              game_incrementframe:
+ 11+  AC83 3A 82 AC         ld a,(game_framenumber)
+ 12+  AC86 3C               inc a
+ 13+  AC87 32 82 AC         ld (game_framenumber),a
+ 14+  AC8A C9               ret
+ 15+  AC8B
+ 16+  AC8B              ;
+ 17+  AC8B              ; Returns current frame
+ 18+  AC8B              ; Outputs:
+ 19+  AC8B              ; a - current frame
+ 20+  AC8B              ;
+ 21+  AC8B              game_getcurrentframe:
+ 22+  AC8B 3A 82 AC         ld a,(game_framenumber)
+ 23+  AC8E C9               ret
 # file closed: game/game.asm
- 32   AC4C                  include "game\player.asm"
+ 32   AC8F                  include "game\player.asm"
 # file opened: game/player.asm
-  1+  AC4C              ;
-  2+  AC4C              ;   Data for current player
-  3+  AC4C              ;   horiz,vert,dir (0 up/down, 1 left, 2 right), frame, frame transition count, is digging (0 no), digging count
-  4+  AC4C              player:
-  5+  AC4C 00 00 02 00      defb    0,0,2,0,1,0,0
-  5+  AC50 01 00 00
-  6+  AC53              ;
-  7+  AC53              ; Initializes a player
-  8+  AC53              ;
-  9+  AC53              player_init:
- 10+  AC53 ED 4B 10 80      ld bc,(start_coord)
- 11+  AC57 ED 43 4C AC      ld (player),bc
- 12+  AC5B C9               ret
- 13+  AC5C
- 14+  AC5C              ;
- 15+  AC5C              ; Draws the player at the current position or deletes them
- 16+  AC5C              ;
- 17+  AC5C              player_drawplayer:
- 18+  AC5C 3A 4E AC         ld a,(player+2)             ; get the current direction
- 19+  AC5F 5F               ld e,a                      ; store in e
- 20+  AC60 3A 4F AC         ld a,(player+3)             ; get the current frame
- 21+  AC63 83               add a,e
- 22+  AC64 07               rlca
- 23+  AC65 07               rlca
- 24+  AC66 07               rlca                        ; multiply by eight
- 25+  AC67 6F               ld l,a
- 26+  AC68 26 00            ld h,0
- 27+  AC6A 11 9E A9         ld de,player_sprite
- 28+  AC6D 19               add hl,de                   ; load hl with the location of the player sprite data
- 29+  AC6E              player_drawplayer0:
- 30+  AC6E ED 4B 4C AC      ld bc,(player)         ; load bc with the start coords
- 31+  AC72 CD 4B A3         call sprites_drawsprite     ; call the routine to draw the sprite
- 32+  AC75 C9               ret
- 33+  AC76
- 34+  AC76              ;
- 35+  AC76              ; Runs after the player just moved. Changes animation frame if required
- 36+  AC76              ;
- 37+  AC76              player_justmoved:
- 38+  AC76 D9               exx
- 39+  AC77 3A 50 AC         ld a,(player+4)             ; get the transition count
- 40+  AC7A FE 00            cp 0
- 41+  AC7C CA 82 AC         jp z, player_justmoved2     ; if zero reset and change the frame
- 42+  AC7F C3 9C AC         jp player_justmoved1       ; otherwise decrease and continue
- 43+  AC82              player_justmoved2:
- 44+  AC82                  ; reset and change frame in here
- 45+  AC82 3E 01            ld a,1
- 46+  AC84 32 50 AC         ld (player+4),a            ; reset back to whatever
- 47+  AC87 3A 4F AC         ld a,(player+3)             ; load the frame
- 48+  AC8A FE 03            cp 3                       ; flip between 3 and 0
- 49+  AC8C C2 94 AC         jp nz, player_justmoved4
- 50+  AC8F 3E 00            ld a,0
- 51+  AC91 C3 96 AC         jp player_justmoved5
- 52+  AC94              player_justmoved4:
- 53+  AC94 3E 03            ld a,3
- 54+  AC96              player_justmoved5:
- 55+  AC96 32 4F AC         ld (player+3),a           ; save back
- 56+  AC99 C3 A0 AC         jp player_justmoved3
- 57+  AC9C              player_justmoved1:
- 58+  AC9C                  ; decrease count
- 59+  AC9C 3D               dec a
- 60+  AC9D 32 50 AC         ld (player+4),a
- 61+  ACA0              player_justmoved3:
- 62+  ACA0 D9               exx;
- 63+  ACA1 C9               ret
+  1+  AC8F              ;
+  2+  AC8F              ;   Data for current player
+  3+  AC8F              ;   horiz,vert,dir (0 up/down, 1 left, 2 right), frame, frame transition count,move remaining, is digging (0 no), digging count
+  4+  AC8F              player:
+  5+  AC8F 00 00 02 00      defb    0,0,2,0,1,0,0,0
+  5+  AC93 01 00 00 00
+  6+  AC97              ;
+  7+  AC97              ; Initializes a player
+  8+  AC97              ;
+  9+  AC97              player_init:
+ 10+  AC97 ED 4B 10 80      ld bc,(start_coord)
+ 11+  AC9B ED 43 8F AC      ld (player),bc
+ 12+  AC9F C9               ret
+ 13+  ACA0
+ 14+  ACA0              ;
+ 15+  ACA0              ; Draws the player at the current position or deletes them
+ 16+  ACA0              ;
+ 17+  ACA0              player_drawplayer:
+ 18+  ACA0 3A 91 AC         ld a,(player+2)             ; get the current direction
+ 19+  ACA3 5F               ld e,a                      ; store in e
+ 20+  ACA4 3A 92 AC         ld a,(player+3)             ; get the current frame
+ 21+  ACA7 83               add a,e
+ 22+  ACA8 07               rlca
+ 23+  ACA9 07               rlca
+ 24+  ACAA 07               rlca                        ; multiply by eight
+ 25+  ACAB 6F               ld l,a
+ 26+  ACAC 26 00            ld h,0
+ 27+  ACAE 11 9E A9         ld de,player_sprite
+ 28+  ACB1 19               add hl,de                   ; load hl with the location of the player sprite data
+ 29+  ACB2              player_drawplayer0:
+ 30+  ACB2 ED 4B 8F AC      ld bc,(player)         ; load bc with the start coords
+ 31+  ACB6 CD 4B A3         call sprites_drawsprite     ; call the routine to draw the sprite
+ 32+  ACB9 C9               ret
+ 33+  ACBA
+ 34+  ACBA              ;
+ 35+  ACBA              ; Runs after the player just moved. Changes animation frame if required
+ 36+  ACBA              ;
+ 37+  ACBA              player_justmoved:
+ 38+  ACBA D9               exx
+ 39+  ACBB 3A 93 AC         ld a,(player+4)             ; get the transition count
+ 40+  ACBE FE 00            cp 0
+ 41+  ACC0 CA C6 AC         jp z, player_justmoved2     ; if zero reset and change the frame
+ 42+  ACC3 C3 E0 AC         jp player_justmoved1       ; otherwise decrease and continue
+ 43+  ACC6              player_justmoved2:
+ 44+  ACC6                  ; reset and change frame in here
+ 45+  ACC6 3E 01            ld a,1
+ 46+  ACC8 32 93 AC         ld (player+4),a            ; reset back to whatever
+ 47+  ACCB 3A 92 AC         ld a,(player+3)             ; load the frame
+ 48+  ACCE FE 03            cp 3                       ; flip between 3 and 0
+ 49+  ACD0 C2 D8 AC         jp nz, player_justmoved4
+ 50+  ACD3 3E 00            ld a,0
+ 51+  ACD5 C3 DA AC         jp player_justmoved5
+ 52+  ACD8              player_justmoved4:
+ 53+  ACD8 3E 03            ld a,3
+ 54+  ACDA              player_justmoved5:
+ 55+  ACDA 32 92 AC         ld (player+3),a           ; save back
+ 56+  ACDD C3 E4 AC         jp player_justmoved3
+ 57+  ACE0              player_justmoved1:
+ 58+  ACE0                  ; decrease count
+ 59+  ACE0 3D               dec a
+ 60+  ACE1 32 93 AC         ld (player+4),a
+ 61+  ACE4              player_justmoved3:
+ 62+  ACE4 D9               exx;
+ 63+  ACE5 C9               ret
 # file closed: game/player.asm
- 33   ACA2                  include "game\ship.asm"
+ 33   ACE6                  include "game\ship.asm"
 # file opened: game/ship.asm
-  1+  ACA2              ;
-  2+  ACA2              ; Ship initial position: vert,horiz
-  3+  ACA2              ;
-  4+  ACA2              ship_initpos:
-  5+  ACA2 00 24            defb 0,36
-  6+  ACA4              ship_initpos2:
-  7+  ACA4 00 00            defb 0,0
-  8+  ACA6              ship_frame:
-  9+  ACA6 00               defb 0
- 10+  ACA7              ;
- 11+  ACA7              ; The current memory location
- 12+  ACA7              ;
- 13+  ACA7              ship_current_sprite:
- 14+  ACA7 00 00            defb 0,0
- 15+  ACA9
- 16+  ACA9              ship_current_coords:
- 17+  ACA9 00 00            defb 0,0
- 18+  ACAB
- 19+  ACAB              ;
- 20+  ACAB              ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
- 21+  ACAB              ;
- 22+  ACAB              ship_land:
- 23+  ACAB ED 4B A2 AC      ld bc,(ship_initpos)
- 24+  ACAF ED 43 A4 AC      ld (ship_initpos2),bc        ; save the initial position for later use
- 25+  ACB3 1E 00            ld e,0                      ; store a flag to track first time round
- 26+  ACB5 06 09            ld b,9                      ; move down 8 pixels
- 27+  ACB7              ship_land0:
- 28+  ACB7 C5               push bc
- 29+  ACB8 7B               ld a,e
- 30+  ACB9 D5               push de                     ; store de for next time round
- 31+  ACBA FE 01            cp 1                        ; check first time flag
- 32+  ACBC C2 D1 AC         jp nz,ship_land1             ; don't draw over previous one if first time
- 33+  ACBF CD 2A AD         call ship_draw_full         ; delete old one
- 34+  ACC2 CD 0E AD         call ship_change_frame      ; increment the frame
- 35+  ACC5 ED 4B A4 AC      ld bc,(ship_initpos2)       ; get the current coords
- 36+  ACC9 81 C6 01         add c,1                     ; move down one pixels
- 37+  ACCC 4F               ld c,a
- 38+  ACCD ED 43 A4 AC      ld (ship_initpos2),bc
- 39+  ACD1              ship_land1:
- 40+  ACD1 CD 2A AD         call ship_draw_full         ; draw the ship
- 41+  ACD4 CD 23 AD         call ship_draw_screen
- 42+  ACD7 D1               pop de
- 43+  ACD8 1E 01            ld e,1
- 44+  ACDA C1               pop bc
- 45+  ACDB 10 DA            djnz ship_land0             ; repeat for downward movement
- 46+  ACDD                  ; done moving down
- 47+  ACDD                  ; now move across
- 48+  ACDD CD 5C AC         call player_drawplayer      ; draw player
- 49+  ACE0 CD 2A AD         call ship_draw_full         ; delete old one
- 50+  ACE3 1E 00            ld e,0                      ; store a flag to track first time round
- 51+  ACE5 06 14            ld b,20                      ; move back 20 pixels pixels
- 52+  ACE7              ship_land3:
- 53+  ACE7 C5               push bc
- 54+  ACE8 7B               ld a,e
- 55+  ACE9 D5               push de                     ; store de for next time round
- 56+  ACEA FE 01            cp 1                        ; check first time flag
- 57+  ACEC C2 01 AD         jp nz,ship_land2             ; don't draw over previous one if first time
- 58+  ACEF CD 2A AD         call ship_draw_full         ; delete old one
- 59+  ACF2 CD 0E AD         call ship_change_frame      ; increment the frame
- 60+  ACF5 ED 4B A4 AC      ld bc,(ship_initpos2)       ; get the current coords
- 61+  ACF9 78               ld a,b
- 62+  ACFA D6 01            sub 1                       ; move back one pixels
- 63+  ACFC 47               ld b,a
- 64+  ACFD ED 43 A4 AC      ld (ship_initpos2),bc
- 65+  AD01              ship_land2:
- 66+  AD01 CD 2A AD         call ship_draw_full         ; draw the ship
- 67+  AD04 CD 23 AD         call ship_draw_screen       ; draw the frame to screen by clearing the buffer
- 68+  AD07 D1               pop de
- 69+  AD08 1E 01            ld e,1                      ; set e to 1 to indicate >1 time
- 70+  AD0A C1               pop bc
- 71+  AD0B 10 DA            djnz ship_land3             ; repeat for vertical movement
- 72+  AD0D C9               ret
- 73+  AD0E
- 74+  AD0E              ;
- 75+  AD0E              ; Swap the animation frame between 0 and 32. This will be added to the memory location later
- 76+  AD0E              ;
- 77+  AD0E              ship_change_frame:
- 78+  AD0E F5               push af
- 79+  AD0F 3A A6 AC         ld a,(ship_frame)
- 80+  AD12 FE 00            cp 0
- 81+  AD14 CA 1C AD         jp z,ship_change_frame0
- 82+  AD17 3E 00            ld a,0                      ; flip to 0
- 83+  AD19 C3 1E AD         jp ship_change_frame1
- 84+  AD1C              ship_change_frame0:
- 85+  AD1C 3E 20            ld a,32                      ; flip to 32
- 86+  AD1E              ship_change_frame1:
- 87+  AD1E 32 A6 AC         ld (ship_frame),a            ; save the frame
- 88+  AD21 F1               pop af
- 89+  AD22 C9               ret
- 90+  AD23
- 91+  AD23              ship_draw_screen:
- 92+  AD23 76               halt
- 93+  AD24 F3               di
- 94+  AD25 CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
- 95+  AD28 FB               ei                          ; enable interupts
- 96+  AD29 C9               ret
- 97+  AD2A
- 98+  AD2A              ship_draw_full:
- 99+  AD2A 21 DE A9         ld hl,ship_sprite
-100+  AD2D ED 4B A4 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
-101+  AD31 22 A7 AC         ld (ship_current_sprite),hl  ; put into memory
-102+  AD34 ED 43 A9 AC      ld (ship_current_coords),bc  ; put into memory
-103+  AD38 CD 57 AD         call ship_draw
-104+  AD3B 08               ex af,af'
-105+  AD3C 3A A6 AC         ld a,(ship_frame)            ; get the animation frame
-106+  AD3F 16 00            ld d,0
-107+  AD41 5F               ld e,a
-108+  AD42 19               add hl,de
-109+  AD43 22 A7 AC         ld (ship_current_sprite),hl  ; put into memory
-110+  AD46 08               ex af,af'
-111+  AD47 ED 4B A4 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
-112+  AD4B 81 C6 08         add c,8                      ; move one line down
-113+  AD4E 4F               ld c,a
-114+  AD4F ED 43 A9 AC      ld (ship_current_coords),bc  ; put into memory
-115+  AD53 CD 57 AD         call ship_draw
-116+  AD56 C9               ret
-117+  AD57
-118+  AD57              ;
-119+  AD57              ; Draw the ship
-120+  AD57              ; Inputs:
-121+  AD57              ; None, all in memory
-122+  AD57              ;
-123+  AD57              ship_draw:
-124+  AD57 3E 04            ld a,4                              ; 4 pieces per half
-125+  AD59              ship_draw0:
-126+  AD59 F5               push af
-127+  AD5A 2A A7 AC         ld hl,(ship_current_sprite)
-128+  AD5D ED 4B A9 AC      ld bc,(ship_current_coords)         ; load bc with the start coords
-129+  AD61 CD 4B A3         call sprites_drawsprite
-130+  AD64 2A A7 AC         ld hl,(ship_current_sprite)
-131+  AD67 ED 4B A9 AC      ld bc,(ship_current_coords)         ; load bc with the start coords
-132+  AD6B 11 08 00         ld de,8
-133+  AD6E 19               add hl,de
-134+  AD6F 80 C6 08         add b,8
-135+  AD72 47               ld b,a
-136+  AD73 22 A7 AC         ld (ship_current_sprite),hl         ; put into memory
-137+  AD76 ED 43 A9 AC      ld (ship_current_coords),bc         ; put into memory
-138+  AD7A F1               pop af
-139+  AD7B 3D               dec a
-140+  AD7C FE 00            cp 0
-141+  AD7E C2 59 AD         jp nz,ship_draw0
-142+  AD81
-143+  AD81 C9               ret
-144+  AD82
+  1+  ACE6              ;
+  2+  ACE6              ; Ship initial position: vert,horiz
+  3+  ACE6              ;
+  4+  ACE6              ship_initpos:
+  5+  ACE6 00 24            defb 0,36
+  6+  ACE8              ship_initpos2:
+  7+  ACE8 00 00            defb 0,0
+  8+  ACEA              ship_frame:
+  9+  ACEA 00               defb 0
+ 10+  ACEB              ;
+ 11+  ACEB              ; The current memory location
+ 12+  ACEB              ;
+ 13+  ACEB              ship_current_sprite:
+ 14+  ACEB 00 00            defb 0,0
+ 15+  ACED
+ 16+  ACED              ship_current_coords:
+ 17+  ACED 00 00            defb 0,0
+ 18+  ACEF
+ 19+  ACEF              ;
+ 20+  ACEF              ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
+ 21+  ACEF              ;
+ 22+  ACEF              ship_land:
+ 23+  ACEF ED 4B E6 AC      ld bc,(ship_initpos)
+ 24+  ACF3 ED 43 E8 AC      ld (ship_initpos2),bc        ; save the initial position for later use
+ 25+  ACF7 1E 00            ld e,0                      ; store a flag to track first time round
+ 26+  ACF9 06 09            ld b,9                      ; move down 8 pixels
+ 27+  ACFB              ship_land0:
+ 28+  ACFB C5               push bc
+ 29+  ACFC 7B               ld a,e
+ 30+  ACFD D5               push de                     ; store de for next time round
+ 31+  ACFE FE 01            cp 1                        ; check first time flag
+ 32+  AD00 C2 15 AD         jp nz,ship_land1             ; don't draw over previous one if first time
+ 33+  AD03 CD 6E AD         call ship_draw_full         ; delete old one
+ 34+  AD06 CD 52 AD         call ship_change_frame      ; increment the frame
+ 35+  AD09 ED 4B E8 AC      ld bc,(ship_initpos2)       ; get the current coords
+ 36+  AD0D 81 C6 01         add c,1                     ; move down one pixels
+ 37+  AD10 4F               ld c,a
+ 38+  AD11 ED 43 E8 AC      ld (ship_initpos2),bc
+ 39+  AD15              ship_land1:
+ 40+  AD15 CD 6E AD         call ship_draw_full         ; draw the ship
+ 41+  AD18 CD 67 AD         call ship_draw_screen
+ 42+  AD1B D1               pop de
+ 43+  AD1C 1E 01            ld e,1
+ 44+  AD1E C1               pop bc
+ 45+  AD1F 10 DA            djnz ship_land0             ; repeat for downward movement
+ 46+  AD21                  ; done moving down
+ 47+  AD21                  ; now move across
+ 48+  AD21 CD A0 AC         call player_drawplayer      ; draw player
+ 49+  AD24 CD 6E AD         call ship_draw_full         ; delete old one
+ 50+  AD27 1E 00            ld e,0                      ; store a flag to track first time round
+ 51+  AD29 06 14            ld b,20                      ; move back 20 pixels pixels
+ 52+  AD2B              ship_land3:
+ 53+  AD2B C5               push bc
+ 54+  AD2C 7B               ld a,e
+ 55+  AD2D D5               push de                     ; store de for next time round
+ 56+  AD2E FE 01            cp 1                        ; check first time flag
+ 57+  AD30 C2 45 AD         jp nz,ship_land2             ; don't draw over previous one if first time
+ 58+  AD33 CD 6E AD         call ship_draw_full         ; delete old one
+ 59+  AD36 CD 52 AD         call ship_change_frame      ; increment the frame
+ 60+  AD39 ED 4B E8 AC      ld bc,(ship_initpos2)       ; get the current coords
+ 61+  AD3D 78               ld a,b
+ 62+  AD3E D6 01            sub 1                       ; move back one pixels
+ 63+  AD40 47               ld b,a
+ 64+  AD41 ED 43 E8 AC      ld (ship_initpos2),bc
+ 65+  AD45              ship_land2:
+ 66+  AD45 CD 6E AD         call ship_draw_full         ; draw the ship
+ 67+  AD48 CD 67 AD         call ship_draw_screen       ; draw the frame to screen by clearing the buffer
+ 68+  AD4B D1               pop de
+ 69+  AD4C 1E 01            ld e,1                      ; set e to 1 to indicate >1 time
+ 70+  AD4E C1               pop bc
+ 71+  AD4F 10 DA            djnz ship_land3             ; repeat for vertical movement
+ 72+  AD51 C9               ret
+ 73+  AD52
+ 74+  AD52              ;
+ 75+  AD52              ; Swap the animation frame between 0 and 32. This will be added to the memory location later
+ 76+  AD52              ;
+ 77+  AD52              ship_change_frame:
+ 78+  AD52 F5               push af
+ 79+  AD53 3A EA AC         ld a,(ship_frame)
+ 80+  AD56 FE 00            cp 0
+ 81+  AD58 CA 60 AD         jp z,ship_change_frame0
+ 82+  AD5B 3E 00            ld a,0                      ; flip to 0
+ 83+  AD5D C3 62 AD         jp ship_change_frame1
+ 84+  AD60              ship_change_frame0:
+ 85+  AD60 3E 20            ld a,32                      ; flip to 32
+ 86+  AD62              ship_change_frame1:
+ 87+  AD62 32 EA AC         ld (ship_frame),a            ; save the frame
+ 88+  AD65 F1               pop af
+ 89+  AD66 C9               ret
+ 90+  AD67
+ 91+  AD67              ship_draw_screen:
+ 92+  AD67 76               halt
+ 93+  AD68 F3               di
+ 94+  AD69 CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
+ 95+  AD6C FB               ei                          ; enable interupts
+ 96+  AD6D C9               ret
+ 97+  AD6E
+ 98+  AD6E              ship_draw_full:
+ 99+  AD6E 21 DE A9         ld hl,ship_sprite
+100+  AD71 ED 4B E8 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
+101+  AD75 22 EB AC         ld (ship_current_sprite),hl  ; put into memory
+102+  AD78 ED 43 ED AC      ld (ship_current_coords),bc  ; put into memory
+103+  AD7C CD 9B AD         call ship_draw
+104+  AD7F 08               ex af,af'
+105+  AD80 3A EA AC         ld a,(ship_frame)            ; get the animation frame
+106+  AD83 16 00            ld d,0
+107+  AD85 5F               ld e,a
+108+  AD86 19               add hl,de
+109+  AD87 22 EB AC         ld (ship_current_sprite),hl  ; put into memory
+110+  AD8A 08               ex af,af'
+111+  AD8B ED 4B E8 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
+112+  AD8F 81 C6 08         add c,8                      ; move one line down
+113+  AD92 4F               ld c,a
+114+  AD93 ED 43 ED AC      ld (ship_current_coords),bc  ; put into memory
+115+  AD97 CD 9B AD         call ship_draw
+116+  AD9A C9               ret
+117+  AD9B
+118+  AD9B              ;
+119+  AD9B              ; Draw the ship
+120+  AD9B              ; Inputs:
+121+  AD9B              ; None, all in memory
+122+  AD9B              ;
+123+  AD9B              ship_draw:
+124+  AD9B 3E 04            ld a,4                              ; 4 pieces per half
+125+  AD9D              ship_draw0:
+126+  AD9D F5               push af
+127+  AD9E 2A EB AC         ld hl,(ship_current_sprite)
+128+  ADA1 ED 4B ED AC      ld bc,(ship_current_coords)         ; load bc with the start coords
+129+  ADA5 CD 4B A3         call sprites_drawsprite
+130+  ADA8 2A EB AC         ld hl,(ship_current_sprite)
+131+  ADAB ED 4B ED AC      ld bc,(ship_current_coords)         ; load bc with the start coords
+132+  ADAF 11 08 00         ld de,8
+133+  ADB2 19               add hl,de
+134+  ADB3 80 C6 08         add b,8
+135+  ADB6 47               ld b,a
+136+  ADB7 22 EB AC         ld (ship_current_sprite),hl         ; put into memory
+137+  ADBA ED 43 ED AC      ld (ship_current_coords),bc         ; put into memory
+138+  ADBE F1               pop af
+139+  ADBF 3D               dec a
+140+  ADC0 FE 00            cp 0
+141+  ADC2 C2 9D AD         jp nz,ship_draw0
+142+  ADC5
+143+  ADC5 C9               ret
+144+  ADC6
 # file closed: game/ship.asm
- 34   AD82                  include "game\tank.asm"
+ 34   ADC6                  include "game\tank.asm"
 # file opened: game/tank.asm
-  1+  AD82              ;
-  2+  AD82              ; tank initial position: vert,horiz
-  3+  AD82              ;
-  4+  AD82              tank_initpos:
-  5+  AD82 10 D0            defb 16,208
-  6+  AD84              tank_initpos2:
-  7+  AD84 00 00            defb 0,0
-  8+  AD86              tank_frame:
-  9+  AD86 00               defb 0
- 10+  AD87              tank_anim:
- 11+  AD87 11               defb 17
- 12+  AD88              ;
- 13+  AD88              ; The current memory location
- 14+  AD88              ;
- 15+  AD88              tank_current_sprite:
- 16+  AD88 00 00            defb 0,0
- 17+  AD8A
- 18+  AD8A              tank_current_coords:
- 19+  AD8A 00 00            defb 0,0
- 20+  AD8C
- 21+  AD8C              ;
- 22+  AD8C              ; Initialise the tank
- 23+  AD8C              ;
- 24+  AD8C              tank_init:
- 25+  AD8C ED 4B 82 AD      ld bc,(tank_initpos)
- 26+  AD90 ED 43 84 AD      ld (tank_initpos2),bc       ; save the initial position for later use
- 27+  AD94 C9               ret
- 28+  AD95
- 29+  AD95              ;
- 30+  AD95              ;   Draw and move the tank
- 31+  AD95              ;   Start processing at frame 200
- 32+  AD95              ;   Don't move if anim is zero
- 33+  AD95              ;   Decrement frame if moved
- 34+  AD95              ;
- 35+  AD95              tank_process:
- 36+  AD95 3A 87 AD         ld a,(tank_anim)
- 37+  AD98 FE 00            cp 0
- 38+  AD9A C8               ret z                       ; return if we've already moved
- 39+  AD9B CD 48 AC         call game_getcurrentframe   ; get the current frame number into a
- 40+  AD9E FE 4B            cp 75
- 41+  ADA0 D8               ret c                      ; return if the frame number is below 100
- 42+  ADA1 CD AC AD         call tank_move              ; move tank if not
- 43+  ADA4 3A 87 AD         ld a,(tank_anim)
- 44+  ADA7 3D               dec a
- 45+  ADA8 32 87 AD         ld (tank_anim),a            ; decrease the anim count
- 46+  ADAB C9               ret
- 47+  ADAC
- 48+  ADAC              tank_move:
- 49+  ADAC ED 4B 84 AD      ld bc,(tank_initpos2)
- 50+  ADB0 C5               push bc
- 51+  ADB1 3A 87 AD         ld a,(tank_anim)
- 52+  ADB4 FE 11            cp 17                       ; check first time flag
- 53+  ADB6 CA C8 AD         jp z,tank_move1         ; don't draw over previous one if first time
- 54+  ADB9 CD CD AD         call tank_draw_full         ; delete old one
- 55+  ADBC ED 4B 84 AD      ld bc,(tank_initpos2)       ; get the current coords
- 56+  ADC0 78               ld a,b
- 57+  ADC1 D6 01            sub 1                       ; move back one pixels
- 58+  ADC3 47               ld b,a
- 59+  ADC4 ED 43 84 AD      ld (tank_initpos2),bc
- 60+  ADC8              tank_move1:
- 61+  ADC8 CD CD AD         call tank_draw_full         ; draw the tank
- 62+  ADCB C1               pop bc
- 63+  ADCC C9               ret
- 64+  ADCD
- 65+  ADCD              tank_draw_full:
- 66+  ADCD 21 3E AA         ld hl,tank_sprite
- 67+  ADD0 ED 4B 84 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
- 68+  ADD4 22 88 AD         ld (tank_current_sprite),hl  ; put into memory
- 69+  ADD7 ED 43 8A AD      ld (tank_current_coords),bc  ; put into memory
- 70+  ADDB CD FA AD         call tank_draw
- 71+  ADDE 08               ex af,af'
- 72+  ADDF 3A 86 AD         ld a,(tank_frame)            ; get the animation frame
- 73+  ADE2 16 00            ld d,0
- 74+  ADE4 5F               ld e,a
- 75+  ADE5 19               add hl,de
- 76+  ADE6 22 88 AD         ld (tank_current_sprite),hl  ; put into memory
- 77+  ADE9 08               ex af,af'
- 78+  ADEA ED 4B 84 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
- 79+  ADEE 81 C6 08         add c,8                      ; move one line down
- 80+  ADF1 4F               ld c,a
- 81+  ADF2 ED 43 8A AD      ld (tank_current_coords),bc  ; put into memory
- 82+  ADF6 CD FA AD         call tank_draw
- 83+  ADF9 C9               ret
- 84+  ADFA
- 85+  ADFA              ;
- 86+  ADFA              ; Draw the tank
- 87+  ADFA              ; Inputs:
- 88+  ADFA              ; None, all in memory
- 89+  ADFA              ;
- 90+  ADFA              tank_draw:
- 91+  ADFA 3E 04            ld a,4                              ; 4 pieces per half
- 92+  ADFC              tank_draw0:
- 93+  ADFC F5               push af
- 94+  ADFD 2A 88 AD         ld hl,(tank_current_sprite)
- 95+  AE00 ED 4B 8A AD      ld bc,(tank_current_coords)         ; load bc with the start coords
- 96+  AE04 CD 4B A3         call sprites_drawsprite
- 97+  AE07 2A 88 AD         ld hl,(tank_current_sprite)
- 98+  AE0A ED 4B 8A AD      ld bc,(tank_current_coords)         ; load bc with the start coords
- 99+  AE0E 11 08 00         ld de,8
-100+  AE11 19               add hl,de
-101+  AE12 80 C6 08         add b,8
-102+  AE15 47               ld b,a
-103+  AE16 22 88 AD         ld (tank_current_sprite),hl         ; put into memory
-104+  AE19 ED 43 8A AD      ld (tank_current_coords),bc         ; put into memory
-105+  AE1D F1               pop af
-106+  AE1E 3D               dec a
-107+  AE1F FE 00            cp 0
-108+  AE21 C2 FC AD         jp nz,tank_draw0
-109+  AE24
-110+  AE24 C9               ret
-111+  AE25
+  1+  ADC6              ;
+  2+  ADC6              ; tank initial position: vert,horiz
+  3+  ADC6              ;
+  4+  ADC6              tank_initpos:
+  5+  ADC6 10 D0            defb 16,208
+  6+  ADC8              tank_initpos2:
+  7+  ADC8 00 00            defb 0,0
+  8+  ADCA              tank_frame:
+  9+  ADCA 00               defb 0
+ 10+  ADCB              tank_anim:
+ 11+  ADCB 11               defb 17
+ 12+  ADCC              ;
+ 13+  ADCC              ; The current memory location
+ 14+  ADCC              ;
+ 15+  ADCC              tank_current_sprite:
+ 16+  ADCC 00 00            defb 0,0
+ 17+  ADCE
+ 18+  ADCE              tank_current_coords:
+ 19+  ADCE 00 00            defb 0,0
+ 20+  ADD0
+ 21+  ADD0              ;
+ 22+  ADD0              ; Initialise the tank
+ 23+  ADD0              ;
+ 24+  ADD0              tank_init:
+ 25+  ADD0 ED 4B C6 AD      ld bc,(tank_initpos)
+ 26+  ADD4 ED 43 C8 AD      ld (tank_initpos2),bc       ; save the initial position for later use
+ 27+  ADD8 C9               ret
+ 28+  ADD9
+ 29+  ADD9              ;
+ 30+  ADD9              ;   Draw and move the tank
+ 31+  ADD9              ;   Start processing at frame 200
+ 32+  ADD9              ;   Don't move if anim is zero
+ 33+  ADD9              ;   Decrement frame if moved
+ 34+  ADD9              ;
+ 35+  ADD9              tank_process:
+ 36+  ADD9 3A CB AD         ld a,(tank_anim)
+ 37+  ADDC FE 00            cp 0
+ 38+  ADDE C8               ret z                       ; return if we've already moved
+ 39+  ADDF CD 8B AC         call game_getcurrentframe   ; get the current frame number into a
+ 40+  ADE2 FE 4B            cp 75
+ 41+  ADE4 D8               ret c                      ; return if the frame number is below 100
+ 42+  ADE5 CD F0 AD         call tank_move              ; move tank if not
+ 43+  ADE8 3A CB AD         ld a,(tank_anim)
+ 44+  ADEB 3D               dec a
+ 45+  ADEC 32 CB AD         ld (tank_anim),a            ; decrease the anim count
+ 46+  ADEF C9               ret
+ 47+  ADF0
+ 48+  ADF0              tank_move:
+ 49+  ADF0 ED 4B C8 AD      ld bc,(tank_initpos2)
+ 50+  ADF4 C5               push bc
+ 51+  ADF5 3A CB AD         ld a,(tank_anim)
+ 52+  ADF8 FE 11            cp 17                       ; check first time flag
+ 53+  ADFA CA 0C AE         jp z,tank_move1         ; don't draw over previous one if first time
+ 54+  ADFD CD 11 AE         call tank_draw_full         ; delete old one
+ 55+  AE00 ED 4B C8 AD      ld bc,(tank_initpos2)       ; get the current coords
+ 56+  AE04 78               ld a,b
+ 57+  AE05 D6 01            sub 1                       ; move back one pixels
+ 58+  AE07 47               ld b,a
+ 59+  AE08 ED 43 C8 AD      ld (tank_initpos2),bc
+ 60+  AE0C              tank_move1:
+ 61+  AE0C CD 11 AE         call tank_draw_full         ; draw the tank
+ 62+  AE0F C1               pop bc
+ 63+  AE10 C9               ret
+ 64+  AE11
+ 65+  AE11              tank_draw_full:
+ 66+  AE11 21 3E AA         ld hl,tank_sprite
+ 67+  AE14 ED 4B C8 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
+ 68+  AE18 22 CC AD         ld (tank_current_sprite),hl  ; put into memory
+ 69+  AE1B ED 43 CE AD      ld (tank_current_coords),bc  ; put into memory
+ 70+  AE1F CD 3E AE         call tank_draw
+ 71+  AE22 08               ex af,af'
+ 72+  AE23 3A CA AD         ld a,(tank_frame)            ; get the animation frame
+ 73+  AE26 16 00            ld d,0
+ 74+  AE28 5F               ld e,a
+ 75+  AE29 19               add hl,de
+ 76+  AE2A 22 CC AD         ld (tank_current_sprite),hl  ; put into memory
+ 77+  AE2D 08               ex af,af'
+ 78+  AE2E ED 4B C8 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
+ 79+  AE32 81 C6 08         add c,8                      ; move one line down
+ 80+  AE35 4F               ld c,a
+ 81+  AE36 ED 43 CE AD      ld (tank_current_coords),bc  ; put into memory
+ 82+  AE3A CD 3E AE         call tank_draw
+ 83+  AE3D C9               ret
+ 84+  AE3E
+ 85+  AE3E              ;
+ 86+  AE3E              ; Draw the tank
+ 87+  AE3E              ; Inputs:
+ 88+  AE3E              ; None, all in memory
+ 89+  AE3E              ;
+ 90+  AE3E              tank_draw:
+ 91+  AE3E 3E 04            ld a,4                              ; 4 pieces per half
+ 92+  AE40              tank_draw0:
+ 93+  AE40 F5               push af
+ 94+  AE41 2A CC AD         ld hl,(tank_current_sprite)
+ 95+  AE44 ED 4B CE AD      ld bc,(tank_current_coords)         ; load bc with the start coords
+ 96+  AE48 CD 4B A3         call sprites_drawsprite
+ 97+  AE4B 2A CC AD         ld hl,(tank_current_sprite)
+ 98+  AE4E ED 4B CE AD      ld bc,(tank_current_coords)         ; load bc with the start coords
+ 99+  AE52 11 08 00         ld de,8
+100+  AE55 19               add hl,de
+101+  AE56 80 C6 08         add b,8
+102+  AE59 47               ld b,a
+103+  AE5A 22 CC AD         ld (tank_current_sprite),hl         ; put into memory
+104+  AE5D ED 43 CE AD      ld (tank_current_coords),bc         ; put into memory
+105+  AE61 F1               pop af
+106+  AE62 3D               dec a
+107+  AE63 FE 00            cp 0
+108+  AE65 C2 40 AE         jp nz,tank_draw0
+109+  AE68
+110+  AE68 C9               ret
+111+  AE69
 # file closed: game/tank.asm
- 35   AE25
- 36   AE25              ;===========================================================================
- 37   AE25              ; main routine - the code execution starts here.
- 38   AE25              ; Sets up the new interrupt routine, the memory
- 39   AE25              ; banks and jumps to the start loop.
- 40   AE25              ;===========================================================================
- 41   AE25              main:
- 42   AE25
- 43   AE25                  ; Setup stack
- 44   AE25 31 1C AF         ld sp,stack_top
- 45   AE28
- 46   AE28                  ; Draw the title screen
- 47   AE28 CD B3 A3         call titlescreen_show
- 48   AE2B
- 49   AE2B CD 00 80         call init_start
- 50   AE2E CD 1B A2         call screen_draw
- 51   AE31 CD 53 AC         call player_init
- 52   AE34 CD AB AC         call ship_land              ; land the ship
- 53   AE37 CD 8C AD         call tank_init
- 54   AE3A
- 55   AE3A              mloop:
- 56   AE3A 76               halt
- 57   AE3B F3               di
- 58   AE3C CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
- 59   AE3F FB               ei                          ; enable interupts
- 60   AE40
- 61   AE40 CD 5C AC         call player_drawplayer      ; delete player
- 62   AE43 CD 86 AA         call control_keyboard       ; check keyboard
- 63   AE46 CD 5C AC         call player_drawplayer      ; draw player
- 64   AE49 CD 95 AD         call tank_process           ; prcoess the tank
- 65   AE4C
- 66   AE4C CD 40 AC         call game_incrementframe    ; increment the game frame
- 67   AE4F
- 68   AE4F C3 3A AE         jp mloop
- 69   AE52
- 70   AE52              ;===========================================================================
- 71   AE52              ; Stack.
- 72   AE52              ;===========================================================================
- 73   AE52
- 74   AE52              ; Stack: this area is reserved for the stack
- 75   AE52              STACK_SIZE: equ 100    ; in words
- 76   AE52
- 77   AE52              ; Reserve stack space
- 78   AE52 00 00            defw 0  ; WPMEM, 2
- 79   AE54              stack_bottom:
- 80   AE54 00 00 00...      defs    STACK_SIZE*2, 0
- 81   AF1C              stack_top:
- 82   AF1C 00 00            defw 0  ; WPMEM, 2
- 83   AF1E
- 84   AF1E                     SAVESNA "ThePit.sna", main
+ 35   AE69
+ 36   AE69              ;===========================================================================
+ 37   AE69              ; main routine - the code execution starts here.
+ 38   AE69              ; Sets up the new interrupt routine, the memory
+ 39   AE69              ; banks and jumps to the start loop.
+ 40   AE69              ;===========================================================================
+ 41   AE69              main:
+ 42   AE69
+ 43   AE69                  ; Setup stack
+ 44   AE69 31 5D AF         ld sp,stack_top
+ 45   AE6C
+ 46   AE6C                  ; Draw the title screen
+ 47   AE6C                  ;call titlescreen_show
+ 48   AE6C
+ 49   AE6C CD 00 80         call init_start
+ 50   AE6F CD 1B A2         call screen_draw
+ 51   AE72 CD 97 AC         call player_init
+ 52   AE75 CD EF AC         call ship_land              ; land the ship
+ 53   AE78 CD D0 AD         call tank_init
+ 54   AE7B
+ 55   AE7B              mloop:
+ 56   AE7B 76               halt
+ 57   AE7C F3               di
+ 58   AE7D CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
+ 59   AE80 FB               ei                          ; enable interupts
+ 60   AE81
+ 61   AE81 CD A0 AC         call player_drawplayer      ; delete player
+ 62   AE84 CD 86 AA         call control_keyboard       ; check keyboard
+ 63   AE87 CD A0 AC         call player_drawplayer      ; draw player
+ 64   AE8A CD D9 AD         call tank_process           ; prcoess the tank
+ 65   AE8D
+ 66   AE8D CD 83 AC         call game_incrementframe    ; increment the game frame
+ 67   AE90
+ 68   AE90 C3 7B AE         jp mloop
+ 69   AE93
+ 70   AE93              ;===========================================================================
+ 71   AE93              ; Stack.
+ 72   AE93              ;===========================================================================
+ 73   AE93
+ 74   AE93              ; Stack: this area is reserved for the stack
+ 75   AE93              STACK_SIZE: equ 100    ; in words
+ 76   AE93
+ 77   AE93              ; Reserve stack space
+ 78   AE93 00 00            defw 0  ; WPMEM, 2
+ 79   AE95              stack_bottom:
+ 80   AE95 00 00 00...      defs    STACK_SIZE*2, 0
+ 81   AF5D              stack_top:
+ 82   AF5D 00 00            defw 0  ; WPMEM, 2
+ 83   AF5F
+ 84   AF5F                     SAVESNA "ThePit.sna", main
 # file closed: main.asm

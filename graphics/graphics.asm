@@ -13,7 +13,7 @@ sprites:
     defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 10, sky block, tank background
     
 sprite_attrs:
-    defb    071 ; 0, space
+    defb    070 ; 0, space
     defb    101 ; 1, cyan block
     defb    077 ; 2, slope left
     defb    077 ; 3, slope right

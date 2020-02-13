@@ -2,6 +2,13 @@
 ; Check the keyboard then move
 ;
 control_keyboard:
+    ld hl,player+5      ; first, check if the player has pixels left to move
+    ld a,(hl)
+    cp 0
+    jp z, control_keyboard0
+    call control_automove
+    ret
+control_keyboard0:
     ld bc,64510         ; port for keyboard row q-t.
     in a,(c)            ; read keyboard.
     ld b,a              ; store result in b register.
@@ -22,6 +29,37 @@ control_keyboard:
     ret
 
 ;
+; Auto move the player until pixels is zero
+;
+control_automove:
+    ld e,a              ; store the number of pixels left to move in e
+    ld bc,(player)      ; load the current coords into bc
+    ld hl,player+2      ; get the direction
+    ld a,(hl)
+    cp 0                ; up or down?
+    ret z               ; don't need to do anything
+    cp 1                ; going left?
+    jp z,control_automove0
+    ld a,b
+    inc a               ; if we're going right, increment a twice for two pixels
+    inc a
+    jp control_automove1
+control_automove0:
+    ld a,b
+    dec a               ; if we're going left, decrement a twice
+    dec a
+control_automove1:
+    ld bc,(player)      ; load the current coords into bc
+    ld b,a              ; done changing, so write back to b
+    ld (player),bc      ; and back to player
+    ld a,e              ; now get the pixel count back
+    dec a               ; decrease by one
+    ld hl,player+5
+    ld (hl),a           ; copy back
+    call player_justmoved
+    ret
+
+;
 ; Moves the player up
 ;
 control_pl_moveup:
@@ -38,8 +76,7 @@ control_pl_moveup:
     cp 0
     jp z,control_pl_moveup1 ; don't move if we can't
     pop af
-    sub 1                   ; subtract 2
-    sub 1
+    sub 1                   ; subtract 1
     ld c,a                  ; load back to c
     ld (player),bc          ; load back to player
     jp control_pl_moveup0
@@ -67,8 +104,7 @@ control_pl_movedown:
     cp 0
     jp z,control_pl_movedown1 ; don't move if we can't
     pop af
-    inc a                   ; add 2
-    inc a
+    inc a                   ; add 1
     ld c,a                  ; load back to c
     ld (player),bc          ; load back to player
     jp control_pl_movedown0
@@ -94,9 +130,12 @@ control_pl_moveleft:
     ld a,e                  ; put e in a
     cp 0
     jp z,control_pl_moveright1 ; don't move if we can't
+    ld hl,player+5          ; need to store the amount of pixels still left to move in the player status
+    ld a,3
+    ld (hl),a   
     pop af
     sub 1                    ; subtract 2
-    sub 1   
+    sub 1
     ld b,a                  ; load back to c
     ld (player),bc          ; load back to player
     jp control_pl_moveleft0
@@ -121,6 +160,9 @@ control_pl_moveright:
     ld a,e                  ; put e in a
     cp 0
     jp z,control_pl_moveright1 ; don't move if we can't
+    ld hl,player+5          ; need to store the amount of pixels still left to move in the player status
+    ld a,3
+    ld (hl),a
     pop af
     inc a                   ; add 2
     inc a
@@ -170,7 +212,7 @@ control_checkcanmove_down:
     ld e,0                          ; zero de
     ld d,0
     ld a,(hl)                       ; get attr of cell below
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_down1 ; don't set flag if not black
     pop bc                          ; get bc back briefly
     ld a,b                         ; screen coord
@@ -180,7 +222,7 @@ control_checkcanmove_down:
     jp z, control_checkcanmove_down0   ; is multiple of 8 so no need to check next block
     inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
     ld a,(hl)                       ; get attr of cell below
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_down1 ; don't set flag if not black
 control_checkcanmove_down0:
     ld e,1
@@ -213,7 +255,7 @@ control_checkcanmove_up2:
     ld e,0                          ; zero de
     ld d,0
     ld a,(hl)                       ; get attr of cell above
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_up1 ; don't set flag if not black
     pop bc                          ; get bc back briefly
     ld a,b                         ; screen coord
@@ -223,7 +265,7 @@ control_checkcanmove_up2:
     jp z, control_checkcanmove_up0   ; is multiple of 8 so no need to check next block
     inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
     ld a,(hl)                       ; get attr of cell below
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_up1 ; don't set flag if not black
 control_checkcanmove_up0:
     ld e,1
@@ -247,7 +289,7 @@ control_checkcanmove_right:
     ld e,0                          ; zero de
     ld d,0
     ld a,(hl)                       ; get attr of cell to the right
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_right1 ; don't set flag if not black
     pop bc                          ; get bc back briefly
     ld a,c                         ; screen coord
@@ -260,7 +302,7 @@ control_checkcanmove_right:
     ld e,0
     ld d,0                          ; zero de again
     ld a,(hl)                       ; get attr of cell below
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_right1 ; don't set flag if not black
 control_checkcanmove_right0:
     ld e,1
@@ -292,7 +334,7 @@ control_checkcanmove_left2:
     ld e,0                          ; zero de
     ld d,0
     ld a,(hl)                       ; get attr of cell to the right
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_left1 ; don't set flag if not black
     pop bc                          ; get bc back briefly
     ld a,c                         ; screen coord
@@ -305,7 +347,7 @@ control_checkcanmove_left2:
     ld e,0
     ld d,0                          ; zero de again
     ld a,(hl)                       ; get attr of cell below
-    cp 71
+    cp 70
     jp nz, control_checkcanmove_left1 ; don't set flag if not black
 control_checkcanmove_left0:
     ld e,1
