@@ -1,8 +1,8 @@
 ;
 ;   Data for current player
-;   horiz,vert,dir (0 up/down, 1 left, 2 right), frame, frame transition count,move remaining, is digging (0 no), digging count
+;   horiz,vert,dir (0 up, 1 left, 2 right, 3 down), frame, frame transition count,move remaining, is digging (0 no), digging count, pixels to dig
 player:
-    defb    0,0,2,0,1,0,0,0
+    defb    0,0,2,0,1,0,0,0,0
 ;
 ; Initializes a player
 ;
@@ -16,6 +16,10 @@ player_init:
 ;
 player_drawplayer:
     ld a,(player+2)             ; get the current direction
+    cp 3
+    jp nz,player_drawplayer0
+    ld a,0                      ; if 3, then down, so set the direction to 0 since the sprite is the same as up
+player_drawplayer0:
     ld e,a                      ; store in e
     ld a,(player+3)             ; get the current frame
     add a,e
@@ -26,7 +30,6 @@ player_drawplayer:
     ld h,0              
     ld de,player_sprite
     add hl,de                   ; load hl with the location of the player sprite data
-player_drawplayer0:
     ld bc,(player)         ; load bc with the start coords
     call sprites_drawsprite     ; call the routine to draw the sprite
     ret

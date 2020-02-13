@@ -2,15 +2,13 @@
 ; Check the keyboard then move
 ;
 control_keyboard:
-    ld hl,player+5      ; first, check if the player has pixels left to move
-    ld a,(hl)
+    ld a,(player+5)      ; first, check if the player has pixels left to move
     cp 0
     jp z, control_keyboard1
     call control_automove
     ret
 control_keyboard1:
-    ld hl,player+6      ; next, check if the player is digging
-    ld a,(hl)
+    ld a,(player+6)      ; next, check if the player is digging
     cp 0
     jp z, control_keyboard0
     call control_dig
@@ -40,12 +38,16 @@ control_keyboard0:
 ;
 control_dig:
     ld bc,(player)      ; load the current coords into bc
-    ld hl,player+2      ; get the direction
-    ld a,(hl)
+    push bc
+    ld a,(player+2)     ; get the direction    
     cp 1                ; left
     jp z,control_dig0 
     cp 2                ; right
     jp z,control_dig1
+    cp 3                ; down
+    jp z,control_dig5
+    cp 0                ; up
+    jp z,control_dig4
     ld hl,player+6
     ld (hl),0           ; turn off digging
     ret                 ; return
@@ -59,8 +61,27 @@ control_dig1:
     ld hl,de 
     inc hl              ; move one left
     jp control_dig2
+control_dig4:
+    call sprites_scadd  ; get the current coord 
+    ld hl,de 
+    ld de,256
+    sbc hl,de             ; move one up
+    jp control_dig2
+control_dig5:
+    call sprites_scadd  ; get the current coord 
+    ld hl,de 
+    inc h              ; move one down
+    jp control_dig2
 control_dig2:
-    ld b,8              ; 8 rows to copy over
+    pop bc
+    push hl
+    call control_spaceisdiggable ; check again if the row is diggable
+    ld a,(player+6)      ; next, check if the player is digging
+    cp 1
+    ret nz              ; return if we're not supposed to be digging
+    pop hl
+    ld a,(player+8)     ; get the number of rows we need to overwrite
+    ld b,a              ; rows to copy over
 control_dig3:
     ld (hl),0           ; load empty into row
     ld de,32
@@ -68,6 +89,9 @@ control_dig3:
     djnz control_dig3
     ld hl,player+6
     ld (hl),0           ; turn off digging
+    ld hl,player+5      ; automove into this space
+    ld a,4
+    ld (hl),a
     ret
 
 ;
@@ -78,21 +102,39 @@ control_automove:
     ld bc,(player)      ; load the current coords into bc
     ld hl,player+2      ; get the direction
     ld a,(hl)
-    cp 0                ; up or down?
-    ret z               ; don't need to do anything
+    cp 3                ; down
+    jp z,control_automove3  ; don't need to do anything
+    cp 0                ; going up
+    jp z,control_automove2
     cp 1                ; going left?
     jp z,control_automove0
     ld a,b
     inc a               ; if we're going right, increment a twice for two pixels
     inc a
+    ld b,a 
+    jp control_automove1
+control_automove3:
+    ld a,c
+    inc a 
+    inc a               ; if we're going down, increment twice
+    ld c,a
+    cp 144
+    call z, control_scroll_down
+    jp control_automove1
+control_automove2:
+    ld a,c
+    dec a 
+    dec a               ; if we're going up, decrement twice
+    ld c,a
+    cp 96
+    call z, control_scroll_up
     jp control_automove1
 control_automove0:
     ld a,b
     dec a               ; if we're going left, decrement a twice
     dec a
+    ld b,a 
 control_automove1:
-    ld bc,(player)      ; load the current coords into bc
-    ld b,a              ; done changing, so write back to b
     ld (player),bc      ; and back to player
     ld a,e              ; now get the pixel count back
     dec a               ; decrease by one
@@ -153,7 +195,7 @@ control_pl_movedown:
 control_pl_movedown1:
     pop af                  ; restore af if needed
 control_pl_movedown0:
-    ld a,0
+    ld a,3
     ld (player+2),a        ; set direction to down
     pop bc
     ret
@@ -342,8 +384,12 @@ control_spaceisdiggable2:
     ld (hl),1                       ; set the player into digging mode
     inc hl
     ld (hl),50                      ; set the number of frame to dig for
+    inc hl
+    ld (hl),8                       ; set the number of pixels to dig
     ret
 control_spaceisdiggable1:
+    ld hl,player+6                  
+    ld (hl),0                       ; set the player out of digging mode
     ret
 
 
@@ -404,10 +450,10 @@ control_checkcanmove_up:
 control_checkcanmove_up1:
     pop bc
     call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly underneath (add 256)
-    ld de,32
-    ld de,0
+    dec h                        ; look at cell directly above (sub 256)
     push bc
+    call control_spaceisdiggable    ; can't move here, but can we dig
+    ld de,0
     pop bc
     pop af
     ret
