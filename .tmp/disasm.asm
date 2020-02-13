@@ -1,112 +1,105 @@
-             org 33B1h ; 33B1h
+; EQU:
+; Data addresses used by the opcodes that point to uninitialized memory areas.
+L0008:       equ  0008h	; 8. Restart. Called by: L2886[288Bh].
+L0018:       equ  0018h	; 24. Restart. Called by: L2886[2886h].
+L0020:       equ  0020h	; 32. Restart. Called by: L2886[289Ah], L2886[289Bh], L2886[28A7h].
+L24FB:       equ  24FBh	; 9467. Subroutine. Called by: L2886[289Ch].
+L2712:       equ  2712h	; 10002. Subroutine. Called by: L2886[28A8h].
+L5C0B:       equ  5C0Bh	; 23563. Data accessed by: 2892h(in L2886), 2896h(in L2886), 28A4h(in L2886)
+L5C5D:       equ  5C5Dh	; 23645. Data accessed by: 288Fh(in L2886), 28A0h(in L2886)
 
 
-; Subroutine: Size=3, CC=1.
-; Called by: -
-; Calls: -
-33B1 L33B1:
-33B1 E1           POP  HL     
-33B2 D1           POP  DE     
-33B3 C9           RET         
+             org 2886h ; 2886h
 
 
-33B4 ED           defb EDh    	; 237,  -19
-33B5 5B           defb 5Bh    	; 91, '['
-33B6 65           defb 65h    	; 101, 'e'
-33B7 5C           defb 5Ch    	; 92, '\'
-33B8 CD           defb CDh    	; 205,  -51
-33B9 C0           defb C0h    	; 192,  -64
-33BA 33           defb 33h    	; 51, '3'
-33BB ED           defb EDh    	; 237,  -19
-33BC 53           defb 53h    	; 83, 'S'
-33BD 65           defb 65h    	; 101, 'e'
-33BE 5C           defb 5Ch    	; 92, '\'
-33BF C9           defb C9h    	; 201,  -55
-33C0 CD           defb CDh    	; 205,  -51
-33C1 A9           defb A9h    	; 169,  -87
-33C2 33           defb 33h    	; 51, '3'
-33C3 ED           defb EDh    	; 237,  -19
-33C4 B0           defb B0h    	; 176,  -80
-33C5 C9           defb C9h    	; 201,  -55
-33C6 62           defb 62h    	; 98, 'b'
-33C7 6B           defb 6Bh    	; 107, 'k'
-33C8 CD           defb CDh    	; 205,  -51
-33C9 A9           defb A9h    	; 169,  -87
-33CA 33           defb 33h    	; 51, '3'
-33CB D9           defb D9h    	; 217,  -39
-33CC E5           defb E5h    	; 229,  -27
-33CD D9           defb D9h    	; 217,  -39
-33CE E3           defb E3h    	; 227,  -29
-33CF C5           defb C5h    	; 197,  -59
-33D0 7E           defb 7Eh    	; 126, '~'
-33D1 E6           defb E6h    	; 230,  -26
-33D2 C0           defb C0h    	; 192,  -64
-33D3 07           defb 07h    	; 7
-33D4 07           defb 07h    	; 7
-33D5 4F           defb 4Fh    	; 79, 'O'
-33D6 0C           defb 0Ch    	; 12
-33D7 7E           defb 7Eh    	; 126, '~'
-33D8 E6           defb E6h    	; 230,  -26
-33D9 3F           defb 3Fh    	; 63, '?'
-33DA 20           defb 20h    	; 32, ' '
-33DB 02           defb 02h    	; 2
-33DC 23           defb 23h    	; 35, '#'
-33DD 7E           defb 7Eh    	; 126, '~'
-33DE C6           defb C6h    	; 198,  -58
-33DF 50           defb 50h    	; 80, 'P'
-33E0 12           defb 12h    	; 18
-33E1 3E           defb 3Eh    	; 62, '>'
-33E2 05           defb 05h    	; 5
-33E3 91           defb 91h    	; 145, -111
-33E4 23           defb 23h    	; 35, '#'
-33E5 13           defb 13h    	; 19
-33E6 06           defb 06h    	; 6
-33E7 00           defb 00h    	; 0
-33E8 ED           defb EDh    	; 237,  -19
-33E9 B0           defb B0h    	; 176,  -80
-33EA C1           defb C1h    	; 193,  -63
-33EB E3           defb E3h    	; 227,  -29
-33EC D9           defb D9h    	; 217,  -39
-33ED E1           defb E1h    	; 225,  -31
-33EE D9           defb D9h    	; 217,  -39
-33EF 47           defb 47h    	; 71, 'G'
-33F0 AF           defb AFh    	; 175,  -81
-33F1 05           defb 05h    	; 5
-33F2 C8           defb C8h    	; 200,  -56
-33F3 12           defb 12h    	; 18
-33F4 13           defb 13h    	; 19
-33F5 18           defb 18h    	; 24
-33F6 FA           defb FAh    	; 250,   -6
-33F7 A7           defb A7h    	; 167,  -89
-33F8 C8           defb C8h    	; 200,  -56
-33F9 F5           defb F5h    	; 245,  -11
-33FA D5           defb D5h    	; 213,  -43
-33FB 11           defb 11h    	; 17
-33FC 00           defb 00h    	; 0
-33FD 00           defb 00h    	; 0
-33FE CD           defb CDh    	; 205,  -51
-33FF C8           defb C8h    	; 200,  -56
-3400 33           defb 33h    	; 51, '3'
-3401 D1           defb D1h    	; 209,  -47
-3402 F1           defb F1h    	; 241,  -15
-3403 3D           defb 3Dh    	; 61, '='
-3404 18           defb 18h    	; 24
-3405 F2           defb F2h    	; 242,  -14
-3406 4F           defb 4Fh    	; 79, 'O'
-3407 07           defb 07h    	; 7
-3408 07           defb 07h    	; 7
-3409 81           defb 81h    	; 129, -127
-340A 4F           defb 4Fh    	; 79, 'O'
-340B 06           defb 06h    	; 6
-340C 00           defb 00h    	; 0
-340D 09           defb 09h    	; 9
-340E C9           defb C9h    	; 201,  -55
-340F D5           defb D5h    	; 213,  -43
-3410 2A           defb 2Ah    	; 42, '*'
-3411 68           defb 68h    	; 104, 'h'
-3412 5C           defb 5Ch    	; 92, '\'
-3413 CD           defb CDh    	; 205,  -51
-3414 06           defb 06h    	; 6
+; Label not accessed.
+2886 L2886:
+2886 DF           RST  18h    
+2887 FE 29        CP   29h    	; 41, ')'
+2889 28 02        JR   Z,L288D 	; 288Dh
+288B CF 19        RST  08h,19h 	; Custom opcode
+288D L288D:
+288D D1           POP  DE     
+288E EB           EX   DE,HL  
+288F 22 5D 5C     LD   (L5C5D),HL 	; 5C5Dh
+2892 2A 0B 5C     LD   HL,(L5C0B) 	; 5C0Bh
+2895 E3           EX   (SP),HL 
+2896 22 0B 5C     LD   (L5C0B),HL 	; 5C0Bh
+2899 D5           PUSH DE     
+289A E7           RST  20h    
+289B E7           RST  20h    
+289C CD FB 24     CALL L24FB  	; 24FBh
+289F E1           POP  HL     
+28A0 22 5D 5C     LD   (L5C5D),HL 	; 5C5Dh
+28A3 E1           POP  HL     
+28A4 22 0B 5C     LD   (L5C0B),HL 	; 5C0Bh
+28A7 E7           RST  20h    
+28A8 C3 12 27     JP   L2712  	; 2712h
+
+
+28AB 23           defb 23h    	; 35, '#'
+28AC 7E           defb 7Eh    	; 126, '~'
+28AD FE           defb FEh    	; 254,   -2
+28AE 21           defb 21h    	; 33, '!'
+28AF 38           defb 38h    	; 56, '8'
+28B0 FA           defb FAh    	; 250,   -6
+28B1 C9           defb C9h    	; 201,  -55
+28B2 FD           defb FDh    	; 253,   -3
+28B3 CB           defb CBh    	; 203,  -53
+28B4 01           defb 01h    	; 1
+28B5 F6           defb F6h    	; 246,  -10
+28B6 DF           defb DFh    	; 223,  -33
+28B7 CD           defb CDh    	; 205,  -51
+28B8 8D           defb 8Dh    	; 141, -115
+28B9 2C           defb 2Ch    	; 44, ','
+28BA D2           defb D2h    	; 210,  -46
+28BB 8A           defb 8Ah    	; 138, -118
+28BC 1C           defb 1Ch    	; 28
+28BD E5           defb E5h    	; 229,  -27
+28BE E6           defb E6h    	; 230,  -26
+28BF 1F           defb 1Fh    	; 31
+28C0 4F           defb 4Fh    	; 79, 'O'
+28C1 E7           defb E7h    	; 231,  -25
+28C2 E5           defb E5h    	; 229,  -27
+28C3 FE           defb FEh    	; 254,   -2
+28C4 28           defb 28h    	; 40, '('
+28C5 28           defb 28h    	; 40, '('
+28C6 28           defb 28h    	; 40, '('
+28C7 CB           defb CBh    	; 203,  -53
+28C8 F1           defb F1h    	; 241,  -15
+28C9 FE           defb FEh    	; 254,   -2
+28CA 24           defb 24h    	; 36, '$'
+28CB 28           defb 28h    	; 40, '('
+28CC 11           defb 11h    	; 17
+28CD CB           defb CBh    	; 203,  -53
+28CE E9           defb E9h    	; 233,  -23
+28CF CD           defb CDh    	; 205,  -51
+28D0 88           defb 88h    	; 136, -120
+28D1 2C           defb 2Ch    	; 44, ','
+28D2 30           defb 30h    	; 48, '0'
+28D3 0F           defb 0Fh    	; 15
+28D4 CD           defb CDh    	; 205,  -51
+28D5 88           defb 88h    	; 136, -120
+28D6 2C           defb 2Ch    	; 44, ','
+28D7 30           defb 30h    	; 48, '0'
+28D8 16           defb 16h    	; 22
+28D9 CB           defb CBh    	; 203,  -53
+28DA B1           defb B1h    	; 177,  -79
+28DB E7           defb E7h    	; 231,  -25
+28DC 18           defb 18h    	; 24
+28DD F6           defb F6h    	; 246,  -10
+28DE E7           defb E7h    	; 231,  -25
+28DF FD           defb FDh    	; 253,   -3
+28E0 CB           defb CBh    	; 203,  -53
+28E1 01           defb 01h    	; 1
+28E2 B6           defb B6h    	; 182,  -74
+28E3 3A           defb 3Ah    	; 58, ':'
+28E4 0C           defb 0Ch    	; 12
+28E5 5C           defb 5Ch    	; 92, '\'
+28E6 A7           defb A7h    	; 167,  -89
+28E7 28           defb 28h    	; 40, '('
+28E8 06           defb 06h    	; 6
+28E9 CD           defb CDh    	; 205,  -51
 ; ...
 ; ...
 ; ...

@@ -30,7 +30,7 @@ control_pl_moveup:
     ld a,c                  ; load c into the acc
     cp 0
     jp z,control_pl_moveup0 ; are we at the edge of the screen
-    cp 98
+    cp 96
     call z, control_scroll_up
     call control_checkcanmove_up ; check we can move up, e will be 1 if we can
     push af
@@ -59,7 +59,7 @@ control_pl_movedown:
     ld a,c                  ; load c into the acc
     cp 224
     jp z,control_pl_movedown0 ; are we at the edge of the screen
-    cp 130
+    cp 144
     call z, control_scroll_down
     call control_checkcanmove_down ; check we can move down, e will be 1 if we can
     push af

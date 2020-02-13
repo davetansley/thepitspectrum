@@ -1288,7 +1288,7 @@
  30+  AAB2 79               ld a,c                  ; load c into the acc
  31+  AAB3 FE 00            cp 0
  32+  AAB5 CA D5 AA         jp z,control_pl_moveup0 ; are we at the edge of the screen
- 33+  AAB8 FE 62            cp 98
+ 33+  AAB8 FE 60            cp 96
  34+  AABA CC 66 AB         call z, control_scroll_up
  35+  AABD CD 9A AB         call control_checkcanmove_up ; check we can move up, e will be 1 if we can
  36+  AAC0 F5               push af
@@ -1317,7 +1317,7 @@
  59+  AAE1 79               ld a,c                  ; load c into the acc
  60+  AAE2 FE E0            cp 224
  61+  AAE4 CA 02 AB         jp z,control_pl_movedown0 ; are we at the edge of the screen
- 62+  AAE7 FE 82            cp 130
+ 62+  AAE7 FE 90            cp 144
  63+  AAE9 CC 5E AB         call z, control_scroll_down
  64+  AAEC CD 6E AB         call control_checkcanmove_down ; check we can move down, e will be 1 if we can
  65+  AAEF F5               push af
@@ -1442,7 +1442,7 @@
 184+  AB8F C2 97 AB         jp nz, control_checkcanmove_down1 ; don't set flag if not black
 185+  AB92              control_checkcanmove_down0:
 186+  AB92 1E 01            ld e,1
-187+  AB94 CD 74 AC         call player_justmoved
+187+  AB94 CD 76 AC         call player_justmoved
 188+  AB97              control_checkcanmove_down1:
 189+  AB97 C1               pop bc
 190+  AB98 F1               pop af
@@ -1485,7 +1485,7 @@
 227+  ABC8 C2 D0 AB         jp nz, control_checkcanmove_up1 ; don't set flag if not black
 228+  ABCB              control_checkcanmove_up0:
 229+  ABCB 1E 01            ld e,1
-230+  ABCD CD 74 AC         call player_justmoved
+230+  ABCD CD 76 AC         call player_justmoved
 231+  ABD0              control_checkcanmove_up1:
 232+  ABD0 C1               pop bc
 233+  ABD1 F1               pop af
@@ -1522,7 +1522,7 @@
 264+  ABF8 C2 00 AC         jp nz, control_checkcanmove_right1 ; don't set flag if not black
 265+  ABFB              control_checkcanmove_right0:
 266+  ABFB 1E 01            ld e,1
-267+  ABFD CD 74 AC         call player_justmoved
+267+  ABFD CD 76 AC         call player_justmoved
 268+  AC00              control_checkcanmove_right1:
 269+  AC00 C1               pop bc
 270+  AC01 F1               pop af
@@ -1567,7 +1567,7 @@
 309+  AC34 C2 3C AC         jp nz, control_checkcanmove_left1 ; don't set flag if not black
 310+  AC37              control_checkcanmove_left0:
 311+  AC37 1E 01            ld e,1
-312+  AC39 CD 74 AC         call player_justmoved
+312+  AC39 CD 76 AC         call player_justmoved
 313+  AC3C              control_checkcanmove_left1:
 314+  AC3C C1               pop bc
 315+  AC3D F1               pop af
@@ -1605,378 +1605,378 @@
 # file opened: game/player.asm
   1+  AC4C              ;
   2+  AC4C              ;   Data for current player
-  3+  AC4C              ;   horiz,vert,dir (0 up/down, 1 left, 2 right), frame, frame transition count
+  3+  AC4C              ;   horiz,vert,dir (0 up/down, 1 left, 2 right), frame, frame transition count, is digging (0 no), digging count
   4+  AC4C              player:
-  5+  AC4C 00 00 02 00      defb    0,0,2,0,1
-  5+  AC50 01
-  6+  AC51              ;
-  7+  AC51              ; Initializes a player
-  8+  AC51              ;
-  9+  AC51              player_init:
- 10+  AC51 ED 4B 10 80      ld bc,(start_coord)
- 11+  AC55 ED 43 4C AC      ld (player),bc
- 12+  AC59 C9               ret
- 13+  AC5A
- 14+  AC5A              ;
- 15+  AC5A              ; Draws the player at the current position or deletes them
- 16+  AC5A              ;
- 17+  AC5A              player_drawplayer:
- 18+  AC5A 3A 4E AC         ld a,(player+2)             ; get the current direction
- 19+  AC5D 5F               ld e,a                      ; store in e
- 20+  AC5E 3A 4F AC         ld a,(player+3)             ; get the current frame
- 21+  AC61 83               add a,e
- 22+  AC62 07               rlca
- 23+  AC63 07               rlca
- 24+  AC64 07               rlca                        ; multiply by eight
- 25+  AC65 6F               ld l,a
- 26+  AC66 26 00            ld h,0
- 27+  AC68 11 9E A9         ld de,player_sprite
- 28+  AC6B 19               add hl,de                   ; load hl with the location of the player sprite data
- 29+  AC6C              player_drawplayer0:
- 30+  AC6C ED 4B 4C AC      ld bc,(player)         ; load bc with the start coords
- 31+  AC70 CD 4B A3         call sprites_drawsprite     ; call the routine to draw the sprite
- 32+  AC73 C9               ret
- 33+  AC74
- 34+  AC74              ;
- 35+  AC74              ; Runs after the player just moved. Changes animation frame if required
- 36+  AC74              ;
- 37+  AC74              player_justmoved:
- 38+  AC74 D9               exx
- 39+  AC75 3A 50 AC         ld a,(player+4)             ; get the transition count
- 40+  AC78 FE 00            cp 0
- 41+  AC7A CA 80 AC         jp z, player_justmoved2     ; if zero reset and change the frame
- 42+  AC7D C3 9A AC         jp player_justmoved1       ; otherwise decrease and continue
- 43+  AC80              player_justmoved2:
- 44+  AC80                  ; reset and change frame in here
- 45+  AC80 3E 01            ld a,1
- 46+  AC82 32 50 AC         ld (player+4),a            ; reset back to whatever
- 47+  AC85 3A 4F AC         ld a,(player+3)             ; load the frame
- 48+  AC88 FE 03            cp 3                       ; flip between 3 and 0
- 49+  AC8A C2 92 AC         jp nz, player_justmoved4
- 50+  AC8D 3E 00            ld a,0
- 51+  AC8F C3 94 AC         jp player_justmoved5
- 52+  AC92              player_justmoved4:
- 53+  AC92 3E 03            ld a,3
- 54+  AC94              player_justmoved5:
- 55+  AC94 32 4F AC         ld (player+3),a           ; save back
- 56+  AC97 C3 9E AC         jp player_justmoved3
- 57+  AC9A              player_justmoved1:
- 58+  AC9A                  ; decrease count
- 59+  AC9A 3D               dec a
- 60+  AC9B 32 50 AC         ld (player+4),a
- 61+  AC9E              player_justmoved3:
- 62+  AC9E D9               exx;
- 63+  AC9F C9               ret
+  5+  AC4C 00 00 02 00      defb    0,0,2,0,1,0,0
+  5+  AC50 01 00 00
+  6+  AC53              ;
+  7+  AC53              ; Initializes a player
+  8+  AC53              ;
+  9+  AC53              player_init:
+ 10+  AC53 ED 4B 10 80      ld bc,(start_coord)
+ 11+  AC57 ED 43 4C AC      ld (player),bc
+ 12+  AC5B C9               ret
+ 13+  AC5C
+ 14+  AC5C              ;
+ 15+  AC5C              ; Draws the player at the current position or deletes them
+ 16+  AC5C              ;
+ 17+  AC5C              player_drawplayer:
+ 18+  AC5C 3A 4E AC         ld a,(player+2)             ; get the current direction
+ 19+  AC5F 5F               ld e,a                      ; store in e
+ 20+  AC60 3A 4F AC         ld a,(player+3)             ; get the current frame
+ 21+  AC63 83               add a,e
+ 22+  AC64 07               rlca
+ 23+  AC65 07               rlca
+ 24+  AC66 07               rlca                        ; multiply by eight
+ 25+  AC67 6F               ld l,a
+ 26+  AC68 26 00            ld h,0
+ 27+  AC6A 11 9E A9         ld de,player_sprite
+ 28+  AC6D 19               add hl,de                   ; load hl with the location of the player sprite data
+ 29+  AC6E              player_drawplayer0:
+ 30+  AC6E ED 4B 4C AC      ld bc,(player)         ; load bc with the start coords
+ 31+  AC72 CD 4B A3         call sprites_drawsprite     ; call the routine to draw the sprite
+ 32+  AC75 C9               ret
+ 33+  AC76
+ 34+  AC76              ;
+ 35+  AC76              ; Runs after the player just moved. Changes animation frame if required
+ 36+  AC76              ;
+ 37+  AC76              player_justmoved:
+ 38+  AC76 D9               exx
+ 39+  AC77 3A 50 AC         ld a,(player+4)             ; get the transition count
+ 40+  AC7A FE 00            cp 0
+ 41+  AC7C CA 82 AC         jp z, player_justmoved2     ; if zero reset and change the frame
+ 42+  AC7F C3 9C AC         jp player_justmoved1       ; otherwise decrease and continue
+ 43+  AC82              player_justmoved2:
+ 44+  AC82                  ; reset and change frame in here
+ 45+  AC82 3E 01            ld a,1
+ 46+  AC84 32 50 AC         ld (player+4),a            ; reset back to whatever
+ 47+  AC87 3A 4F AC         ld a,(player+3)             ; load the frame
+ 48+  AC8A FE 03            cp 3                       ; flip between 3 and 0
+ 49+  AC8C C2 94 AC         jp nz, player_justmoved4
+ 50+  AC8F 3E 00            ld a,0
+ 51+  AC91 C3 96 AC         jp player_justmoved5
+ 52+  AC94              player_justmoved4:
+ 53+  AC94 3E 03            ld a,3
+ 54+  AC96              player_justmoved5:
+ 55+  AC96 32 4F AC         ld (player+3),a           ; save back
+ 56+  AC99 C3 A0 AC         jp player_justmoved3
+ 57+  AC9C              player_justmoved1:
+ 58+  AC9C                  ; decrease count
+ 59+  AC9C 3D               dec a
+ 60+  AC9D 32 50 AC         ld (player+4),a
+ 61+  ACA0              player_justmoved3:
+ 62+  ACA0 D9               exx;
+ 63+  ACA1 C9               ret
 # file closed: game/player.asm
- 33   ACA0                  include "game\ship.asm"
+ 33   ACA2                  include "game\ship.asm"
 # file opened: game/ship.asm
-  1+  ACA0              ;
-  2+  ACA0              ; Ship initial position: vert,horiz
-  3+  ACA0              ;
-  4+  ACA0              ship_initpos:
-  5+  ACA0 00 24            defb 0,36
-  6+  ACA2              ship_initpos2:
-  7+  ACA2 00 00            defb 0,0
-  8+  ACA4              ship_frame:
-  9+  ACA4 00               defb 0
- 10+  ACA5              ;
- 11+  ACA5              ; The current memory location
- 12+  ACA5              ;
- 13+  ACA5              ship_current_sprite:
- 14+  ACA5 00 00            defb 0,0
- 15+  ACA7
- 16+  ACA7              ship_current_coords:
- 17+  ACA7 00 00            defb 0,0
- 18+  ACA9
- 19+  ACA9              ;
- 20+  ACA9              ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
- 21+  ACA9              ;
- 22+  ACA9              ship_land:
- 23+  ACA9 ED 4B A0 AC      ld bc,(ship_initpos)
- 24+  ACAD ED 43 A2 AC      ld (ship_initpos2),bc        ; save the initial position for later use
- 25+  ACB1 1E 00            ld e,0                      ; store a flag to track first time round
- 26+  ACB3 06 09            ld b,9                      ; move down 8 pixels
- 27+  ACB5              ship_land0:
- 28+  ACB5 C5               push bc
- 29+  ACB6 7B               ld a,e
- 30+  ACB7 D5               push de                     ; store de for next time round
- 31+  ACB8 FE 01            cp 1                        ; check first time flag
- 32+  ACBA C2 CF AC         jp nz,ship_land1             ; don't draw over previous one if first time
- 33+  ACBD CD 28 AD         call ship_draw_full         ; delete old one
- 34+  ACC0 CD 0C AD         call ship_change_frame      ; increment the frame
- 35+  ACC3 ED 4B A2 AC      ld bc,(ship_initpos2)       ; get the current coords
- 36+  ACC7 81 C6 01         add c,1                     ; move down one pixels
- 37+  ACCA 4F               ld c,a
- 38+  ACCB ED 43 A2 AC      ld (ship_initpos2),bc
- 39+  ACCF              ship_land1:
- 40+  ACCF CD 28 AD         call ship_draw_full         ; draw the ship
- 41+  ACD2 CD 21 AD         call ship_draw_screen
- 42+  ACD5 D1               pop de
- 43+  ACD6 1E 01            ld e,1
- 44+  ACD8 C1               pop bc
- 45+  ACD9 10 DA            djnz ship_land0             ; repeat for downward movement
- 46+  ACDB                  ; done moving down
- 47+  ACDB                  ; now move across
- 48+  ACDB CD 5A AC         call player_drawplayer      ; draw player
- 49+  ACDE CD 28 AD         call ship_draw_full         ; delete old one
- 50+  ACE1 1E 00            ld e,0                      ; store a flag to track first time round
- 51+  ACE3 06 14            ld b,20                      ; move back 20 pixels pixels
- 52+  ACE5              ship_land3:
- 53+  ACE5 C5               push bc
- 54+  ACE6 7B               ld a,e
- 55+  ACE7 D5               push de                     ; store de for next time round
- 56+  ACE8 FE 01            cp 1                        ; check first time flag
- 57+  ACEA C2 FF AC         jp nz,ship_land2             ; don't draw over previous one if first time
- 58+  ACED CD 28 AD         call ship_draw_full         ; delete old one
- 59+  ACF0 CD 0C AD         call ship_change_frame      ; increment the frame
- 60+  ACF3 ED 4B A2 AC      ld bc,(ship_initpos2)       ; get the current coords
- 61+  ACF7 78               ld a,b
- 62+  ACF8 D6 01            sub 1                       ; move back one pixels
- 63+  ACFA 47               ld b,a
- 64+  ACFB ED 43 A2 AC      ld (ship_initpos2),bc
- 65+  ACFF              ship_land2:
- 66+  ACFF CD 28 AD         call ship_draw_full         ; draw the ship
- 67+  AD02 CD 21 AD         call ship_draw_screen       ; draw the frame to screen by clearing the buffer
- 68+  AD05 D1               pop de
- 69+  AD06 1E 01            ld e,1                      ; set e to 1 to indicate >1 time
- 70+  AD08 C1               pop bc
- 71+  AD09 10 DA            djnz ship_land3             ; repeat for vertical movement
- 72+  AD0B C9               ret
- 73+  AD0C
- 74+  AD0C              ;
- 75+  AD0C              ; Swap the animation frame between 0 and 32. This will be added to the memory location later
- 76+  AD0C              ;
- 77+  AD0C              ship_change_frame:
- 78+  AD0C F5               push af
- 79+  AD0D 3A A4 AC         ld a,(ship_frame)
- 80+  AD10 FE 00            cp 0
- 81+  AD12 CA 1A AD         jp z,ship_change_frame0
- 82+  AD15 3E 00            ld a,0                      ; flip to 0
- 83+  AD17 C3 1C AD         jp ship_change_frame1
- 84+  AD1A              ship_change_frame0:
- 85+  AD1A 3E 20            ld a,32                      ; flip to 32
- 86+  AD1C              ship_change_frame1:
- 87+  AD1C 32 A4 AC         ld (ship_frame),a            ; save the frame
- 88+  AD1F F1               pop af
- 89+  AD20 C9               ret
- 90+  AD21
- 91+  AD21              ship_draw_screen:
- 92+  AD21 76               halt
- 93+  AD22 F3               di
- 94+  AD23 CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
- 95+  AD26 FB               ei                          ; enable interupts
- 96+  AD27 C9               ret
- 97+  AD28
- 98+  AD28              ship_draw_full:
- 99+  AD28 21 DE A9         ld hl,ship_sprite
-100+  AD2B ED 4B A2 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
-101+  AD2F 22 A5 AC         ld (ship_current_sprite),hl  ; put into memory
-102+  AD32 ED 43 A7 AC      ld (ship_current_coords),bc  ; put into memory
-103+  AD36 CD 55 AD         call ship_draw
-104+  AD39 08               ex af,af'
-105+  AD3A 3A A4 AC         ld a,(ship_frame)            ; get the animation frame
-106+  AD3D 16 00            ld d,0
-107+  AD3F 5F               ld e,a
-108+  AD40 19               add hl,de
-109+  AD41 22 A5 AC         ld (ship_current_sprite),hl  ; put into memory
-110+  AD44 08               ex af,af'
-111+  AD45 ED 4B A2 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
-112+  AD49 81 C6 08         add c,8                      ; move one line down
-113+  AD4C 4F               ld c,a
-114+  AD4D ED 43 A7 AC      ld (ship_current_coords),bc  ; put into memory
-115+  AD51 CD 55 AD         call ship_draw
-116+  AD54 C9               ret
-117+  AD55
-118+  AD55              ;
-119+  AD55              ; Draw the ship
-120+  AD55              ; Inputs:
-121+  AD55              ; None, all in memory
-122+  AD55              ;
-123+  AD55              ship_draw:
-124+  AD55 3E 04            ld a,4                              ; 4 pieces per half
-125+  AD57              ship_draw0:
-126+  AD57 F5               push af
-127+  AD58 2A A5 AC         ld hl,(ship_current_sprite)
-128+  AD5B ED 4B A7 AC      ld bc,(ship_current_coords)         ; load bc with the start coords
-129+  AD5F CD 4B A3         call sprites_drawsprite
-130+  AD62 2A A5 AC         ld hl,(ship_current_sprite)
-131+  AD65 ED 4B A7 AC      ld bc,(ship_current_coords)         ; load bc with the start coords
-132+  AD69 11 08 00         ld de,8
-133+  AD6C 19               add hl,de
-134+  AD6D 80 C6 08         add b,8
-135+  AD70 47               ld b,a
-136+  AD71 22 A5 AC         ld (ship_current_sprite),hl         ; put into memory
-137+  AD74 ED 43 A7 AC      ld (ship_current_coords),bc         ; put into memory
-138+  AD78 F1               pop af
-139+  AD79 3D               dec a
-140+  AD7A FE 00            cp 0
-141+  AD7C C2 57 AD         jp nz,ship_draw0
-142+  AD7F
-143+  AD7F C9               ret
-144+  AD80
+  1+  ACA2              ;
+  2+  ACA2              ; Ship initial position: vert,horiz
+  3+  ACA2              ;
+  4+  ACA2              ship_initpos:
+  5+  ACA2 00 24            defb 0,36
+  6+  ACA4              ship_initpos2:
+  7+  ACA4 00 00            defb 0,0
+  8+  ACA6              ship_frame:
+  9+  ACA6 00               defb 0
+ 10+  ACA7              ;
+ 11+  ACA7              ; The current memory location
+ 12+  ACA7              ;
+ 13+  ACA7              ship_current_sprite:
+ 14+  ACA7 00 00            defb 0,0
+ 15+  ACA9
+ 16+  ACA9              ship_current_coords:
+ 17+  ACA9 00 00            defb 0,0
+ 18+  ACAB
+ 19+  ACAB              ;
+ 20+  ACAB              ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
+ 21+  ACAB              ;
+ 22+  ACAB              ship_land:
+ 23+  ACAB ED 4B A2 AC      ld bc,(ship_initpos)
+ 24+  ACAF ED 43 A4 AC      ld (ship_initpos2),bc        ; save the initial position for later use
+ 25+  ACB3 1E 00            ld e,0                      ; store a flag to track first time round
+ 26+  ACB5 06 09            ld b,9                      ; move down 8 pixels
+ 27+  ACB7              ship_land0:
+ 28+  ACB7 C5               push bc
+ 29+  ACB8 7B               ld a,e
+ 30+  ACB9 D5               push de                     ; store de for next time round
+ 31+  ACBA FE 01            cp 1                        ; check first time flag
+ 32+  ACBC C2 D1 AC         jp nz,ship_land1             ; don't draw over previous one if first time
+ 33+  ACBF CD 2A AD         call ship_draw_full         ; delete old one
+ 34+  ACC2 CD 0E AD         call ship_change_frame      ; increment the frame
+ 35+  ACC5 ED 4B A4 AC      ld bc,(ship_initpos2)       ; get the current coords
+ 36+  ACC9 81 C6 01         add c,1                     ; move down one pixels
+ 37+  ACCC 4F               ld c,a
+ 38+  ACCD ED 43 A4 AC      ld (ship_initpos2),bc
+ 39+  ACD1              ship_land1:
+ 40+  ACD1 CD 2A AD         call ship_draw_full         ; draw the ship
+ 41+  ACD4 CD 23 AD         call ship_draw_screen
+ 42+  ACD7 D1               pop de
+ 43+  ACD8 1E 01            ld e,1
+ 44+  ACDA C1               pop bc
+ 45+  ACDB 10 DA            djnz ship_land0             ; repeat for downward movement
+ 46+  ACDD                  ; done moving down
+ 47+  ACDD                  ; now move across
+ 48+  ACDD CD 5C AC         call player_drawplayer      ; draw player
+ 49+  ACE0 CD 2A AD         call ship_draw_full         ; delete old one
+ 50+  ACE3 1E 00            ld e,0                      ; store a flag to track first time round
+ 51+  ACE5 06 14            ld b,20                      ; move back 20 pixels pixels
+ 52+  ACE7              ship_land3:
+ 53+  ACE7 C5               push bc
+ 54+  ACE8 7B               ld a,e
+ 55+  ACE9 D5               push de                     ; store de for next time round
+ 56+  ACEA FE 01            cp 1                        ; check first time flag
+ 57+  ACEC C2 01 AD         jp nz,ship_land2             ; don't draw over previous one if first time
+ 58+  ACEF CD 2A AD         call ship_draw_full         ; delete old one
+ 59+  ACF2 CD 0E AD         call ship_change_frame      ; increment the frame
+ 60+  ACF5 ED 4B A4 AC      ld bc,(ship_initpos2)       ; get the current coords
+ 61+  ACF9 78               ld a,b
+ 62+  ACFA D6 01            sub 1                       ; move back one pixels
+ 63+  ACFC 47               ld b,a
+ 64+  ACFD ED 43 A4 AC      ld (ship_initpos2),bc
+ 65+  AD01              ship_land2:
+ 66+  AD01 CD 2A AD         call ship_draw_full         ; draw the ship
+ 67+  AD04 CD 23 AD         call ship_draw_screen       ; draw the frame to screen by clearing the buffer
+ 68+  AD07 D1               pop de
+ 69+  AD08 1E 01            ld e,1                      ; set e to 1 to indicate >1 time
+ 70+  AD0A C1               pop bc
+ 71+  AD0B 10 DA            djnz ship_land3             ; repeat for vertical movement
+ 72+  AD0D C9               ret
+ 73+  AD0E
+ 74+  AD0E              ;
+ 75+  AD0E              ; Swap the animation frame between 0 and 32. This will be added to the memory location later
+ 76+  AD0E              ;
+ 77+  AD0E              ship_change_frame:
+ 78+  AD0E F5               push af
+ 79+  AD0F 3A A6 AC         ld a,(ship_frame)
+ 80+  AD12 FE 00            cp 0
+ 81+  AD14 CA 1C AD         jp z,ship_change_frame0
+ 82+  AD17 3E 00            ld a,0                      ; flip to 0
+ 83+  AD19 C3 1E AD         jp ship_change_frame1
+ 84+  AD1C              ship_change_frame0:
+ 85+  AD1C 3E 20            ld a,32                      ; flip to 32
+ 86+  AD1E              ship_change_frame1:
+ 87+  AD1E 32 A6 AC         ld (ship_frame),a            ; save the frame
+ 88+  AD21 F1               pop af
+ 89+  AD22 C9               ret
+ 90+  AD23
+ 91+  AD23              ship_draw_screen:
+ 92+  AD23 76               halt
+ 93+  AD24 F3               di
+ 94+  AD25 CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
+ 95+  AD28 FB               ei                          ; enable interupts
+ 96+  AD29 C9               ret
+ 97+  AD2A
+ 98+  AD2A              ship_draw_full:
+ 99+  AD2A 21 DE A9         ld hl,ship_sprite
+100+  AD2D ED 4B A4 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
+101+  AD31 22 A7 AC         ld (ship_current_sprite),hl  ; put into memory
+102+  AD34 ED 43 A9 AC      ld (ship_current_coords),bc  ; put into memory
+103+  AD38 CD 57 AD         call ship_draw
+104+  AD3B 08               ex af,af'
+105+  AD3C 3A A6 AC         ld a,(ship_frame)            ; get the animation frame
+106+  AD3F 16 00            ld d,0
+107+  AD41 5F               ld e,a
+108+  AD42 19               add hl,de
+109+  AD43 22 A7 AC         ld (ship_current_sprite),hl  ; put into memory
+110+  AD46 08               ex af,af'
+111+  AD47 ED 4B A4 AC      ld bc,(ship_initpos2)         ; load bc with the start coords
+112+  AD4B 81 C6 08         add c,8                      ; move one line down
+113+  AD4E 4F               ld c,a
+114+  AD4F ED 43 A9 AC      ld (ship_current_coords),bc  ; put into memory
+115+  AD53 CD 57 AD         call ship_draw
+116+  AD56 C9               ret
+117+  AD57
+118+  AD57              ;
+119+  AD57              ; Draw the ship
+120+  AD57              ; Inputs:
+121+  AD57              ; None, all in memory
+122+  AD57              ;
+123+  AD57              ship_draw:
+124+  AD57 3E 04            ld a,4                              ; 4 pieces per half
+125+  AD59              ship_draw0:
+126+  AD59 F5               push af
+127+  AD5A 2A A7 AC         ld hl,(ship_current_sprite)
+128+  AD5D ED 4B A9 AC      ld bc,(ship_current_coords)         ; load bc with the start coords
+129+  AD61 CD 4B A3         call sprites_drawsprite
+130+  AD64 2A A7 AC         ld hl,(ship_current_sprite)
+131+  AD67 ED 4B A9 AC      ld bc,(ship_current_coords)         ; load bc with the start coords
+132+  AD6B 11 08 00         ld de,8
+133+  AD6E 19               add hl,de
+134+  AD6F 80 C6 08         add b,8
+135+  AD72 47               ld b,a
+136+  AD73 22 A7 AC         ld (ship_current_sprite),hl         ; put into memory
+137+  AD76 ED 43 A9 AC      ld (ship_current_coords),bc         ; put into memory
+138+  AD7A F1               pop af
+139+  AD7B 3D               dec a
+140+  AD7C FE 00            cp 0
+141+  AD7E C2 59 AD         jp nz,ship_draw0
+142+  AD81
+143+  AD81 C9               ret
+144+  AD82
 # file closed: game/ship.asm
- 34   AD80                  include "game\tank.asm"
+ 34   AD82                  include "game\tank.asm"
 # file opened: game/tank.asm
-  1+  AD80              ;
-  2+  AD80              ; tank initial position: vert,horiz
-  3+  AD80              ;
-  4+  AD80              tank_initpos:
-  5+  AD80 10 D0            defb 16,208
-  6+  AD82              tank_initpos2:
-  7+  AD82 00 00            defb 0,0
-  8+  AD84              tank_frame:
-  9+  AD84 00               defb 0
- 10+  AD85              tank_anim:
- 11+  AD85 11               defb 17
- 12+  AD86              ;
- 13+  AD86              ; The current memory location
- 14+  AD86              ;
- 15+  AD86              tank_current_sprite:
- 16+  AD86 00 00            defb 0,0
- 17+  AD88
- 18+  AD88              tank_current_coords:
- 19+  AD88 00 00            defb 0,0
- 20+  AD8A
- 21+  AD8A              ;
- 22+  AD8A              ; Initialise the tank
- 23+  AD8A              ;
- 24+  AD8A              tank_init:
- 25+  AD8A ED 4B 80 AD      ld bc,(tank_initpos)
- 26+  AD8E ED 43 82 AD      ld (tank_initpos2),bc       ; save the initial position for later use
- 27+  AD92 C9               ret
- 28+  AD93
- 29+  AD93              ;
- 30+  AD93              ;   Draw and move the tank
- 31+  AD93              ;   Start processing at frame 200
- 32+  AD93              ;   Don't move if anim is zero
- 33+  AD93              ;   Decrement frame if moved
- 34+  AD93              ;
- 35+  AD93              tank_process:
- 36+  AD93 3A 85 AD         ld a,(tank_anim)
- 37+  AD96 FE 00            cp 0
- 38+  AD98 C8               ret z                       ; return if we've already moved
- 39+  AD99 CD 48 AC         call game_getcurrentframe   ; get the current frame number into a
- 40+  AD9C FE 4B            cp 75
- 41+  AD9E D8               ret c                      ; return if the frame number is below 100
- 42+  AD9F CD AA AD         call tank_move              ; move tank if not
- 43+  ADA2 3A 85 AD         ld a,(tank_anim)
- 44+  ADA5 3D               dec a
- 45+  ADA6 32 85 AD         ld (tank_anim),a            ; decrease the anim count
- 46+  ADA9 C9               ret
- 47+  ADAA
- 48+  ADAA              tank_move:
- 49+  ADAA ED 4B 82 AD      ld bc,(tank_initpos2)
- 50+  ADAE C5               push bc
- 51+  ADAF 3A 85 AD         ld a,(tank_anim)
- 52+  ADB2 FE 11            cp 17                       ; check first time flag
- 53+  ADB4 CA C6 AD         jp z,tank_move1         ; don't draw over previous one if first time
- 54+  ADB7 CD CB AD         call tank_draw_full         ; delete old one
- 55+  ADBA ED 4B 82 AD      ld bc,(tank_initpos2)       ; get the current coords
- 56+  ADBE 78               ld a,b
- 57+  ADBF D6 01            sub 1                       ; move back one pixels
- 58+  ADC1 47               ld b,a
- 59+  ADC2 ED 43 82 AD      ld (tank_initpos2),bc
- 60+  ADC6              tank_move1:
- 61+  ADC6 CD CB AD         call tank_draw_full         ; draw the tank
- 62+  ADC9 C1               pop bc
- 63+  ADCA C9               ret
- 64+  ADCB
- 65+  ADCB              tank_draw_full:
- 66+  ADCB 21 3E AA         ld hl,tank_sprite
- 67+  ADCE ED 4B 82 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
- 68+  ADD2 22 86 AD         ld (tank_current_sprite),hl  ; put into memory
- 69+  ADD5 ED 43 88 AD      ld (tank_current_coords),bc  ; put into memory
- 70+  ADD9 CD F8 AD         call tank_draw
- 71+  ADDC 08               ex af,af'
- 72+  ADDD 3A 84 AD         ld a,(tank_frame)            ; get the animation frame
- 73+  ADE0 16 00            ld d,0
- 74+  ADE2 5F               ld e,a
- 75+  ADE3 19               add hl,de
- 76+  ADE4 22 86 AD         ld (tank_current_sprite),hl  ; put into memory
- 77+  ADE7 08               ex af,af'
- 78+  ADE8 ED 4B 82 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
- 79+  ADEC 81 C6 08         add c,8                      ; move one line down
- 80+  ADEF 4F               ld c,a
- 81+  ADF0 ED 43 88 AD      ld (tank_current_coords),bc  ; put into memory
- 82+  ADF4 CD F8 AD         call tank_draw
- 83+  ADF7 C9               ret
- 84+  ADF8
- 85+  ADF8              ;
- 86+  ADF8              ; Draw the tank
- 87+  ADF8              ; Inputs:
- 88+  ADF8              ; None, all in memory
- 89+  ADF8              ;
- 90+  ADF8              tank_draw:
- 91+  ADF8 3E 04            ld a,4                              ; 4 pieces per half
- 92+  ADFA              tank_draw0:
- 93+  ADFA F5               push af
- 94+  ADFB 2A 86 AD         ld hl,(tank_current_sprite)
- 95+  ADFE ED 4B 88 AD      ld bc,(tank_current_coords)         ; load bc with the start coords
- 96+  AE02 CD 4B A3         call sprites_drawsprite
- 97+  AE05 2A 86 AD         ld hl,(tank_current_sprite)
- 98+  AE08 ED 4B 88 AD      ld bc,(tank_current_coords)         ; load bc with the start coords
- 99+  AE0C 11 08 00         ld de,8
-100+  AE0F 19               add hl,de
-101+  AE10 80 C6 08         add b,8
-102+  AE13 47               ld b,a
-103+  AE14 22 86 AD         ld (tank_current_sprite),hl         ; put into memory
-104+  AE17 ED 43 88 AD      ld (tank_current_coords),bc         ; put into memory
-105+  AE1B F1               pop af
-106+  AE1C 3D               dec a
-107+  AE1D FE 00            cp 0
-108+  AE1F C2 FA AD         jp nz,tank_draw0
-109+  AE22
-110+  AE22 C9               ret
-111+  AE23
+  1+  AD82              ;
+  2+  AD82              ; tank initial position: vert,horiz
+  3+  AD82              ;
+  4+  AD82              tank_initpos:
+  5+  AD82 10 D0            defb 16,208
+  6+  AD84              tank_initpos2:
+  7+  AD84 00 00            defb 0,0
+  8+  AD86              tank_frame:
+  9+  AD86 00               defb 0
+ 10+  AD87              tank_anim:
+ 11+  AD87 11               defb 17
+ 12+  AD88              ;
+ 13+  AD88              ; The current memory location
+ 14+  AD88              ;
+ 15+  AD88              tank_current_sprite:
+ 16+  AD88 00 00            defb 0,0
+ 17+  AD8A
+ 18+  AD8A              tank_current_coords:
+ 19+  AD8A 00 00            defb 0,0
+ 20+  AD8C
+ 21+  AD8C              ;
+ 22+  AD8C              ; Initialise the tank
+ 23+  AD8C              ;
+ 24+  AD8C              tank_init:
+ 25+  AD8C ED 4B 82 AD      ld bc,(tank_initpos)
+ 26+  AD90 ED 43 84 AD      ld (tank_initpos2),bc       ; save the initial position for later use
+ 27+  AD94 C9               ret
+ 28+  AD95
+ 29+  AD95              ;
+ 30+  AD95              ;   Draw and move the tank
+ 31+  AD95              ;   Start processing at frame 200
+ 32+  AD95              ;   Don't move if anim is zero
+ 33+  AD95              ;   Decrement frame if moved
+ 34+  AD95              ;
+ 35+  AD95              tank_process:
+ 36+  AD95 3A 87 AD         ld a,(tank_anim)
+ 37+  AD98 FE 00            cp 0
+ 38+  AD9A C8               ret z                       ; return if we've already moved
+ 39+  AD9B CD 48 AC         call game_getcurrentframe   ; get the current frame number into a
+ 40+  AD9E FE 4B            cp 75
+ 41+  ADA0 D8               ret c                      ; return if the frame number is below 100
+ 42+  ADA1 CD AC AD         call tank_move              ; move tank if not
+ 43+  ADA4 3A 87 AD         ld a,(tank_anim)
+ 44+  ADA7 3D               dec a
+ 45+  ADA8 32 87 AD         ld (tank_anim),a            ; decrease the anim count
+ 46+  ADAB C9               ret
+ 47+  ADAC
+ 48+  ADAC              tank_move:
+ 49+  ADAC ED 4B 84 AD      ld bc,(tank_initpos2)
+ 50+  ADB0 C5               push bc
+ 51+  ADB1 3A 87 AD         ld a,(tank_anim)
+ 52+  ADB4 FE 11            cp 17                       ; check first time flag
+ 53+  ADB6 CA C8 AD         jp z,tank_move1         ; don't draw over previous one if first time
+ 54+  ADB9 CD CD AD         call tank_draw_full         ; delete old one
+ 55+  ADBC ED 4B 84 AD      ld bc,(tank_initpos2)       ; get the current coords
+ 56+  ADC0 78               ld a,b
+ 57+  ADC1 D6 01            sub 1                       ; move back one pixels
+ 58+  ADC3 47               ld b,a
+ 59+  ADC4 ED 43 84 AD      ld (tank_initpos2),bc
+ 60+  ADC8              tank_move1:
+ 61+  ADC8 CD CD AD         call tank_draw_full         ; draw the tank
+ 62+  ADCB C1               pop bc
+ 63+  ADCC C9               ret
+ 64+  ADCD
+ 65+  ADCD              tank_draw_full:
+ 66+  ADCD 21 3E AA         ld hl,tank_sprite
+ 67+  ADD0 ED 4B 84 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
+ 68+  ADD4 22 88 AD         ld (tank_current_sprite),hl  ; put into memory
+ 69+  ADD7 ED 43 8A AD      ld (tank_current_coords),bc  ; put into memory
+ 70+  ADDB CD FA AD         call tank_draw
+ 71+  ADDE 08               ex af,af'
+ 72+  ADDF 3A 86 AD         ld a,(tank_frame)            ; get the animation frame
+ 73+  ADE2 16 00            ld d,0
+ 74+  ADE4 5F               ld e,a
+ 75+  ADE5 19               add hl,de
+ 76+  ADE6 22 88 AD         ld (tank_current_sprite),hl  ; put into memory
+ 77+  ADE9 08               ex af,af'
+ 78+  ADEA ED 4B 84 AD      ld bc,(tank_initpos2)         ; load bc with the start coords
+ 79+  ADEE 81 C6 08         add c,8                      ; move one line down
+ 80+  ADF1 4F               ld c,a
+ 81+  ADF2 ED 43 8A AD      ld (tank_current_coords),bc  ; put into memory
+ 82+  ADF6 CD FA AD         call tank_draw
+ 83+  ADF9 C9               ret
+ 84+  ADFA
+ 85+  ADFA              ;
+ 86+  ADFA              ; Draw the tank
+ 87+  ADFA              ; Inputs:
+ 88+  ADFA              ; None, all in memory
+ 89+  ADFA              ;
+ 90+  ADFA              tank_draw:
+ 91+  ADFA 3E 04            ld a,4                              ; 4 pieces per half
+ 92+  ADFC              tank_draw0:
+ 93+  ADFC F5               push af
+ 94+  ADFD 2A 88 AD         ld hl,(tank_current_sprite)
+ 95+  AE00 ED 4B 8A AD      ld bc,(tank_current_coords)         ; load bc with the start coords
+ 96+  AE04 CD 4B A3         call sprites_drawsprite
+ 97+  AE07 2A 88 AD         ld hl,(tank_current_sprite)
+ 98+  AE0A ED 4B 8A AD      ld bc,(tank_current_coords)         ; load bc with the start coords
+ 99+  AE0E 11 08 00         ld de,8
+100+  AE11 19               add hl,de
+101+  AE12 80 C6 08         add b,8
+102+  AE15 47               ld b,a
+103+  AE16 22 88 AD         ld (tank_current_sprite),hl         ; put into memory
+104+  AE19 ED 43 8A AD      ld (tank_current_coords),bc         ; put into memory
+105+  AE1D F1               pop af
+106+  AE1E 3D               dec a
+107+  AE1F FE 00            cp 0
+108+  AE21 C2 FC AD         jp nz,tank_draw0
+109+  AE24
+110+  AE24 C9               ret
+111+  AE25
 # file closed: game/tank.asm
- 35   AE23
- 36   AE23              ;===========================================================================
- 37   AE23              ; main routine - the code execution starts here.
- 38   AE23              ; Sets up the new interrupt routine, the memory
- 39   AE23              ; banks and jumps to the start loop.
- 40   AE23              ;===========================================================================
- 41   AE23              main:
- 42   AE23
- 43   AE23                  ; Setup stack
- 44   AE23 31 1A AF         ld sp,stack_top
- 45   AE26
- 46   AE26                  ; Draw the title screen
- 47   AE26 CD B3 A3         call titlescreen_show
- 48   AE29
- 49   AE29 CD 00 80         call init_start
- 50   AE2C CD 1B A2         call screen_draw
- 51   AE2F CD 51 AC         call player_init
- 52   AE32 CD A9 AC         call ship_land              ; land the ship
- 53   AE35 CD 8A AD         call tank_init
- 54   AE38
- 55   AE38              mloop:
- 56   AE38 76               halt
- 57   AE39 F3               di
- 58   AE3A CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
- 59   AE3D FB               ei                          ; enable interupts
- 60   AE3E
- 61   AE3E CD 5A AC         call player_drawplayer      ; delete player
- 62   AE41 CD 86 AA         call control_keyboard       ; check keyboard
- 63   AE44 CD 5A AC         call player_drawplayer      ; draw player
- 64   AE47 CD 93 AD         call tank_process           ; prcoess the tank
- 65   AE4A
- 66   AE4A CD 40 AC         call game_incrementframe    ; increment the game frame
- 67   AE4D
- 68   AE4D C3 38 AE         jp mloop
- 69   AE50
- 70   AE50              ;===========================================================================
- 71   AE50              ; Stack.
- 72   AE50              ;===========================================================================
- 73   AE50
- 74   AE50              ; Stack: this area is reserved for the stack
- 75   AE50              STACK_SIZE: equ 100    ; in words
- 76   AE50
- 77   AE50              ; Reserve stack space
- 78   AE50 00 00            defw 0  ; WPMEM, 2
- 79   AE52              stack_bottom:
- 80   AE52 00 00 00...      defs    STACK_SIZE*2, 0
- 81   AF1A              stack_top:
- 82   AF1A 00 00            defw 0  ; WPMEM, 2
- 83   AF1C
- 84   AF1C                     SAVESNA "ThePit.sna", main
+ 35   AE25
+ 36   AE25              ;===========================================================================
+ 37   AE25              ; main routine - the code execution starts here.
+ 38   AE25              ; Sets up the new interrupt routine, the memory
+ 39   AE25              ; banks and jumps to the start loop.
+ 40   AE25              ;===========================================================================
+ 41   AE25              main:
+ 42   AE25
+ 43   AE25                  ; Setup stack
+ 44   AE25 31 1C AF         ld sp,stack_top
+ 45   AE28
+ 46   AE28                  ; Draw the title screen
+ 47   AE28 CD B3 A3         call titlescreen_show
+ 48   AE2B
+ 49   AE2B CD 00 80         call init_start
+ 50   AE2E CD 1B A2         call screen_draw
+ 51   AE31 CD 53 AC         call player_init
+ 52   AE34 CD AB AC         call ship_land              ; land the ship
+ 53   AE37 CD 8C AD         call tank_init
+ 54   AE3A
+ 55   AE3A              mloop:
+ 56   AE3A 76               halt
+ 57   AE3B F3               di
+ 58   AE3C CD 75 A1         call screen_buffertoscreen  ; copy buffer to screen
+ 59   AE3F FB               ei                          ; enable interupts
+ 60   AE40
+ 61   AE40 CD 5C AC         call player_drawplayer      ; delete player
+ 62   AE43 CD 86 AA         call control_keyboard       ; check keyboard
+ 63   AE46 CD 5C AC         call player_drawplayer      ; draw player
+ 64   AE49 CD 95 AD         call tank_process           ; prcoess the tank
+ 65   AE4C
+ 66   AE4C CD 40 AC         call game_incrementframe    ; increment the game frame
+ 67   AE4F
+ 68   AE4F C3 3A AE         jp mloop
+ 69   AE52
+ 70   AE52              ;===========================================================================
+ 71   AE52              ; Stack.
+ 72   AE52              ;===========================================================================
+ 73   AE52
+ 74   AE52              ; Stack: this area is reserved for the stack
+ 75   AE52              STACK_SIZE: equ 100    ; in words
+ 76   AE52
+ 77   AE52              ; Reserve stack space
+ 78   AE52 00 00            defw 0  ; WPMEM, 2
+ 79   AE54              stack_bottom:
+ 80   AE54 00 00 00...      defs    STACK_SIZE*2, 0
+ 81   AF1C              stack_top:
+ 82   AF1C 00 00            defw 0  ; WPMEM, 2
+ 83   AF1E
+ 84   AF1E                     SAVESNA "ThePit.sna", main
 # file closed: main.asm

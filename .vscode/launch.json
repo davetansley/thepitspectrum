@@ -18,7 +18,7 @@
                     "mainFile": "main.asm"
                 }
             ],
-            "startAutomatically": false,
+            "startAutomatically": true,
             "skipInterrupt": true,
             "commandsAfterLaunch": [
                 //"-sprites",

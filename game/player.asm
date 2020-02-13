@@ -1,8 +1,8 @@
 ;
 ;   Data for current player
-;   horiz,vert,dir (0 up/down, 1 left, 2 right), frame, frame transition count
+;   horiz,vert,dir (0 up/down, 1 left, 2 right), frame, frame transition count, is digging (0 no), digging count
 player:
-    defb    0,0,2,0,1
+    defb    0,0,2,0,1,0,0
 ;
 ; Initializes a player
 ;
