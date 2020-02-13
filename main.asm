@@ -45,7 +45,7 @@ main:
     ld sp,stack_top
 
     ; Draw the title screen
-    ;call titlescreen_show
+    call titlescreen_show
 
     call init_start
     call screen_draw

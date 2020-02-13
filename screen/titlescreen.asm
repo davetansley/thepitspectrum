@@ -11,7 +11,7 @@ titlescreen_show:
 ; Draws the iconic logo
 ; 
 titlescreen_drawtitle:
-    ld b,105              ; number of points
+    ld b,102              ; number of points
     ld ix,titlescreen_logo_data
 titlescreen_drawtitle0:
     push bc
@@ -49,11 +49,11 @@ titlescreen_init:
 ; Horiz, vert
 ;
 titlescreen_logo_data:
-    defb 8,0,9,0,10,0,12,0,15,0,17,0,18,0,19,0,20,0
+    defb 8,0,9,0,10,0,12,0,15,0,17,0,18,0,19,0
     defb 9,1,12,1,15,1,17,1
-    defb 9,2,12,2,13,2,14,2,15,2,17,2,18,2,19,2,20,2
+    defb 9,2,12,2,13,2,14,2,15,2,17,2,18,2,19,2
     defb 9,3,12,3,15,3,17,3
-    defb 9,4,12,4,15,4,17,4,18,4,19,4,20,4
+    defb 9,4,12,4,15,4,17,4,18,4,19,4
     defb 0,6,1,6,2,6,3,6,4,6,5,6,6,6,7,6,8,6,9,6,10,6,11,6
     defb 16,6,17,6,18,6,19,6,20,6,21,6,22,6,23,6,24,6,25,6,26,6,27,6
     defb 2,7,2,8,2,9,2,10,2,11,2,12,2,13,2,14,2,15,2,16,2,17,2,18,2,19,2,20
