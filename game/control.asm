@@ -150,16 +150,17 @@ control_pl_moveup:
     push bc
     ld bc,(player)          ; get the current coords, b horiz, c vert
     ld a,c                  ; load c into the acc
-    cp 32
+    cp 24
     jp z,control_pl_moveup0 ; are we at the edge of the screen
     cp 96
-    call z, control_scroll_up
+    call c, control_scroll_up
     call control_checkcanmove_up ; check we can move up, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
     cp 0
     jp z,control_pl_moveup1 ; don't move if we can't
     pop af
+    sub 1                   ; subtract 1
     sub 1                   ; subtract 1
     ld c,a                  ; load back to c
     ld (player),bc          ; load back to player
@@ -181,13 +182,14 @@ control_pl_movedown:
     cp 224
     jp z,control_pl_movedown0 ; are we at the edge of the screen
     cp 144
-    call z, control_scroll_down
+    call nc, control_scroll_down
     call control_checkcanmove_down ; check we can move down, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
     cp 0
     jp z,control_pl_movedown1 ; don't move if we can't
     pop af
+    inc a                   ; add 1
     inc a                   ; add 1
     ld c,a                  ; load back to c
     ld (player),bc          ; load back to player
