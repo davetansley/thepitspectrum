@@ -5,8 +5,15 @@ control_keyboard:
     ld hl,player+5      ; first, check if the player has pixels left to move
     ld a,(hl)
     cp 0
-    jp z, control_keyboard0
+    jp z, control_keyboard1
     call control_automove
+    ret
+control_keyboard1:
+    ld hl,player+6      ; next, check if the player is digging
+    ld a,(hl)
+    cp 0
+    jp z, control_keyboard0
+    call control_dig
     ret
 control_keyboard0:
     ld bc,64510         ; port for keyboard row q-t.
@@ -26,6 +33,41 @@ control_keyboard0:
     call nc,control_pl_moveright       ; player left.
     rr b                ; check next key.
     call nc,control_pl_moveleft       ; player right.
+    ret
+
+;
+; Performs a dig if the counter has reset, otherwise, messes with the graphics
+;
+control_dig:
+    ld bc,(player)      ; load the current coords into bc
+    ld hl,player+2      ; get the direction
+    ld a,(hl)
+    cp 1                ; left
+    jp z,control_dig0 
+    cp 2                ; right
+    jp z,control_dig1
+    ld hl,player+6
+    ld (hl),0           ; turn off digging
+    ret                 ; return
+control_dig0:           ; going left
+    call sprites_scadd  ; get the current coord 
+    ld hl,de 
+    dec hl              ; move one left
+    jp control_dig2
+control_dig1:
+    call sprites_scadd  ; get the current coord 
+    ld hl,de 
+    inc hl              ; move one left
+    jp control_dig2
+control_dig2:
+    ld b,8              ; 8 rows to copy over
+control_dig3:
+    ld (hl),0           ; load empty into row
+    ld de,32
+    add hl,de           ; move to next row
+    djnz control_dig3
+    ld hl,player+6
+    ld (hl),0           ; turn off digging
     ret
 
 ;
@@ -66,7 +108,7 @@ control_pl_moveup:
     push bc
     ld bc,(player)          ; get the current coords, b horiz, c vert
     ld a,c                  ; load c into the acc
-    cp 0
+    cp 32
     jp z,control_pl_moveup0 ; are we at the edge of the screen
     cp 96
     call z, control_scroll_up
@@ -124,12 +166,11 @@ control_pl_moveleft:
     ld a,b                  ; load b into the acc
     cp 16
     jp z,control_pl_moveleft0 ; are we at the edge of the screen
-    jp z,control_pl_moveleft0 ; are we at the edge of the screen
     call control_checkcanmove_left ; check we can move down, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
     cp 0
-    jp z,control_pl_moveright1 ; don't move if we can't
+    jp z,control_pl_moveleft1 ; don't move if we can't
     ld hl,player+5          ; need to store the amount of pixels still left to move in the player status
     ld a,3
     ld (hl),a   
@@ -198,6 +239,115 @@ control_scroll_up:
     ret
 
 ;
+; Checks the contents of a cell are empty - ie, all pixel rows are zero
+; Inputs: 
+; hl - memory location of top pixel row
+; bc - screen coords, b horiz, c vert
+; Outputs:
+; e - 0 if not empty, 1 if empty
+;
+control_spaceisempty:
+    ld a,8                          ; 8 rows to check
+control_spaceisempty0:
+    ex af,af'                       ; store the loop counter
+    ld a,(hl)                       ; get current pixel row
+    cp 0
+    jp nz, control_spaceisempty1    ; row is not empty, can't move here
+    ld a,c                          ; load the vertical coord 
+    inc a                           ; next row down
+    ld de,32
+    add hl,de                       ; otherwise, just go one down for hl, which means add 32, because of course
+    ld c,a                          ; copy vert coord back to c
+    ex af,af'                       ; get loop counter back
+    dec a                           ; decrease loop counter
+    jp nz, control_spaceisempty0
+    ld d,0
+    ld e,1                          ; got to end, so space is empty
+    ret
+control_spaceisempty1:
+    ld d,0
+    ld e,0                          ; returning false, ie space not empty
+    ret
+
+;
+; Checks the line of a cell below is empty - ie, first pixel rows is zero
+; Inputs: 
+; hl - memory location of top pixel row
+; bc - screen coords, b horiz, c vert
+; Outputs:
+; e - 0 if not empty, 1 if empty
+;
+control_linebelowisempty:
+    ld a,(hl)                       ; get current pixel row
+    cp 0
+    jp nz, control_linebelowisempty1    ; row is not empty, can't move here
+    ld d,0
+    ld e,1                          ; got to end, so space is empty
+    ret
+control_linebelowisempty1:
+    ld d,0
+    ld e,0                          ; returning false, ie space not empty
+    ret
+
+;
+; Checks the line of a cell above is empty - ie, last pixel rows are zero
+; Inputs: 
+; hl - memory location of top pixel row
+; bc - screen coords, b horiz, c vert
+; Outputs:
+; e - 0 if not empty, 1 if empty
+;
+control_lineaboveisempty:
+    ld a,(hl)                       ; get current pixel row
+    cp 0
+    jp nz, control_lineaboveisempty1    ; row is not empty, can't move here
+    ld d,0
+    ld e,1                          ; got to end, so space is empty
+    ret
+control_lineaboveisempty1:
+    ld d,0
+    ld e,0                          ; returning false, ie space not empty
+    ret
+
+;
+; Checks the contents of a cell are diggable - ie, all pixel rows are dirt or empty
+; Inputs: 
+; hl - memory location of top pixel row
+; bc - screen coords, b horiz, c vert
+; Outputs:
+; none - puts player into digging mode
+;
+control_spaceisdiggable:
+    ld a,8                          ; 8 rows to check
+control_spaceisdiggable0:
+    ex af,af'                       ; store the loop counter
+    ld a,(hl)                       ; get current pixel row
+    cp 0
+    jp z, control_spaceisdiggable2  ; row is empty, can dig here
+    cp 85
+    jp z, control_spaceisdiggable2  ; row is dirt, can dig here
+    cp 170
+    jp z, control_spaceisdiggable2  ; row is dirt, can dig here
+    jp control_spaceisdiggable1     ; otherwise, stop checking
+control_spaceisdiggable2:
+    ld a,c                          ; load the vertical coord 
+    inc a                           ; next row down
+    ld de,32
+    add hl,de                       ; otherwise, just go one down for hl, which means add 32, because of course
+    ld c,a                          ; copy vert coord back to c
+    ex af,af'                       ; get loop counter back
+    dec a                           ; decrease loop counter
+    jp nz, control_spaceisdiggable0
+    ld hl,player+6                  
+    ld (hl),1                       ; set the player into digging mode
+    inc hl
+    ld (hl),50                      ; set the number of frame to dig for
+    ret
+control_spaceisdiggable1:
+    ret
+
+
+;
 ; Checks if the player can move down
 ; Inputs:
 ; bc - player coords, b horiz, c vert
@@ -206,28 +356,25 @@ control_scroll_up:
 control_checkcanmove_down:
     push af
     push bc
-    call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-    ld hl,32                        ; look at cell directly underneath (add 32)
-    add hl,de                       ; memory location of cell beneath now in hl
-    ld e,0                          ; zero de
-    ld d,0
-    ld a,(hl)                       ; get attr of cell below
-    cp 70
-    jp nz, control_checkcanmove_down1 ; don't set flag if not black
-    pop bc                          ; get bc back briefly
-    ld a,b                         ; screen coord
-    push bc                         ; put it back for later
-    and 7                           ; and with 7
-    cp 0    
-    jp z, control_checkcanmove_down0   ; is multiple of 8 so no need to check next block
-    inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
-    ld a,(hl)                       ; get attr of cell below
-    cp 70
-    jp nz, control_checkcanmove_down1 ; don't set flag if not black
-control_checkcanmove_down0:
-    ld e,1
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de                        ; look at cell directly underneath (add 256)
+    inc h                       ; memory location of cell beneath now in hl
+    call control_linebelowisempty       ; check space is empty
+    ld a,e                          ; check space empty flag
+    cp 0
+    jp z, control_checkcanmove_down1 ; can't move
     call player_justmoved
+    pop bc
+    pop af
+    ret
 control_checkcanmove_down1:
+    pop bc
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de                        ; look at cell directly underneath (add 256)
+    inc h 
+    push bc
+    call control_spaceisdiggable    ; can't move here, but can we dig
+    ld de,0
     pop bc
     pop af
     ret
@@ -241,36 +388,26 @@ control_checkcanmove_down1:
 control_checkcanmove_up:
     push af
     push bc
-    call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-    ld hl,de
-    pop bc                          ; get bc back briefly
-    ld a,c                         ; screen coord
-    push bc                         ; put it back for later
-    and 7                           ; and with 7
-    cp 0                            ; need to check if the vert coord is multiple of 8, if it is, subtract 32 from memory address
-    jp nz,control_checkcanmove_up2                                  
-    ld de,32                        ; look at cell directly above (sub 32)
-    sbc hl,de                       ; memory location of cell above now in hl
-control_checkcanmove_up2:
-    ld e,0                          ; zero de
-    ld d,0
-    ld a,(hl)                       ; get attr of cell above
-    cp 70
-    jp nz, control_checkcanmove_up1 ; don't set flag if not black
-    pop bc                          ; get bc back briefly
-    ld a,b                         ; screen coord
-    push bc                         ; put it back for later
-    and 7                           ; and with 7
-    cp 0    
-    jp z, control_checkcanmove_up0   ; is multiple of 8 so no need to check next block
-    inc hl                          ; check the next cell across if stradling a block - if b/horiz not multiple of 8
-    ld a,(hl)                       ; get attr of cell below
-    cp 70
-    jp nz, control_checkcanmove_up1 ; don't set flag if not black
-control_checkcanmove_up0:
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de                        ; look at cell directly underneath (add 256)
+    ld de,32
+    sbc hl,de                       ; memory location of line above now in hl
+    call control_lineaboveisempty       ; check space is empty
+    ld a,e                          ; check space empty flag
+    cp 0
+    jp z, control_checkcanmove_up1 ; can't move
     ld e,1
     call player_justmoved
+    pop bc
+    pop af
+    ret
 control_checkcanmove_up1:
+    pop bc
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de                        ; look at cell directly underneath (add 256)
+    ld de,32
+    ld de,0
+    push bc
     pop bc
     pop af
     ret
@@ -284,30 +421,25 @@ control_checkcanmove_up1:
 control_checkcanmove_right:
     push af
     push bc
-    call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-    inc hl                        ; look at cell directly to the right (add 1) 
-    ld e,0                          ; zero de
-    ld d,0
-    ld a,(hl)                       ; get attr of cell to the right
-    cp 70
-    jp nz, control_checkcanmove_right1 ; don't set flag if not black
-    pop bc                          ; get bc back briefly
-    ld a,c                         ; screen coord
-    push bc                         ; put it back for later
-    and 7                           ; and with 7
-    cp 0    
-    jp z, control_checkcanmove_right0   ; is multiple of 8 so no need to check next block
-    ld de,32                          ; check the next cell down if stradling a block - if c/vert not multiple of 8
-    add hl,de
-    ld e,0
-    ld d,0                          ; zero de again
-    ld a,(hl)                       ; get attr of cell below
-    cp 70
-    jp nz, control_checkcanmove_right1 ; don't set flag if not black
-control_checkcanmove_right0:
-    ld e,1
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de                        ; look at cell directly to the right (add 1)
+    inc hl                          ; memory location of cell to the right now in hl
+    call control_spaceisempty       ; check space is empty
+    ld a,e                          ; check space empty flag
+    cp 0
+    jp z, control_checkcanmove_right1 ; can't move
     call player_justmoved
+    pop bc
+    pop af
+    ret
 control_checkcanmove_right1:
+    pop bc
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de
+    inc hl                          ; memory location of cell to the right now in hl
+    push bc
+    call control_spaceisdiggable    ; can't move here, but can we dig
+    ld de,0
     pop bc
     pop af
     ret
@@ -321,38 +453,25 @@ control_checkcanmove_right1:
 control_checkcanmove_left:
     push af
     push bc
-    call screen_getattraddressfromscreencoords ; get the memory location of cell into de
-    ld hl,de
-    pop bc                          ; get bc back briefly
-    ld a,b                         ; screen coord
-    push bc                         ; put it back for later
-    and 7                           ; and with 7
-    cp 0                            ; need to check if the horiz coord is multiple of 8, if it is, subtract 32 from memory address
-    jp nz,control_checkcanmove_left2                                  
-    dec hl                       ; memory location of cell left now in hl
-control_checkcanmove_left2:
-    ld e,0                          ; zero de
-    ld d,0
-    ld a,(hl)                       ; get attr of cell to the right
-    cp 70
-    jp nz, control_checkcanmove_left1 ; don't set flag if not black
-    pop bc                          ; get bc back briefly
-    ld a,c                         ; screen coord
-    push bc                         ; put it back for later
-    and 7                           ; and with 7
-    cp 0    
-    jp z, control_checkcanmove_left0   ; is multiple of 8 so no need to check next block
-    ld de,32                          ; check the next cell down if stradling a block - if c/vert not multiple of 8
-    add hl,de
-    ld e,0
-    ld d,0                          ; zero de again
-    ld a,(hl)                       ; get attr of cell below
-    cp 70
-    jp nz, control_checkcanmove_left1 ; don't set flag if not black
-control_checkcanmove_left0:
-    ld e,1
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de                        ; look at cell directly to the right (add 1)
+    dec hl                          ; memory location of cell to the right now in hl
+    call control_spaceisempty       ; check space is empty
+    ld a,e                          ; check space empty flag
+    cp 0
+    jp z, control_checkcanmove_left1 ; can't move
     call player_justmoved
+    pop bc
+    pop af
+    ret
 control_checkcanmove_left1:
+    pop bc
+    call sprites_scadd              ; get the memory location of cell into de
+    ld hl,de
+    dec hl                          ; memory location of cell to the right now in hl
+    push bc
+    call control_spaceisdiggable    ; can't move here, but can we dig
+    ld de,0
     pop bc
     pop af
     ret
