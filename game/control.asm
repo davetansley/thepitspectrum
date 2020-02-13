@@ -59,14 +59,14 @@ control_dig0:           ; going left
 control_dig1:
     call sprites_scadd  ; get the current coord 
     ld hl,de 
-    inc hl              ; move one left
+    inc hl              ; move one right
     jp control_dig2
 control_dig4:
     call sprites_scadd  ; get the current coord 
     ld hl,de 
-    ld de,256
+    ld de,32
     sbc hl,de             ; move one up
-    jp control_dig2
+    jp control_dig6
 control_dig5:
     call sprites_scadd  ; get the current coord 
     ld hl,de 
@@ -74,24 +74,51 @@ control_dig5:
     jp control_dig2
 control_dig2:
     pop bc
-    push hl
-    call control_spaceisdiggable ; check again if the row is diggable
-    ld a,(player+6)      ; next, check if the player is digging
-    cp 1
-    ret nz              ; return if we're not supposed to be digging
-    pop hl
     ld a,(player+8)     ; get the number of rows we need to overwrite
     ld b,a              ; rows to copy over
 control_dig3:
-    ld (hl),0           ; load empty into row
+    call control_getpixelrow
+    ld (hl),a           ; load empty into row
     ld de,32
     add hl,de           ; move to next row
     djnz control_dig3
-    ld hl,player+6
-    ld (hl),0           ; turn off digging
-    ld hl,player+5      ; automove into this space
-    ld a,4
-    ld (hl),a
+    jp control_dig10
+control_dig6:           ; special case for going up
+    pop bc
+    ld a,(player+8)     ; get the number of rows we need to overwrite
+    ld b,a              ; rows to copy over
+control_dig7:
+    call control_getpixelrow
+control_dig12:
+    ld (hl),a           ; load empty into row
+    ld de,32
+    sbc hl,de           ; move up to next row
+    djnz control_dig7
+control_dig10:
+    ld ix,player+7
+    ld a,(ix)     ; get the dig frame number 
+    dec a
+    ld (ix),a
+    ret
+
+;
+; Gets a modified pixel row to overwrite dirt - if this is the last dig, overwrite with nothing, otherwise xor to flip the dirt
+; Inputs:
+; hl - memory of pixel row
+; Outputs:
+; a - modified row to write
+;
+control_getpixelrow:
+    ld a,(player+7)     ; get the dig frame number 
+    cp 0                ; is this the last dig
+    jp z,control_getpixelrow1   
+    ld a,(hl)           ; if not, xor with 255 to flip it
+    xor 255
+    ret
+control_getpixelrow1:
+    ld ix,player+6
+    ld (ix),0           ; turn off digging
+    ld a,0              ; if it is, load with empty
     ret
 
 ;
@@ -154,7 +181,7 @@ control_pl_moveup:
     jp z,control_pl_moveup0 ; are we at the edge of the screen
     cp 96
     call c, control_scroll_up
-    call control_checkcanmove_up ; check we can move up, e will be 1 if we can
+    call movement_checkcanmove_up ; check we can move up, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
     cp 0
@@ -183,7 +210,7 @@ control_pl_movedown:
     jp z,control_pl_movedown0 ; are we at the edge of the screen
     cp 144
     call nc, control_scroll_down
-    call control_checkcanmove_down ; check we can move down, e will be 1 if we can
+    call movement_checkcanmove_down ; check we can move down, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
     cp 0
@@ -210,7 +237,7 @@ control_pl_moveleft:
     ld a,b                  ; load b into the acc
     cp 16
     jp z,control_pl_moveleft0 ; are we at the edge of the screen
-    call control_checkcanmove_left ; check we can move down, e will be 1 if we can
+    call movement_checkcanmove_left ; check we can move down, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
     cp 0
@@ -240,7 +267,7 @@ control_pl_moveright:
     ld a,b                  ; load b into the acc
     cp 240
     jp z,control_pl_moveright0 ; are we at the edge of the screen
-    call control_checkcanmove_right ; check we can move down, e will be 1 if we can
+    call movement_checkcanmove_right ; check we can move down, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
     cp 0
@@ -282,246 +309,6 @@ control_scroll_up:
     pop af
     ret
 
-;
-; Checks the contents of a cell are empty - ie, all pixel rows are zero
-; Inputs: 
-; hl - memory location of top pixel row
-; bc - screen coords, b horiz, c vert
-; Outputs:
-; e - 0 if not empty, 1 if empty
-;
-control_spaceisempty:
-    ld a,8                          ; 8 rows to check
-control_spaceisempty0:
-    ex af,af'                       ; store the loop counter
-    ld a,(hl)                       ; get current pixel row
-    cp 0
-    jp nz, control_spaceisempty1    ; row is not empty, can't move here
-    ld a,c                          ; load the vertical coord 
-    inc a                           ; next row down
-    ld de,32
-    add hl,de                       ; otherwise, just go one down for hl, which means add 32, because of course
-    ld c,a                          ; copy vert coord back to c
-    ex af,af'                       ; get loop counter back
-    dec a                           ; decrease loop counter
-    jp nz, control_spaceisempty0
-    ld d,0
-    ld e,1                          ; got to end, so space is empty
-    ret
-control_spaceisempty1:
-    ld d,0
-    ld e,0                          ; returning false, ie space not empty
-    ret
 
-;
-; Checks the line of a cell below is empty - ie, first pixel rows is zero
-; Inputs: 
-; hl - memory location of top pixel row
-; bc - screen coords, b horiz, c vert
-; Outputs:
-; e - 0 if not empty, 1 if empty
-;
-control_linebelowisempty:
-    ld a,(hl)                       ; get current pixel row
-    cp 0
-    jp nz, control_linebelowisempty1    ; row is not empty, can't move here
-    ld d,0
-    ld e,1                          ; got to end, so space is empty
-    ret
-control_linebelowisempty1:
-    ld d,0
-    ld e,0                          ; returning false, ie space not empty
-    ret
-
-;
-; Checks the line of a cell above is empty - ie, last pixel rows are zero
-; Inputs: 
-; hl - memory location of top pixel row
-; bc - screen coords, b horiz, c vert
-; Outputs:
-; e - 0 if not empty, 1 if empty
-;
-control_lineaboveisempty:
-    ld a,(hl)                       ; get current pixel row
-    cp 0
-    jp nz, control_lineaboveisempty1    ; row is not empty, can't move here
-    ld d,0
-    ld e,1                          ; got to end, so space is empty
-    ret
-control_lineaboveisempty1:
-    ld d,0
-    ld e,0                          ; returning false, ie space not empty
-    ret
-
-;
-; Checks the contents of a cell are diggable - ie, all pixel rows are dirt or empty
-; Inputs: 
-; hl - memory location of top pixel row
-; bc - screen coords, b horiz, c vert
-; Outputs:
-; none - puts player into digging mode
-;
-control_spaceisdiggable:
-    ld a,8                          ; 8 rows to check
-control_spaceisdiggable0:
-    ex af,af'                       ; store the loop counter
-    ld a,(hl)                       ; get current pixel row
-    cp 0
-    jp z, control_spaceisdiggable2  ; row is empty, can dig here
-    cp 85
-    jp z, control_spaceisdiggable2  ; row is dirt, can dig here
-    cp 170
-    jp z, control_spaceisdiggable2  ; row is dirt, can dig here
-    jp control_spaceisdiggable1     ; otherwise, stop checking
-control_spaceisdiggable2:
-    ld a,c                          ; load the vertical coord 
-    inc a                           ; next row down
-    ld de,32
-    add hl,de                       ; otherwise, just go one down for hl, which means add 32, because of course
-    ld c,a                          ; copy vert coord back to c
-    ex af,af'                       ; get loop counter back
-    dec a                           ; decrease loop counter
-    jp nz, control_spaceisdiggable0
-    ld hl,player+6                  
-    ld (hl),1                       ; set the player into digging mode
-    inc hl
-    ld (hl),50                      ; set the number of frame to dig for
-    inc hl
-    ld (hl),8                       ; set the number of pixels to dig
-    ret
-control_spaceisdiggable1:
-    ld hl,player+6                  
-    ld (hl),0                       ; set the player out of digging mode
-    ret
-
-
-;
-; Checks if the player can move down
-; Inputs:
-; bc - player coords, b horiz, c vert
-; Outputs:
-; de - 1 can move
-control_checkcanmove_down:
-    push af
-    push bc
-    call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly underneath (add 256)
-    inc h                       ; memory location of cell beneath now in hl
-    call control_linebelowisempty       ; check space is empty
-    ld a,e                          ; check space empty flag
-    cp 0
-    jp z, control_checkcanmove_down1 ; can't move
-    call player_justmoved
-    pop bc
-    pop af
-    ret
-control_checkcanmove_down1:
-    pop bc
-    call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly underneath (add 256)
-    inc h 
-    push bc
-    call control_spaceisdiggable    ; can't move here, but can we dig
-    ld de,0
-    pop bc
-    pop af
-    ret
-
-;
-; Checks if the player can move up
-; Inputs:
-; bc - player coords, b horiz, c vert
-; Outputs:
-; de - 1 can move
-control_checkcanmove_up:
-    push af
-    push bc
-    call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly underneath (add 256)
-    ld de,32
-    sbc hl,de                       ; memory location of line above now in hl
-    call control_lineaboveisempty       ; check space is empty
-    ld a,e                          ; check space empty flag
-    cp 0
-    jp z, control_checkcanmove_up1 ; can't move
-    ld e,1
-    call player_justmoved
-    pop bc
-    pop af
-    ret
-control_checkcanmove_up1:
-    pop bc
-    call sprites_scadd              ; get the memory location of cell into de
-    dec h                        ; look at cell directly above (sub 256)
-    push bc
-    call control_spaceisdiggable    ; can't move here, but can we dig
-    ld de,0
-    pop bc
-    pop af
-    ret
-
-;
-; Checks if the player can move right
-; Inputs:
-; bc - player coords, b horiz, c vert
-; Outputs:
-; de - 1 can move
-control_checkcanmove_right:
-    push af
-    push bc
-    call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly to the right (add 1)
-    inc hl                          ; memory location of cell to the right now in hl
-    call control_spaceisempty       ; check space is empty
-    ld a,e                          ; check space empty flag
-    cp 0
-    jp z, control_checkcanmove_right1 ; can't move
-    call player_justmoved
-    pop bc
-    pop af
-    ret
-control_checkcanmove_right1:
-    pop bc
-    call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de
-    inc hl                          ; memory location of cell to the right now in hl
-    push bc
-    call control_spaceisdiggable    ; can't move here, but can we dig
-    ld de,0
-    pop bc
-    pop af
-    ret
-
-;
-; Checks if the player can move left
-; Inputs:
-; bc - player coords, b horiz, c vert
-; Outputs:
-; de - 1 can move
-control_checkcanmove_left:
-    push af
-    push bc
-    call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly to the right (add 1)
-    dec hl                          ; memory location of cell to the right now in hl
-    call control_spaceisempty       ; check space is empty
-    ld a,e                          ; check space empty flag
-    cp 0
-    jp z, control_checkcanmove_left1 ; can't move
-    call player_justmoved
-    pop bc
-    pop af
-    ret
-control_checkcanmove_left1:
-    pop bc
-    call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de
-    dec hl                          ; memory location of cell to the right now in hl
-    push bc
-    call control_spaceisdiggable    ; can't move here, but can we dig
-    ld de,0
-    pop bc
-    pop af
-    ret
 
     

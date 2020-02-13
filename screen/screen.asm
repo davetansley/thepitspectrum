@@ -7,6 +7,9 @@ screen_attr_buffer:
 screen_offset:
     defb 0                      ; offset from top of screen in lines
 
+screen_tmp:
+    defb 0                      ; temporary memory
+
 ;
 ; Copies the buffer to the screen. Use stack.
 ; Inputs: none
@@ -154,8 +157,14 @@ screen_draw0:
     ld a,b                  
     cp 29                       ; check if at bottom
     jp nz,screen_draw0          ; if not, loop
-    call screen_initrocks       ; draw rocks
-
+    ld hl, screen_tmp
+    ld (hl),9                   ; load the block number into memory
+    ld ix,level01rocks          ; rock memory
+    call screen_initobjects     ; draw rocks
+    ld hl, screen_tmp
+    ld (hl),12                  ; load the block number into memory
+    ld ix,level01missiles       ; missile memory
+    call screen_initobjects     ; draw missiles
     call screen_setuptext       ; draws text on the screen
     ret
 
@@ -178,33 +187,33 @@ screen_setuptext:
     call screen_setscorecolours
     ret
 ;
-; Draw initial rock positions
+; Draw initial object positions
 ; Inputs:
-;
-screen_initrocks:
-    ld ix,level01rocks          ; load the location of the rock into ix
-screen_initrocks0:
+; ix - memory location of objects
+; a - graphic
+screen_initobjects:
     ld c,(ix)                   ; get the horiz coord
     ld a,c
     cp 255
-    jp z,screen_initrocks2
+    jp z,screen_initobjects2
     inc ix                      ; move to next
     ld b,(ix)                   ; get the vert coord
     inc ix
     call screen_getcellattradress ; get the memory address of b,c attr into de
-    ld a,9                      ; load the block number for rock
     push de
+    ld a,(screen_tmp)                  ; get the block number back
     call screen_getattr         ; get the memory location for this cell's attr into hl
     pop de
     ld a,(hl)                   ; get the attr value at the address
     ld (de),a                   ; load the attr into memory
-    ld a,9                      ; load the block number for rock
+    ld a,(screen_tmp)                  ; get the block number back
     call screen_getblock        ; get the block data into hl
     call screen_showchar        ; show this character here
-screen_initrocks1:
+    
+screen_initobjects1:
     inc ix                      ; move past state
-    jp screen_initrocks0      ; decrease b and check if zero
-screen_initrocks2:
+    jp screen_initobjects      
+screen_initobjects2:
     ret
 
 

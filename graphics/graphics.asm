@@ -12,6 +12,7 @@ sprites:
     defb    28,126,255,127,254,252,127,  62    ; 9, rock	
     defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 10, sky block, tank background
     defb    0  ,  0,  0,  0,  0,  0,255,255   ; 11, sky block, pixel trapdoor
+	defb    153,219,126, 36,255,126, 60, 24   ; 12, missile
     
 sprite_attrs:
     defb    070 ; 0, space
@@ -26,6 +27,7 @@ sprite_attrs:
     defb    066 ; 9, rock
     defb    074 ; 10, sky, red ink (tank)
 	defb    073 ; 11, sky, trapdoor
+	defb    067 ; 12, missile
 
 player_sprite:
 	defb	 16, 57,146,252, 56, 61,195,128 ; 0 up/down 1
@@ -34,8 +36,10 @@ player_sprite:
 	defb	  8,156, 73, 63, 28,188,195,  1 ; 3 up/down 2    
 	defb	  8, 28,  8,252, 60, 60,100, 12; 4 left 2
 	defb	 16, 56, 16, 63, 60, 60, 38, 48 ; 5 right 2  
-	defb	 2,  7,  2, 63, 15, 15, 25,  3  ; 6 shoot left
-	defb	 64,224, 64,252,240,240,152,192 ; 7 shoot right
+	defb	 62, 28,  8, 72,120, 58,191,250 ; 6 shoot up
+	defb	 2,135,194,255,207,143, 25,  3  ; 7 shoot left
+	defb	 64,225, 67,255,243,241,152,192 ; 8 shoot right
+	defb	 95,253, 92, 30, 18, 16, 56,124 ; 9 shoot down
 
 ;
 ; First 4 top half, next 4 bottom 1, next 4 bottom 2

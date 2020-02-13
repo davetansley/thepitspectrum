@@ -28,6 +28,7 @@
     include "graphics\graphics.asm"
 
     include "game\control.asm"
+    include "game\movement.asm"
     include "game\game.asm"
     include "game\player.asm"
     include "game\ship.asm"

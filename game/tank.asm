@@ -38,7 +38,7 @@ tank_process:
     ret z                       ; return if we've already moved
     call game_getcurrentframe   ; get the current frame number into a
     cp 75
-    ret c                      ; return if the frame number is below 100
+    ret c                       ; return if the frame number is below 100
     call tank_move              ; move tank if not
     ld a,(tank_anim)
     dec a
@@ -50,7 +50,7 @@ tank_move:
     push bc
     ld a,(tank_anim)
     cp 17                       ; check first time flag
-    jp z,tank_move1         ; don't draw over previous one if first time
+    jp z,tank_move1             ; don't draw over previous one if first time
     call tank_draw_full         ; delete old one
     ld bc,(tank_initpos2)       ; get the current coords
     ld a,b

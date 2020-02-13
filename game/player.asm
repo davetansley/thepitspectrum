@@ -21,18 +21,27 @@ player_drawplayer:
     ld a,0                      ; if 3, then down, so set the direction to 0 since the sprite is the same as up
 player_drawplayer0:
     ld e,a                      ; store in e
-    ld a,(player+3)             ; get the current frame
+    ld a,(player+6)             ; get the dig flag
+    cp 1
+    jp z,player_drawplayer1    ; get dig frame
+    ld a,(player+3)             ; this is normal movement so get the current frame
     add a,e
+    jp player_drawplayer2
+player_drawplayer1
+    ld a,(player+2)             ; get the current direction again, because want all four
+    add a,6                     ; add direction to 6 to get frame    
+player_drawplayer2
     rlca
     rlca
     rlca                        ; multiply by eight
     ld l,a
-    ld h,0              
+    ld h,0  
     ld de,player_sprite
     add hl,de                   ; load hl with the location of the player sprite data
-    ld bc,(player)         ; load bc with the start coords
+    ld bc,(player)              ; load bc with the start coords
     call sprites_drawsprite     ; call the routine to draw the sprite
     ret
+
 
 ;
 ; Runs after the player just moved. Changes animation frame if required
