@@ -1235,14 +1235,14 @@
  37+  AA2B 3C 3C 64 0C
  38+  AA2F 10 38 10 3F  	defb	 16, 56, 16, 63, 60, 60, 38, 48 ; 5 right 2
  38+  AA33 3C 3C 26 30
- 39+  AA37 3E 1C 08 48  	defb	 62, 28,  8, 72,120, 58,191,250 ; 6 shoot up
- 39+  AA3B 78 3A BF FA
- 40+  AA3F 02 87 C2 FF  	defb	 2,135,194,255,207,143, 25,  3  ; 7 shoot left
- 40+  AA43 CF 8F 19 03
- 41+  AA47 40 E1 43 FF  	defb	 64,225, 67,255,243,241,152,192 ; 8 shoot right
- 41+  AA4B F3 F1 98 C0
- 42+  AA4F 5F FD 5C 1E  	defb	 95,253, 92, 30, 18, 16, 56,124 ; 9 shoot down
- 42+  AA53 12 10 38 7C
+ 39+  AA37 54 28 10 12  	defb	 84, 40, 16, 18, 30, 92,253, 95 ; 6 shoot up
+ 39+  AA3B 1E 5C FD 5F
+ 40+  AA3F 02 87 42 BF  	defb	 2,135, 66,191, 79,143, 25,  3  ; 7 shoot left
+ 40+  AA43 4F 8F 19 03
+ 41+  AA47 40 E1 42 FD  	defb	 64,225, 66,253,242,241,152,192 ; 8 shoot right
+ 41+  AA4B F2 F1 98 C0
+ 42+  AA4F FA BF 3A 78  	defb	 250,191, 58,120, 72,  8, 20, 42 ; 9 shoot down
+ 42+  AA53 48 08 14 2A
  43+  AA57
  44+  AA57              ;
  45+  AA57              ; First 4 top half, next 4 bottom 1, next 4 bottom 2

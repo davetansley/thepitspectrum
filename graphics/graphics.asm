@@ -36,10 +36,10 @@ player_sprite:
 	defb	  8,156, 73, 63, 28,188,195,  1 ; 3 up/down 2    
 	defb	  8, 28,  8,252, 60, 60,100, 12; 4 left 2
 	defb	 16, 56, 16, 63, 60, 60, 38, 48 ; 5 right 2  
-	defb	 62, 28,  8, 72,120, 58,191,250 ; 6 shoot up
-	defb	 2,135,194,255,207,143, 25,  3  ; 7 shoot left
-	defb	 64,225, 67,255,243,241,152,192 ; 8 shoot right
-	defb	 95,253, 92, 30, 18, 16, 56,124 ; 9 shoot down
+	defb	 84, 40, 16, 18, 30, 92,253, 95 ; 6 shoot up
+	defb	 2,135, 66,191, 79,143, 25,  3  ; 7 shoot left
+	defb	 64,225, 66,253,242,241,152,192 ; 8 shoot right
+	defb	 250,191, 58,120, 72,  8, 20, 42 ; 9 shoot down
 
 ;
 ; First 4 top half, next 4 bottom 1, next 4 bottom 2
