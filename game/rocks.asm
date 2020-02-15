@@ -123,6 +123,17 @@ rocks_fall1:
     jp nz,rocks_fall3    ; move the rock if the row is empty
     inc c               ; increment the vertical
     ld (ix),bc          ; store the new coords
+    ld a,c              ; get the vertical coord into a
+    and 7               ; divisible by 8?
+    cp 0
+    jp nz,rocks_fall4   ; if not, carry on
+    ld a,c              ; get vertical
+    sub 8               ; look up one square
+    ld c,a              ; put a back in c
+    call screen_getattraddressfromscreencoords ; get the attr address into de
+    ld hl,de
+    ld (hl),70          ; load this square with the yellow colour
+rocks_fall4:
     ex af,af'
     dec a
     cp 0

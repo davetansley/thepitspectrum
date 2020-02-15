@@ -2463,7 +2463,7 @@
  86+  B11C                  ; we're wobbling
  87+  B11C DD 23            inc ix              ; get frame number for wobble
  88+  B11E DD 7E 00         ld a,(ix)           ; get wobble frame into a
- 89+  B121 CD 98 B1         call rocks_wobble
+ 89+  B121 CD AB B1         call rocks_wobble
  90+  B124 DD 23            inc ix              ; increment for next
  91+  B126 C3 37 B1         jp rocks_processrocks1  ; do next rock
  92+  B129              rocks_processrocks2:
@@ -2498,123 +2498,134 @@
 120+  B14F 14               inc d               ; add 256 to get next row
 121+  B150 1A               ld a,(de)           ; get the contents of the next row
 122+  B151 FE 00            cp 0
-123+  B153 C2 83 B1         jp nz,rocks_fall3    ; move the rock if the row is empty
+123+  B153 C2 96 B1         jp nz,rocks_fall3    ; move the rock if the row is empty
 124+  B156 0C               inc c               ; increment the vertical
 125+  B157 DD 71 00 DD      ld (ix),bc          ; store the new coords
 125+  B15B 70 01
-126+  B15D 08               ex af,af'
-127+  B15E 3D               dec a
-128+  B15F FE 00            cp 0
-129+  B161 C2 45 B1         jp nz,rocks_fall1   ; do another pixel if needed
-130+  B164              rocks_fall2:
-131+  B164 3E 09            ld a,9              ; rock graphic
-132+  B166 ED 4B CC B0      ld bc,(rocks_tmp2)  ; get the original coords
-133+  B16A CD 3D A3         call screen_getblock     ; get the memory into hl
-134+  B16D CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
-135+  B170 3E 09            ld a,9
-136+  B172 DD 4E 00 DD      ld bc,(ix)          ; get the new coords
-136+  B176 46 01
-137+  B178 CD 3D A3         call screen_getblock     ; get the memory into hl
-138+  B17B CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
-139+  B17E DD 23            inc ix
-140+  B180 DD 23            inc ix                  ; get ix back to state
-141+  B182 C9               ret
-142+  B183              rocks_fall3:
-143+  B183 3E 00            ld a,0              ; set the state to fell
-144+  B185 DD 77 02         ld (ix+2),a           ; store the falling state
-145+  B188 DD 4E 00 DD      ld bc,(ix)          ; get the coords
-145+  B18C 46 01
-146+  B18E CD 02 A3         call screen_getattraddressfromscreencoords ; get the attr address into de
-147+  B191 62 6B            ld hl,de
-148+  B193 36 42            ld (hl),66
-149+  B195 C3 64 B1         jp rocks_fall2      ; rejoin main loop
-150+  B198
-151+  B198              ;
-152+  B198              ; Wobbles a rocks
-153+  B198              ; Inputs:
-154+  B198              ; bc - coord of current rock graphic on screen
-155+  B198              ; ix - memory location of current rock in rock list, currently at the 4th position (wobble count)
-156+  B198              ; a - wobble frame
-157+  B198              rocks_wobble:
-158+  B198 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle
-159+  B19B 1E 09            ld e,9              ; this is the rock frame
-160+  B19D 83               add a,e             ; add the frame toggle
-161+  B19E C5               push bc
-162+  B19F CD 3D A3         call screen_getblock     ; get the memory into hl
-163+  B1A2 CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
-164+  B1A5 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle against
-165+  B1A8 EE 01            xor 1               ; flip to other state
-166+  B1AA 32 CB B0         ld (rocks_tmp),a    ; store
-167+  B1AD 1E 09            ld e,9              ; this is the rock frame
-168+  B1AF 83               add a,e             ; add the frame toggle
-169+  B1B0 CD 3D A3         call screen_getblock     ; get the memory into hl
-170+  B1B3 C1               pop bc
-171+  B1B4 CD 5F A3         call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
-172+  B1B7 DD 7E 00         ld a,(ix)           ; get the wobble count back
-173+  B1BA 3D               dec a               ; decrease
-174+  B1BB DD 77 00         ld (ix),a           ; store
-175+  B1BE FE 00            cp 0
-176+  B1C0 C0               ret nz              ; if we're not at zero, return
-177+  B1C1 DD 2B            dec ix              ; otherwise look to state location
-178+  B1C3 3E 01            ld a,1              ; set the state to falling
-179+  B1C5 DD 77 00         ld (ix),a           ; store the falling state
-180+  B1C8 DD 23            inc ix              ; set ix back to location of wobble count, and we're done
-181+  B1CA C9               ret
-182+  B1CB
+126+  B15D 79               ld a,c              ; get the vertical coord into a
+127+  B15E E6 07            and 7               ; divisible by 8?
+128+  B160 FE 00            cp 0
+129+  B162 C2 70 B1         jp nz,rocks_fall4   ; if not, carry on
+130+  B165 79               ld a,c              ; get vertical
+131+  B166 D6 08            sub 8               ; look up one square
+132+  B168 4F               ld c,a              ; put a back in c
+133+  B169 CD 02 A3         call screen_getattraddressfromscreencoords ; get the attr address into de
+134+  B16C 62 6B            ld hl,de
+135+  B16E 36 46            ld (hl),70          ; load this square with the yellow colour
+136+  B170              rocks_fall4:
+137+  B170 08               ex af,af'
+138+  B171 3D               dec a
+139+  B172 FE 00            cp 0
+140+  B174 C2 45 B1         jp nz,rocks_fall1   ; do another pixel if needed
+141+  B177              rocks_fall2:
+142+  B177 3E 09            ld a,9              ; rock graphic
+143+  B179 ED 4B CC B0      ld bc,(rocks_tmp2)  ; get the original coords
+144+  B17D CD 3D A3         call screen_getblock     ; get the memory into hl
+145+  B180 CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+146+  B183 3E 09            ld a,9
+147+  B185 DD 4E 00 DD      ld bc,(ix)          ; get the new coords
+147+  B189 46 01
+148+  B18B CD 3D A3         call screen_getblock     ; get the memory into hl
+149+  B18E CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+150+  B191 DD 23            inc ix
+151+  B193 DD 23            inc ix                  ; get ix back to state
+152+  B195 C9               ret
+153+  B196              rocks_fall3:
+154+  B196 3E 00            ld a,0              ; set the state to fell
+155+  B198 DD 77 02         ld (ix+2),a           ; store the falling state
+156+  B19B DD 4E 00 DD      ld bc,(ix)          ; get the coords
+156+  B19F 46 01
+157+  B1A1 CD 02 A3         call screen_getattraddressfromscreencoords ; get the attr address into de
+158+  B1A4 62 6B            ld hl,de
+159+  B1A6 36 42            ld (hl),66
+160+  B1A8 C3 77 B1         jp rocks_fall2      ; rejoin main loop
+161+  B1AB
+162+  B1AB              ;
+163+  B1AB              ; Wobbles a rocks
+164+  B1AB              ; Inputs:
+165+  B1AB              ; bc - coord of current rock graphic on screen
+166+  B1AB              ; ix - memory location of current rock in rock list, currently at the 4th position (wobble count)
+167+  B1AB              ; a - wobble frame
+168+  B1AB              rocks_wobble:
+169+  B1AB 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle
+170+  B1AE 1E 09            ld e,9              ; this is the rock frame
+171+  B1B0 83               add a,e             ; add the frame toggle
+172+  B1B1 C5               push bc
+173+  B1B2 CD 3D A3         call screen_getblock     ; get the memory into hl
+174+  B1B5 CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+175+  B1B8 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle against
+176+  B1BB EE 01            xor 1               ; flip to other state
+177+  B1BD 32 CB B0         ld (rocks_tmp),a    ; store
+178+  B1C0 1E 09            ld e,9              ; this is the rock frame
+179+  B1C2 83               add a,e             ; add the frame toggle
+180+  B1C3 CD 3D A3         call screen_getblock     ; get the memory into hl
+181+  B1C6 C1               pop bc
+182+  B1C7 CD 5F A3         call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
+183+  B1CA DD 7E 00         ld a,(ix)           ; get the wobble count back
+184+  B1CD 3D               dec a               ; decrease
+185+  B1CE DD 77 00         ld (ix),a           ; store
+186+  B1D1 FE 00            cp 0
+187+  B1D3 C0               ret nz              ; if we're not at zero, return
+188+  B1D4 DD 2B            dec ix              ; otherwise look to state location
+189+  B1D6 3E 01            ld a,1              ; set the state to falling
+190+  B1D8 DD 77 00         ld (ix),a           ; store the falling state
+191+  B1DB DD 23            inc ix              ; set ix back to location of wobble count, and we're done
+192+  B1DD C9               ret
+193+  B1DE
 # file closed: game/rocks.asm
- 37   B1CB
- 38   B1CB              ;===========================================================================
- 39   B1CB              ; main routine - the code execution starts here.
- 40   B1CB              ; Sets up the new interrupt routine, the memory
- 41   B1CB              ; banks and jumps to the start loop.
- 42   B1CB              ;===========================================================================
- 43   B1CB              main:
- 44   B1CB
- 45   B1CB                  ; Setup stack
- 46   B1CB 31 C9 B2         ld sp,stack_top
- 47   B1CE
- 48   B1CE                  ; Draw the title screen
- 49   B1CE CD C7 A3         call titlescreen_show
- 50   B1D1
- 51   B1D1 CD 00 80         call init_start
- 52   B1D4 CD 1C A2         call screen_draw
- 53   B1D7 CD D2 AE         call player_init
- 54   B1DA CD 41 AF         call ship_land              ; land the ship
- 55   B1DD CD 22 B0         call tank_init
- 56   B1E0
- 57   B1E0              mloop:
- 58   B1E0 76               halt
- 59   B1E1 CD E7 B1         call main_loop_processing
- 60   B1E4 C3 E0 B1         jp mloop
- 61   B1E7
- 62   B1E7              main_loop_processing:
- 63   B1E7 F3               di
- 64   B1E8 CD 76 A1         call screen_buffertoscreen  ; copy buffer to screen
- 65   B1EB FB               ei                          ; enable interupts
- 66   B1EC
- 67   B1EC CD DB AE         call player_drawplayer      ; delete player
- 68   B1EF CD 08 AB         call control_keyboard       ; check keyboard
- 69   B1F2 CD DB AE         call player_drawplayer      ; draw player
- 70   B1F5 CD 2B B0         call tank_process           ; prcoess the tank
- 71   B1F8 CD FE B0         call rocks_processrocks     ; process falling rocks
- 72   B1FB
- 73   B1FB CD BD AE         call game_incrementframe    ; increment the game frame
- 74   B1FE
- 75   B1FE C9               ret
- 76   B1FF
- 77   B1FF              ;===========================================================================
- 78   B1FF              ; Stack.
- 79   B1FF              ;===========================================================================
- 80   B1FF
- 81   B1FF              ; Stack: this area is reserved for the stack
- 82   B1FF              STACK_SIZE: equ 100    ; in words
- 83   B1FF
- 84   B1FF              ; Reserve stack space
- 85   B1FF 00 00            defw 0  ; WPMEM, 2
- 86   B201              stack_bottom:
- 87   B201 00 00 00...      defs    STACK_SIZE*2, 0
- 88   B2C9              stack_top:
- 89   B2C9 00 00            defw 0  ; WPMEM, 2
- 90   B2CB
- 91   B2CB                     SAVESNA "ThePit.sna", main
+ 37   B1DE
+ 38   B1DE              ;===========================================================================
+ 39   B1DE              ; main routine - the code execution starts here.
+ 40   B1DE              ; Sets up the new interrupt routine, the memory
+ 41   B1DE              ; banks and jumps to the start loop.
+ 42   B1DE              ;===========================================================================
+ 43   B1DE              main:
+ 44   B1DE
+ 45   B1DE                  ; Setup stack
+ 46   B1DE 31 DC B2         ld sp,stack_top
+ 47   B1E1
+ 48   B1E1                  ; Draw the title screen
+ 49   B1E1 CD C7 A3         call titlescreen_show
+ 50   B1E4
+ 51   B1E4 CD 00 80         call init_start
+ 52   B1E7 CD 1C A2         call screen_draw
+ 53   B1EA CD D2 AE         call player_init
+ 54   B1ED CD 41 AF         call ship_land              ; land the ship
+ 55   B1F0 CD 22 B0         call tank_init
+ 56   B1F3
+ 57   B1F3              mloop:
+ 58   B1F3 76               halt
+ 59   B1F4 CD FA B1         call main_loop_processing
+ 60   B1F7 C3 F3 B1         jp mloop
+ 61   B1FA
+ 62   B1FA              main_loop_processing:
+ 63   B1FA F3               di
+ 64   B1FB CD 76 A1         call screen_buffertoscreen  ; copy buffer to screen
+ 65   B1FE FB               ei                          ; enable interupts
+ 66   B1FF
+ 67   B1FF CD DB AE         call player_drawplayer      ; delete player
+ 68   B202 CD 08 AB         call control_keyboard       ; check keyboard
+ 69   B205 CD DB AE         call player_drawplayer      ; draw player
+ 70   B208 CD 2B B0         call tank_process           ; prcoess the tank
+ 71   B20B CD FE B0         call rocks_processrocks     ; process falling rocks
+ 72   B20E
+ 73   B20E CD BD AE         call game_incrementframe    ; increment the game frame
+ 74   B211
+ 75   B211 C9               ret
+ 76   B212
+ 77   B212              ;===========================================================================
+ 78   B212              ; Stack.
+ 79   B212              ;===========================================================================
+ 80   B212
+ 81   B212              ; Stack: this area is reserved for the stack
+ 82   B212              STACK_SIZE: equ 100    ; in words
+ 83   B212
+ 84   B212              ; Reserve stack space
+ 85   B212 00 00            defw 0  ; WPMEM, 2
+ 86   B214              stack_bottom:
+ 87   B214 00 00 00...      defs    STACK_SIZE*2, 0
+ 88   B2DC              stack_top:
+ 89   B2DC 00 00            defw 0  ; WPMEM, 2
+ 90   B2DE
+ 91   B2DE                     SAVESNA "ThePit.sna", main
 # file closed: main.asm
