@@ -10,7 +10,7 @@ sprites:
     defb    255,255,  0,  0,  0,  0,  0,  0   ; 7, trapdoor
     defb    24, 44, 78,143,241,114, 52,  24    ; 8, gem
     defb    60,126,255,127,254,254,255,126    ; 9, rock	
-	defb	60,126,255,254,127,127,255,126    ; 10, rock 2
+	defb	126,255,127,127,254,255,126, 60    ; 10, rock 2
     defb    0  ,  0,  0,  0,  0,  0,255,255   ; 11, sky block, pixel trapdoor
 	defb    153,219,126, 36,255,126, 60, 24   ; 12, missile
     defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 13, sky block, tank background

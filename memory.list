@@ -1200,8 +1200,8 @@
  11+  A9D6 F1 72 34 18
  12+  A9DA 3C 7E FF 7F      defb    60,126,255,127,254,254,255,126    ; 9, rock
  12+  A9DE FE FE FF 7E
- 13+  A9E2 3C 7E FF FE  	defb	60,126,255,254,127,127,255,126    ; 10, rock 2
- 13+  A9E6 7F 7F FF 7E
+ 13+  A9E2 7E FF 7F 7F  	defb	126,255,127,127,254,255,126, 60    ; 10, rock 2
+ 13+  A9E6 FE FF 7E 3C
  14+  A9EA 00 00 00 00      defb    0  ,  0,  0,  0,  0,  0,255,255   ; 11, sky block, pixel trapdoor
  14+  A9EE 00 00 FF FF
  15+  A9F2 99 DB 7E 24  	defb    153,219,126, 36,255,126, 60, 24   ; 12, missile
@@ -1427,7 +1427,7 @@
 123+  ABD0 0D               dec c               ; decrease c to track rows
 124+  ABD1 10 F4            djnz control_dig7
 125+  ABD3 79               ld a,c
-126+  ABD4 D6 08            sub 8
+126+  ABD4 D6 07            sub 7
 127+  ABD6 C1               pop bc
 128+  ABD7 4F               ld c,a
 129+  ABD8 C5               push bc             ; store the decreased c coord
@@ -1441,7 +1441,7 @@
 137+  ABE8 DD 7E 00         ld a,(ix)     ; get the dig state
 138+  ABEB FE 00            cp 0
 139+  ABED C1               pop bc
-140+  ABEE CC CC B0         call z, rocks_checkforfalling ; make the check if we're no longer digging
+140+  ABEE CC CE B0         call z, rocks_checkforfalling ; make the check if we're no longer digging
 141+  ABF1 C9               ret
 142+  ABF2
 143+  ABF2              ;
@@ -1813,7 +1813,7 @@
 153+  ADBF 21 CF AE         ld hl,player+6
 154+  ADC2 36 01            ld (hl),1                       ; set the player into digging mode
 155+  ADC4 23               inc hl
-156+  ADC5 36 05            ld (hl),5                      ; set the number of frame to dig for
+156+  ADC5 36 03            ld (hl),3                      ; set the number of frame to dig for
 157+  ADC7 23               inc hl
 158+  ADC8 73               ld (hl),e                       ; set the number of pixels to dig
 159+  ADC9 C9               ret
@@ -2388,176 +2388,233 @@
  12+  B0CB              rocks_tmp:
  13+  B0CB 00               defb 0
  14+  B0CC
- 15+  B0CC              ;
- 16+  B0CC              ; Checks for a rock that needs to start falling. Takes a memory location of the first line at the bottom of the space.
- 17+  B0CC              ; Checks to see if the pixel row in that location is a rock bottom. If it is, mark this rock as ready to fall.
- 18+  B0CC              ; If the pixel row is not the rock bottom, stop checking.
- 19+  B0CC              ; Inputs:
- 20+  B0CC              ; hl- memory location
- 21+  B0CC              ;
- 22+  B0CC              rocks_checkforfalling:
- 23+  B0CC 7E               ld a,(hl)           ; get the pixel row in this memory location
- 24+  B0CD FE 7E            cp 126              ; check against the bottom pixel row of the rock graphic
- 25+  B0CF C2 D5 B0         jp nz,rocks_checkforfalling2 ; not a rock, stop
- 26+  B0D2 CD D6 B0         call rocks_addrocktofalling ; mark the rock as falling
- 27+  B0D5              rocks_checkforfalling2:
- 28+  B0D5 C9               ret
- 29+  B0D6
- 30+  B0D6              ;
- 31+  B0D6              ; Adds the rock to the structure that tracks falling rocks
- 32+  B0D6              ; Inputs:
- 33+  B0D6              ; hl - memory location of falling rock graphic
- 34+  B0D6              ; bc - coords of rock, c vert
- 35+  B0D6              rocks_addrocktofalling:
- 36+  B0D6 C5               push bc             ; store the coords
- 37+  B0D7 11 BB B0         ld de,rocks_falling
- 38+  B0DA 06 04            ld b,4              ; number of possible falling rocks
- 39+  B0DC              rocks_addrocktofalling0:
- 40+  B0DC 13               inc de
- 41+  B0DD 13               inc de
- 42+  B0DE 13               inc de              ; move three along to get the state
- 43+  B0DF 1A               ld a,(de)           ; load the state
- 44+  B0E0 FE 00            cp 0                ; check if this is not falling
- 45+  B0E2 C2 F7 B0         jp nz,rocks_addrocktofalling1 ; continue the loop if not 0
- 46+  B0E5 3E 0A            ld a,10             ; load the number of frames to wobble
- 47+  B0E7 12               ld (de),a
- 48+  B0E8 1B               dec de              ; move de back to state
- 49+  B0E9 3E 02            ld a,2
- 50+  B0EB 12               ld (de),a           ; set the state to wobbling
- 51+  B0EC 1B               dec de              ; move back coords
- 52+  B0ED C1               pop bc              ; get back coords
- 53+  B0EE 78               ld a,b
- 54+  B0EF 12               ld (de),a           ; store the vertical
- 55+  B0F0 1B               dec de
- 56+  B0F1 79               ld a,c
- 57+  B0F2 12               ld (de),a           ; store the horizontal
- 58+  B0F3 C5               push bc
- 59+  B0F4 C3 FA B0         jp rocks_addrocktofalling2 ; done
- 60+  B0F7              rocks_addrocktofalling1:
- 61+  B0F7 13               inc de              ; move memory along to next rock
- 62+  B0F8 10 E2            djnz rocks_addrocktofalling0 ; try the next rock
- 63+  B0FA              rocks_addrocktofalling2: ; done, return
- 64+  B0FA C1               pop bc              ; to tidy up
- 65+  B0FB C9               ret
- 66+  B0FC
- 67+  B0FC              ;
- 68+  B0FC              ; Processes any falling rocks
- 69+  B0FC              ;
- 70+  B0FC              rocks_processrocks:
- 71+  B0FC DD 21 BB B0      ld ix,rocks_falling
- 72+  B100 06 04            ld b,4              ; the number of rocks to check
- 73+  B102              rocks_processrocks0:
- 74+  B102 C5               push bc             ; store loop count
- 75+  B103 DD 4E 00 DD      ld bc,(ix)          ; load the coords for this rock into bc
- 75+  B107 46 01
- 76+  B109 DD 23            inc ix
- 77+  B10B DD 23            inc ix              ; move to the state
- 78+  B10D DD 7E 00         ld a,(ix)           ; load the state into a
- 79+  B110 FE 00            cp 0
- 80+  B112 CA 2B B1         jp z,rocks_processrocks1 ; if not falling, check next
- 81+  B115 FE 02            cp 2
- 82+  B117 C2 2B B1         jp nz, rocks_processrocks2
- 83+  B11A                  ; we're wobbling
- 84+  B11A DD 23            inc ix              ; get frame number for wobble
- 85+  B11C DD 7E 00         ld a,(ix)           ; get wobble frame into a
- 86+  B11F CD 2F B1         call rocks_wobble
- 87+  B122 DD 23            inc ix              ; increment for next
- 88+  B124 C3 2B B1         jp rocks_processrocks1  ; do next rock
- 89+  B127                  ; we're falling
- 90+  B127 DD 23            inc ix
- 91+  B129 DD 23            inc ix              ; inc de to get to next
- 92+  B12B              rocks_processrocks2:
- 93+  B12B              rocks_processrocks1:
- 94+  B12B C1               pop bc              ; get loop count back
- 95+  B12C 10 D4            djnz rocks_processrocks0
- 96+  B12E C9               ret
- 97+  B12F
- 98+  B12F              ;
- 99+  B12F              ; Wobbles a rocks
-100+  B12F              ; Inputs:
-101+  B12F              ; bc - coord of current rock graphic on screen
-102+  B12F              ; ix - memory location of current rock in rock list, currently at the 4th position (wobble count)
-103+  B12F              ; a - wobble frame
-104+  B12F              rocks_wobble:
-105+  B12F 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle
-106+  B132 1E 09            ld e,9              ; this is the rock frame
-107+  B134 83               add a,e             ; add the frame toggle
-108+  B135 C5               push bc
-109+  B136 CD 3D A3         call screen_getblock     ; get the memory into hl
-110+  B139 CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
-111+  B13C 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle against
-112+  B13F EE 01            xor 1               ; flip to other state
-113+  B141 32 CB B0         ld (rocks_tmp),a    ; store
-114+  B144 1E 09            ld e,9              ; this is the rock frame
-115+  B146 83               add a,e             ; add the frame toggle
-116+  B147 CD 3D A3         call screen_getblock     ; get the memory into hl
-117+  B14A C1               pop bc
-118+  B14B CD 5F A3         call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
-119+  B14E DD 7E 00         ld a,(ix)           ; get the wobble count back
-120+  B151 3D               dec a               ; decrease
-121+  B152 DD 77 00         ld (ix),a           ; store
-122+  B155 FE 00            cp 0
-123+  B157 C0               ret nz              ; if we're not at zero, return
-124+  B158 DD 2B            dec ix              ; otherwise look to state location
-125+  B15A 3E 01            ld a,1              ; set the state to falling
-126+  B15C DD 77 00         ld (ix),a           ; store the falling state
-127+  B15F DD 23            inc ix              ; set ix back to location of wobble count, and we're done
-128+  B161 C9               ret
-129+  B162
+ 15+  B0CC              rocks_tmp2:
+ 16+  B0CC 00 00            defb 0,0
+ 17+  B0CE
+ 18+  B0CE              ;
+ 19+  B0CE              ; Checks for a rock that needs to start falling. Takes a memory location of the first line at the bottom of the space.
+ 20+  B0CE              ; Checks to see if the pixel row in that location is a rock bottom. If it is, mark this rock as ready to fall.
+ 21+  B0CE              ; If the pixel row is not the rock bottom, stop checking.
+ 22+  B0CE              ; Inputs:
+ 23+  B0CE              ; hl- memory location
+ 24+  B0CE              ;
+ 25+  B0CE              rocks_checkforfalling:
+ 26+  B0CE 7E               ld a,(hl)           ; get the pixel row in this memory location
+ 27+  B0CF FE 7E            cp 126              ; check against the bottom pixel row of the rock graphic
+ 28+  B0D1 C2 D7 B0         jp nz,rocks_checkforfalling2 ; not a rock, stop
+ 29+  B0D4 CD D8 B0         call rocks_addrocktofalling ; mark the rock as falling
+ 30+  B0D7              rocks_checkforfalling2:
+ 31+  B0D7 C9               ret
+ 32+  B0D8
+ 33+  B0D8              ;
+ 34+  B0D8              ; Adds the rock to the structure that tracks falling rocks
+ 35+  B0D8              ; Inputs:
+ 36+  B0D8              ; hl - memory location of falling rock graphic
+ 37+  B0D8              ; bc - coords of rock, c vert
+ 38+  B0D8              rocks_addrocktofalling:
+ 39+  B0D8 C5               push bc             ; store the coords
+ 40+  B0D9 11 BB B0         ld de,rocks_falling
+ 41+  B0DC 06 04            ld b,4              ; number of possible falling rocks
+ 42+  B0DE              rocks_addrocktofalling0:
+ 43+  B0DE 13               inc de
+ 44+  B0DF 13               inc de
+ 45+  B0E0 13               inc de              ; move three along to get the state
+ 46+  B0E1 1A               ld a,(de)           ; load the state
+ 47+  B0E2 FE 00            cp 0                ; check if this is not falling
+ 48+  B0E4 C2 F9 B0         jp nz,rocks_addrocktofalling1 ; continue the loop if not 0
+ 49+  B0E7 3E 10            ld a,16             ; load the number of frames to wobble
+ 50+  B0E9 12               ld (de),a
+ 51+  B0EA 1B               dec de              ; move de back to state
+ 52+  B0EB 3E 02            ld a,2
+ 53+  B0ED 12               ld (de),a           ; set the state to wobbling
+ 54+  B0EE 1B               dec de              ; move back coords
+ 55+  B0EF C1               pop bc              ; get back coords
+ 56+  B0F0 78               ld a,b
+ 57+  B0F1 12               ld (de),a           ; store the vertical
+ 58+  B0F2 1B               dec de
+ 59+  B0F3 79               ld a,c
+ 60+  B0F4 12               ld (de),a           ; store the horizontal
+ 61+  B0F5 C5               push bc
+ 62+  B0F6 C3 FC B0         jp rocks_addrocktofalling2 ; done
+ 63+  B0F9              rocks_addrocktofalling1:
+ 64+  B0F9 13               inc de              ; move memory along to next rock
+ 65+  B0FA 10 E2            djnz rocks_addrocktofalling0 ; try the next rock
+ 66+  B0FC              rocks_addrocktofalling2: ; done, return
+ 67+  B0FC C1               pop bc              ; to tidy up
+ 68+  B0FD C9               ret
+ 69+  B0FE
+ 70+  B0FE              ;
+ 71+  B0FE              ; Processes any falling rocks
+ 72+  B0FE              ;
+ 73+  B0FE              rocks_processrocks:
+ 74+  B0FE DD 21 BB B0      ld ix,rocks_falling
+ 75+  B102 06 04            ld b,4              ; the number of rocks to check
+ 76+  B104              rocks_processrocks0:
+ 77+  B104 C5               push bc             ; store loop count
+ 78+  B105 DD 4E 00 DD      ld bc,(ix)          ; load the coords for this rock into bc
+ 78+  B109 46 01
+ 79+  B10B DD 23            inc ix
+ 80+  B10D DD 23            inc ix              ; move to the state
+ 81+  B10F DD 7E 00         ld a,(ix)           ; load the state into a
+ 82+  B112 FE 00            cp 0
+ 83+  B114 CA 33 B1         jp z,rocks_processrocks3 ; if not falling, check next
+ 84+  B117 FE 02            cp 2
+ 85+  B119 C2 29 B1         jp nz, rocks_processrocks2
+ 86+  B11C                  ; we're wobbling
+ 87+  B11C DD 23            inc ix              ; get frame number for wobble
+ 88+  B11E DD 7E 00         ld a,(ix)           ; get wobble frame into a
+ 89+  B121 CD 98 B1         call rocks_wobble
+ 90+  B124 DD 23            inc ix              ; increment for next
+ 91+  B126 C3 37 B1         jp rocks_processrocks1  ; do next rock
+ 92+  B129              rocks_processrocks2:
+ 93+  B129                  ; we're falling
+ 94+  B129 CD 3B B1         call rocks_fall
+ 95+  B12C DD 23            inc ix
+ 96+  B12E DD 23            inc ix              ; inc ix to get to next
+ 97+  B130 C3 37 B1         jp rocks_processrocks1
+ 98+  B133              rocks_processrocks3:
+ 99+  B133 DD 23            inc ix
+100+  B135 DD 23            inc ix
+101+  B137              rocks_processrocks1:
+102+  B137 C1               pop bc              ; get loop count back
+103+  B138 10 CA            djnz rocks_processrocks0
+104+  B13A C9               ret
+105+  B13B
+106+  B13B              ;
+107+  B13B              ; Falls a rock one pixel, checks the next square down to see if it is empty, if not, stop falling
+108+  B13B              ; bc - coord of current rock graphic on screen
+109+  B13B              ; ix - memory location of current rock in rock list, currently at the 3rd position (rock state)
+110+  B13B              ;
+111+  B13B              rocks_fall:
+112+  B13B DD 2B            dec ix
+113+  B13D DD 2B            dec ix              ; decrease ix back to coords
+114+  B13F ED 43 CC B0      ld (rocks_tmp2),bc  ; store original coords
+115+  B143 3E 03            ld a,3              ; move this number of pixels
+116+  B145              rocks_fall1:
+117+  B145 08               ex af,af'
+118+  B146 DD 4E 00 DD      ld bc,(ix)          ; get current coords
+118+  B14A 46 01
+119+  B14C CD A2 A3         call sprites_scadd  ; get the memory of the coords into de
+120+  B14F 14               inc d               ; add 256 to get next row
+121+  B150 1A               ld a,(de)           ; get the contents of the next row
+122+  B151 FE 00            cp 0
+123+  B153 C2 83 B1         jp nz,rocks_fall3    ; move the rock if the row is empty
+124+  B156 0C               inc c               ; increment the vertical
+125+  B157 DD 71 00 DD      ld (ix),bc          ; store the new coords
+125+  B15B 70 01
+126+  B15D 08               ex af,af'
+127+  B15E 3D               dec a
+128+  B15F FE 00            cp 0
+129+  B161 C2 45 B1         jp nz,rocks_fall1   ; do another pixel if needed
+130+  B164              rocks_fall2:
+131+  B164 3E 09            ld a,9              ; rock graphic
+132+  B166 ED 4B CC B0      ld bc,(rocks_tmp2)  ; get the original coords
+133+  B16A CD 3D A3         call screen_getblock     ; get the memory into hl
+134+  B16D CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+135+  B170 3E 09            ld a,9
+136+  B172 DD 4E 00 DD      ld bc,(ix)          ; get the new coords
+136+  B176 46 01
+137+  B178 CD 3D A3         call screen_getblock     ; get the memory into hl
+138+  B17B CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+139+  B17E DD 23            inc ix
+140+  B180 DD 23            inc ix                  ; get ix back to state
+141+  B182 C9               ret
+142+  B183              rocks_fall3:
+143+  B183 3E 00            ld a,0              ; set the state to fell
+144+  B185 DD 77 02         ld (ix+2),a           ; store the falling state
+145+  B188 DD 4E 00 DD      ld bc,(ix)          ; get the coords
+145+  B18C 46 01
+146+  B18E CD 02 A3         call screen_getattraddressfromscreencoords ; get the attr address into de
+147+  B191 62 6B            ld hl,de
+148+  B193 36 42            ld (hl),66
+149+  B195 C3 64 B1         jp rocks_fall2      ; rejoin main loop
+150+  B198
+151+  B198              ;
+152+  B198              ; Wobbles a rocks
+153+  B198              ; Inputs:
+154+  B198              ; bc - coord of current rock graphic on screen
+155+  B198              ; ix - memory location of current rock in rock list, currently at the 4th position (wobble count)
+156+  B198              ; a - wobble frame
+157+  B198              rocks_wobble:
+158+  B198 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle
+159+  B19B 1E 09            ld e,9              ; this is the rock frame
+160+  B19D 83               add a,e             ; add the frame toggle
+161+  B19E C5               push bc
+162+  B19F CD 3D A3         call screen_getblock     ; get the memory into hl
+163+  B1A2 CD 5F A3         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+164+  B1A5 3A CB B0         ld a,(rocks_tmp)    ; get the frame toggle against
+165+  B1A8 EE 01            xor 1               ; flip to other state
+166+  B1AA 32 CB B0         ld (rocks_tmp),a    ; store
+167+  B1AD 1E 09            ld e,9              ; this is the rock frame
+168+  B1AF 83               add a,e             ; add the frame toggle
+169+  B1B0 CD 3D A3         call screen_getblock     ; get the memory into hl
+170+  B1B3 C1               pop bc
+171+  B1B4 CD 5F A3         call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
+172+  B1B7 DD 7E 00         ld a,(ix)           ; get the wobble count back
+173+  B1BA 3D               dec a               ; decrease
+174+  B1BB DD 77 00         ld (ix),a           ; store
+175+  B1BE FE 00            cp 0
+176+  B1C0 C0               ret nz              ; if we're not at zero, return
+177+  B1C1 DD 2B            dec ix              ; otherwise look to state location
+178+  B1C3 3E 01            ld a,1              ; set the state to falling
+179+  B1C5 DD 77 00         ld (ix),a           ; store the falling state
+180+  B1C8 DD 23            inc ix              ; set ix back to location of wobble count, and we're done
+181+  B1CA C9               ret
+182+  B1CB
 # file closed: game/rocks.asm
- 37   B162
- 38   B162              ;===========================================================================
- 39   B162              ; main routine - the code execution starts here.
- 40   B162              ; Sets up the new interrupt routine, the memory
- 41   B162              ; banks and jumps to the start loop.
- 42   B162              ;===========================================================================
- 43   B162              main:
- 44   B162
- 45   B162                  ; Setup stack
- 46   B162 31 60 B2         ld sp,stack_top
- 47   B165
- 48   B165                  ; Draw the title screen
- 49   B165 CD C7 A3         call titlescreen_show
- 50   B168
- 51   B168 CD 00 80         call init_start
- 52   B16B CD 1C A2         call screen_draw
- 53   B16E CD D2 AE         call player_init
- 54   B171 CD 41 AF         call ship_land              ; land the ship
- 55   B174 CD 22 B0         call tank_init
- 56   B177
- 57   B177              mloop:
- 58   B177 76               halt
- 59   B178 CD 7E B1         call main_loop_processing
- 60   B17B C3 77 B1         jp mloop
- 61   B17E
- 62   B17E              main_loop_processing:
- 63   B17E F3               di
- 64   B17F CD 76 A1         call screen_buffertoscreen  ; copy buffer to screen
- 65   B182 FB               ei                          ; enable interupts
- 66   B183
- 67   B183 CD DB AE         call player_drawplayer      ; delete player
- 68   B186 CD 08 AB         call control_keyboard       ; check keyboard
- 69   B189 CD DB AE         call player_drawplayer      ; draw player
- 70   B18C CD 2B B0         call tank_process           ; prcoess the tank
- 71   B18F CD FC B0         call rocks_processrocks     ; process falling rocks
- 72   B192
- 73   B192 CD BD AE         call game_incrementframe    ; increment the game frame
- 74   B195
- 75   B195 C9               ret
- 76   B196
- 77   B196              ;===========================================================================
- 78   B196              ; Stack.
- 79   B196              ;===========================================================================
- 80   B196
- 81   B196              ; Stack: this area is reserved for the stack
- 82   B196              STACK_SIZE: equ 100    ; in words
- 83   B196
- 84   B196              ; Reserve stack space
- 85   B196 00 00            defw 0  ; WPMEM, 2
- 86   B198              stack_bottom:
- 87   B198 00 00 00...      defs    STACK_SIZE*2, 0
- 88   B260              stack_top:
- 89   B260 00 00            defw 0  ; WPMEM, 2
- 90   B262
- 91   B262                     SAVESNA "ThePit.sna", main
+ 37   B1CB
+ 38   B1CB              ;===========================================================================
+ 39   B1CB              ; main routine - the code execution starts here.
+ 40   B1CB              ; Sets up the new interrupt routine, the memory
+ 41   B1CB              ; banks and jumps to the start loop.
+ 42   B1CB              ;===========================================================================
+ 43   B1CB              main:
+ 44   B1CB
+ 45   B1CB                  ; Setup stack
+ 46   B1CB 31 C9 B2         ld sp,stack_top
+ 47   B1CE
+ 48   B1CE                  ; Draw the title screen
+ 49   B1CE CD C7 A3         call titlescreen_show
+ 50   B1D1
+ 51   B1D1 CD 00 80         call init_start
+ 52   B1D4 CD 1C A2         call screen_draw
+ 53   B1D7 CD D2 AE         call player_init
+ 54   B1DA CD 41 AF         call ship_land              ; land the ship
+ 55   B1DD CD 22 B0         call tank_init
+ 56   B1E0
+ 57   B1E0              mloop:
+ 58   B1E0 76               halt
+ 59   B1E1 CD E7 B1         call main_loop_processing
+ 60   B1E4 C3 E0 B1         jp mloop
+ 61   B1E7
+ 62   B1E7              main_loop_processing:
+ 63   B1E7 F3               di
+ 64   B1E8 CD 76 A1         call screen_buffertoscreen  ; copy buffer to screen
+ 65   B1EB FB               ei                          ; enable interupts
+ 66   B1EC
+ 67   B1EC CD DB AE         call player_drawplayer      ; delete player
+ 68   B1EF CD 08 AB         call control_keyboard       ; check keyboard
+ 69   B1F2 CD DB AE         call player_drawplayer      ; draw player
+ 70   B1F5 CD 2B B0         call tank_process           ; prcoess the tank
+ 71   B1F8 CD FE B0         call rocks_processrocks     ; process falling rocks
+ 72   B1FB
+ 73   B1FB CD BD AE         call game_incrementframe    ; increment the game frame
+ 74   B1FE
+ 75   B1FE C9               ret
+ 76   B1FF
+ 77   B1FF              ;===========================================================================
+ 78   B1FF              ; Stack.
+ 79   B1FF              ;===========================================================================
+ 80   B1FF
+ 81   B1FF              ; Stack: this area is reserved for the stack
+ 82   B1FF              STACK_SIZE: equ 100    ; in words
+ 83   B1FF
+ 84   B1FF              ; Reserve stack space
+ 85   B1FF 00 00            defw 0  ; WPMEM, 2
+ 86   B201              stack_bottom:
+ 87   B201 00 00 00...      defs    STACK_SIZE*2, 0
+ 88   B2C9              stack_top:
+ 89   B2C9 00 00            defw 0  ; WPMEM, 2
+ 90   B2CB
+ 91   B2CB                     SAVESNA "ThePit.sna", main
 # file closed: main.asm

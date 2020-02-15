@@ -153,7 +153,7 @@ movement_spacebelowisdiggable5:
     ld hl,player+6                  
     ld (hl),1                       ; set the player into digging mode
     inc hl
-    ld (hl),5                      ; set the number of frame to dig for
+    ld (hl),3                      ; set the number of frame to dig for
     inc hl
     ld (hl),e                       ; set the number of pixels to dig
     ret

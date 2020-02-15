@@ -123,7 +123,7 @@ control_dig12:
     dec c               ; decrease c to track rows
     djnz control_dig7
     ld a,c
-    sub 8
+    sub 7
     pop bc
     ld c,a
     push bc             ; store the decreased c coord

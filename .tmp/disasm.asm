@@ -1,111 +1,10 @@
 ; EQU:
 ; Data addresses used by the opcodes that point to uninitialized memory areas.
-L0008:       equ  0008h	; 8. Restart. Called by: L00FC[0114h].
 L0028:       equ  0028h	; 40. Restart. Called by: L044A[044Ah].
-L0038:       equ  0038h	; 56. Restart. Called by: L55FD[55FDh], L55FD[5602h], L55FD[5603h], L55FD[5604h], L55FD[5605h], L55FD[5606h], L55FD[5607h], L55FD[5608h], L55FD[5609h], L55FD[5619h], L55FD[561Dh], L55FD[5622h], L55FD[5623h], L55FD[5624h], L55FD[5625h], L55FD[5626h], L55FD[5627h], L55FD[5628h], L55FD[5629h], L55FD[563Dh], L55FD[5642h], L55FD[5643h], L55FD[5644h], L55FD[5645h], L55FD[5646h], L55FD[5647h], L55FD[5648h], L55FD[5649h], L55FD[5654h], L55FD[5655h], L55FD[5659h], L55FD[565Dh].
-L00DA:       equ  00DAh
-L00E1:       equ  00E1h
-L0164:       equ  0164h
+L0038:       equ  0038h	; 56. Restart. Called by: L4822[4822h], L4822[4829h], L4822[483Dh], L4822[4842h], L4822[4843h], L4822[4844h], L4822[4846h], L4822[4847h], L4822[4848h], L4822[4849h], L4822[485Dh], L4822[4862h], L4822[487Dh], L4822[4882h], L4822[4883h], L4822[4884h], L4822[4885h].
 L03B5:       equ  03B5h	; 949. Subroutine. Called by: L044A[0469h].
 L0429:       equ  0429h
 L1E99:       equ  1E99h	; 7833. Subroutine. Called by: L044A[045Fh].
-L4942:       equ  4942h	; 18754. Subroutine. Called by: L00FC[00FCh].
-L4C46:       equ  4C46h	; 19526. Subroutine. Called by: L00FC[015Ah].
-L4E41:       equ  4E41h	; 20033. Subroutine. Called by: L00FC[0101h].
-L4F46:       equ  4F46h	; 20294. Subroutine. Called by: L00FC[0121h].
-L4F4D:       equ  4F4Dh	; 20301. Subroutine. Called by: L00FC[0127h].
-LBD3C:       equ  BD3Ch	; 48444. Subroutine. Called by: L00FC[0104h].
-
-
-             org 00FCh ; 00FCh
-
-
-; Subroutine: Size=100, CC=14.
-; Called by: -
-; Calls: L0008, L4942, L4C46, L4E41, L4F46, L4F4D, LBD3C.
-00FC L00FC:
-00FC D4 42 49     CALL NC,L4942 	; 4942h
-00FF CE 4F        ADC  A,4Fh  	; 79, 'O'
-0101 D2 41 4E     JP   NC,L4E41 	; 4E41h
-0104 C4 3C BD     CALL NZ,LBD3C 	; BD3Ch
-0107 3E BD        LD   A,BDh  	; 189,  -67
-0109 3C           INC  A      
-010A BE           CP   (HL)   
-010B 4C           LD   C,H    
-010C 49           LD   C,C    
-010D 4E           LD   C,(HL) 
-010E C5           PUSH BC     
-010F 54           LD   D,H    
-0110 48           LD   C,B    
-0111 45           LD   B,L    
-0112 CE 54        ADC  A,54h  	; 84, 'T'
-0114 CF 53        RST  08h,53h 	; Custom opcode
-0116 54           LD   D,H    
-0117 45           LD   B,L    
-0118 D0           RET  NC     
-0119 44           LD   B,H    
-011A 45           LD   B,L    
-011B 46           LD   B,(HL) 
-011C 20 46        JR   NZ,L0164 	; 0164h
-011E CE 43        ADC  A,43h  	; 67, 'C'
-0120 41           LD   B,C    
-0121 D4 46 4F     CALL NC,L4F46 	; 4F46h
-0124 52           LD   D,D    
-0125 4D           LD   C,L    
-0126 41           LD   B,C    
-0127 D4 4D 4F     CALL NC,L4F4D 	; 4F4Dh
-012A 56           LD   D,(HL) 
-012B C5           PUSH BC     
-012C 45           LD   B,L    
-012D 52           LD   D,D    
-012E 41           LD   B,C    
-012F 53           LD   D,E    
-0130 C5           PUSH BC     
-0131 4F           LD   C,A    
-0132 50           LD   D,B    
-0133 45           LD   B,L    
-0134 4E           LD   C,(HL) 
-0135 20 A3        JR   NZ,L00DA 	; 00DAh
-0137 43           LD   B,E    
-0138 4C           LD   C,H    
-0139 4F           LD   C,A    
-013A 53           LD   D,E    
-013B 45           LD   B,L    
-013C 20 A3        JR   NZ,L00E1 	; 00E1h
-013E 4D           LD   C,L    
-013F 45           LD   B,L    
-0140 52           LD   D,D    
-0141 47           LD   B,A    
-0142 C5           PUSH BC     
-0143 56           LD   D,(HL) 
-0144 45           LD   B,L    
-0145 52           LD   D,D    
-0146 49           LD   C,C    
-0147 46           LD   B,(HL) 
-0148 D9           EXX         
-0149 42           LD   B,D    
-014A 45           LD   B,L    
-014B 45           LD   B,L    
-014C D0           RET  NC     
-014D 43           LD   B,E    
-014E 49           LD   C,C    
-014F 52           LD   D,D    
-0150 43           LD   B,E    
-0151 4C           LD   C,H    
-0152 C5           PUSH BC     
-0153 49           LD   C,C    
-0154 4E           LD   C,(HL) 
-0155 CB 50        BIT  2,B    
-0157 41           LD   B,C    
-0158 50           LD   D,B    
-0159 45           LD   B,L    
-015A D2 46 4C     JP   NC,L4C46 	; 4C46h
-015D 41           LD   B,C    
-015E 53           LD   D,E    
-015F C8           RET  Z      
-; ...
-; ...
-; ...
 
 
              org 044Ah ; 044Ah
@@ -214,111 +113,111 @@ LBD3C:       equ  BD3Ch	; 48444. Subroutine. Called by: L00FC[0104h].
 ; ...
 
 
-             org 55FDh ; 55FDh
+             org 4822h ; 4822h
 
 
 ; Label not accessed.
-55FD L55FD:
-55FD FF           RST  38h    
-55FE 00           NOP         
-55FF 00           NOP         
-5600 00           NOP         
-5601 00           NOP         
-5602 FF           RST  38h    
-5603 FF           RST  38h    
-5604 FF           RST  38h    
-5605 FF           RST  38h    
-5606 FF           RST  38h    
-5607 FF           RST  38h    
-5608 FF           RST  38h    
-5609 FF           RST  38h    
-560A 55           LD   D,L    
-560B 00           NOP         
-560C 00           NOP         
-560D 00           NOP         
-560E 00           NOP         
-560F 00           NOP         
-5610 00           NOP         
-5611 00           NOP         
-5612 00           NOP         
-5613 00           NOP         
-5614 00           NOP         
-5615 00           NOP         
-5616 00           NOP         
-5617 00           NOP         
-5618 00           NOP         
-5619 FF           RST  38h    
-561A 55           LD   D,L    
-561B 55           LD   D,L    
-561C 00           NOP         
-561D FF           RST  38h    
-561E 00           NOP         
-561F 00           NOP         
-5620 00           NOP         
-5621 00           NOP         
-5622 FF           RST  38h    
-5623 FF           RST  38h    
-5624 FF           RST  38h    
-5625 FF           RST  38h    
-5626 FF           RST  38h    
-5627 FF           RST  38h    
-5628 FF           RST  38h    
-5629 FF           RST  38h    
-562A 55           LD   D,L    
-562B 00           NOP         
-562C 55           LD   D,L    
-562D 55           LD   D,L    
-562E 55           LD   D,L    
-562F 55           LD   D,L    
-5630 55           LD   D,L    
-5631 55           LD   D,L    
-5632 00           NOP         
-5633 55           LD   D,L    
-5634 55           LD   D,L    
-5635 55           LD   D,L    
-5636 00           NOP         
-5637 55           LD   D,L    
-5638 55           LD   D,L    
-5639 55           LD   D,L    
-563A 55           LD   D,L    
-563B 55           LD   D,L    
-563C 00           NOP         
-563D FF           RST  38h    
-563E 00           NOP         
-563F 00           NOP         
-5640 00           NOP         
-5641 00           NOP         
-5642 FF           RST  38h    
-5643 FF           RST  38h    
-5644 FF           RST  38h    
-5645 FF           RST  38h    
-5646 FF           RST  38h    
-5647 FF           RST  38h    
-5648 FF           RST  38h    
-5649 FF           RST  38h    
-564A 55           LD   D,L    
-564B 00           NOP         
-564C 55           LD   D,L    
-564D 55           LD   D,L    
-564E 55           LD   D,L    
-564F 55           LD   D,L    
-5650 55           LD   D,L    
-5651 55           LD   D,L    
-5652 00           NOP         
-5653 55           LD   D,L    
-5654 FF           RST  38h    
-5655 FF           RST  38h    
-5656 00           NOP         
-5657 55           LD   D,L    
-5658 55           LD   D,L    
-5659 FF           RST  38h    
-565A 55           LD   D,L    
-565B 55           LD   D,L    
-565C 00           NOP         
-565D FF           RST  38h    
-565E 00           NOP         
-565F 00           NOP         
-5660 00           NOP         
+4822 L4822:
+4822 FF           RST  38h    
+4823 55           LD   D,L    
+4824 55           LD   D,L    
+4825 55           LD   D,L    
+4826 55           LD   D,L    
+4827 55           LD   D,L    
+4828 55           LD   D,L    
+4829 FF           RST  38h    
+482A 55           LD   D,L    
+482B 55           LD   D,L    
+482C 3C           INC  A      
+482D 55           LD   D,L    
+482E 55           LD   D,L    
+482F 55           LD   D,L    
+4830 3C           INC  A      
+4831 55           LD   D,L    
+4832 00           NOP         
+4833 00           NOP         
+4834 00           NOP         
+4835 00           NOP         
+4836 55           LD   D,L    
+4837 55           LD   D,L    
+4838 55           LD   D,L    
+4839 55           LD   D,L    
+483A 55           LD   D,L    
+483B 55           LD   D,L    
+483C 55           LD   D,L    
+483D FF           RST  38h    
+483E 00           NOP         
+483F 00           NOP         
+4840 00           NOP         
+4841 00           NOP         
+4842 FF           RST  38h    
+4843 FF           RST  38h    
+4844 FF           RST  38h    
+4845 55           LD   D,L    
+4846 FF           RST  38h    
+4847 FF           RST  38h    
+4848 FF           RST  38h    
+4849 FF           RST  38h    
+484A 55           LD   D,L    
+484B 3C           INC  A      
+484C 55           LD   D,L    
+484D 55           LD   D,L    
+484E 3C           INC  A      
+484F 55           LD   D,L    
+4850 55           LD   D,L    
+4851 55           LD   D,L    
+4852 00           NOP         
+4853 3C           INC  A      
+4854 55           LD   D,L    
+4855 55           LD   D,L    
+4856 55           LD   D,L    
+4857 55           LD   D,L    
+4858 55           LD   D,L    
+4859 55           LD   D,L    
+485A 55           LD   D,L    
+485B 55           LD   D,L    
+485C 55           LD   D,L    
+485D FF           RST  38h    
+485E 00           NOP         
+485F 00           NOP         
+4860 00           NOP         
+4861 00           NOP         
+4862 FF           RST  38h    
+4863 00           NOP         
+4864 00           NOP         
+4865 00           NOP         
+4866 00           NOP         
+4867 00           NOP         
+4868 00           NOP         
+4869 55           LD   D,L    
+486A 55           LD   D,L    
+486B 55           LD   D,L    
+486C 55           LD   D,L    
+486D 3C           INC  A      
+486E 55           LD   D,L    
+486F 55           LD   D,L    
+4870 55           LD   D,L    
+4871 55           LD   D,L    
+4872 00           NOP         
+4873 55           LD   D,L    
+4874 55           LD   D,L    
+4875 55           LD   D,L    
+4876 3C           INC  A      
+4877 55           LD   D,L    
+4878 55           LD   D,L    
+4879 3C           INC  A      
+487A 55           LD   D,L    
+487B 55           LD   D,L    
+487C 3C           INC  A      
+487D FF           RST  38h    
+487E 00           NOP         
+487F 00           NOP         
+4880 00           NOP         
+4881 00           NOP         
+4882 FF           RST  38h    
+4883 FF           RST  38h    
+4884 FF           RST  38h    
+4885 FF           RST  38h    
 ; ...
 ; ...
 ; ...

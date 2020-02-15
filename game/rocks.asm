@@ -12,6 +12,9 @@ rocks_falling:
 rocks_tmp:
     defb 0
 
+rocks_tmp2:
+    defb 0,0
+
 ;
 ; Checks for a rock that needs to start falling. Takes a memory location of the first line at the bottom of the space.
 ; Checks to see if the pixel row in that location is a rock bottom. If it is, mark this rock as ready to fall.
@@ -43,7 +46,7 @@ rocks_addrocktofalling0:
     ld a,(de)           ; load the state
     cp 0                ; check if this is not falling
     jp nz,rocks_addrocktofalling1 ; continue the loop if not 0
-    ld a,10             ; load the number of frames to wobble
+    ld a,16             ; load the number of frames to wobble
     ld (de),a
     dec de              ; move de back to state
     ld a,2
@@ -77,7 +80,7 @@ rocks_processrocks0:
     inc ix              ; move to the state
     ld a,(ix)           ; load the state into a
     cp 0
-    jp z,rocks_processrocks1 ; if not falling, check next
+    jp z,rocks_processrocks3 ; if not falling, check next
     cp 2
     jp nz, rocks_processrocks2
     ; we're wobbling
@@ -86,14 +89,64 @@ rocks_processrocks0:
     call rocks_wobble
     inc ix              ; increment for next
     jp rocks_processrocks1  ; do next rock
-    ; we're falling
-    inc ix
-    inc ix              ; inc de to get to next 
 rocks_processrocks2:
+    ; we're falling
+    call rocks_fall
+    inc ix
+    inc ix              ; inc ix to get to next
+    jp rocks_processrocks1 
+rocks_processrocks3:
+    inc ix 
+    inc ix
 rocks_processrocks1: 
     pop bc              ; get loop count back         
     djnz rocks_processrocks0
     ret
+
+;
+; Falls a rock one pixel, checks the next square down to see if it is empty, if not, stop falling
+; bc - coord of current rock graphic on screen
+; ix - memory location of current rock in rock list, currently at the 3rd position (rock state)
+;
+rocks_fall:
+    dec ix
+    dec ix              ; decrease ix back to coords
+    ld (rocks_tmp2),bc  ; store original coords
+    ld a,3              ; move this number of pixels
+rocks_fall1:
+    ex af,af'
+    ld bc,(ix)          ; get current coords
+    call sprites_scadd  ; get the memory of the coords into de 
+    inc d               ; add 256 to get next row
+    ld a,(de)           ; get the contents of the next row
+    cp 0
+    jp nz,rocks_fall3    ; move the rock if the row is empty
+    inc c               ; increment the vertical
+    ld (ix),bc          ; store the new coords
+    ex af,af'
+    dec a
+    cp 0
+    jp nz,rocks_fall1   ; do another pixel if needed
+rocks_fall2:
+    ld a,9              ; rock graphic
+    ld bc,(rocks_tmp2)  ; get the original coords
+    call screen_getblock     ; get the memory into hl
+    call sprites_drawsprite  ; draw the sprite - over the top of the current one
+    ld a,9
+    ld bc,(ix)          ; get the new coords
+    call screen_getblock     ; get the memory into hl
+    call sprites_drawsprite  ; draw the sprite - over the top of the current one
+    inc ix
+    inc ix                  ; get ix back to state
+    ret
+rocks_fall3:
+    ld a,0              ; set the state to fell
+    ld (ix+2),a           ; store the falling state
+    ld bc,(ix)          ; get the coords
+    call screen_getattraddressfromscreencoords ; get the attr address into de
+    ld hl,de
+    ld (hl),66
+    jp rocks_fall2      ; rejoin main loop
 
 ;
 ; Wobbles a rocks
