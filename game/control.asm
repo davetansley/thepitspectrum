@@ -55,36 +55,63 @@ control_dig0:           ; going left
     call sprites_scadd  ; get the current coord 
     ld hl,de 
     dec hl              ; move one left
+    pop bc              ; get the coords back, subtract 8 from horiz, 8 from vert, store (will be coords of space above dug dirt)
+    ld a,b
+    ld b,8
+    sub b
+    ld b,a
+    ld a,c
+    ld c,8
+    sub c
+    ld c,a
+    push bc
     jp control_dig2
 control_dig1:
     call sprites_scadd  ; get the current coord 
     ld hl,de 
     inc hl              ; move one right
+    pop bc              ; get the coords back, add 8 to horiz, subtract 8 from vert store (will be coords of space above dug dirt)
+    ld a,8
+    add a,b
+    ld b,a
+    ld a,c
+    ld c,8
+    sub c
+    ld c,a
+    push bc
     jp control_dig2
 control_dig4:
     call sprites_scadd  ; get the current coord 
     ld hl,de 
     ld de,32
     sbc hl,de             ; move one up
+    pop bc              ; get the coords back, 1 from vert, store, then we'll sub 1 from c for each row later
+    dec c
+    push bc
     jp control_dig6
 control_dig5:
     call sprites_scadd  ; get the current coord 
     ld hl,de 
     inc h              ; move one down
+                       ; not bothered about working out bc here, since rock will never fall if digging down
     jp control_dig2
+; Normal (not up) digging    
 control_dig2:
-    pop bc
     ld a,(player+8)     ; get the number of rows we need to overwrite
     ld b,a              ; rows to copy over
+    push hl             ; store the memory location of the first row for later
 control_dig3:
     call control_getpixelrow
-    ld (hl),a           ; load empty into row
+    ld (hl),a           ; load contents into row
     ld de,32
     add hl,de           ; move to next row
     djnz control_dig3
+    pop hl              ; get the original memory location back
+    ld de,32
+    sbc hl,de           ; move to above row, ready for checking for rock
     jp control_dig10
-control_dig6:           ; special case for going up
-    pop bc
+; Special case for going up
+control_dig6:           
     ld a,(player+8)     ; get the number of rows we need to overwrite
     ld b,a              ; rows to copy over
 control_dig7:
@@ -93,12 +120,24 @@ control_dig12:
     ld (hl),a           ; load empty into row
     ld de,32
     sbc hl,de           ; move up to next row
+    dec c               ; decrease c to track rows
     djnz control_dig7
+    ld a,c
+    sub 8
+    pop bc
+    ld c,a
+    push bc             ; store the decreased c coord
 control_dig10:
     ld ix,player+7
     ld a,(ix)     ; get the dig frame number 
     dec a
     ld (ix),a
+    ; call the check for rocks above the removed dirt
+    ld ix,player+6
+    ld a,(ix)     ; get the dig state
+    cp 0
+    pop bc
+    call z, rocks_checkforfalling ; make the check if we're no longer digging 
     ret
 
 ;

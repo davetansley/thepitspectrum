@@ -33,6 +33,7 @@
     include "game\player.asm"
     include "game\ship.asm"
     include "game\tank.asm"
+    include "game\rocks.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -55,6 +56,10 @@ main:
     
 mloop:    
     halt 
+    call main_loop_processing
+    jp mloop
+
+main_loop_processing:
     di
     call screen_buffertoscreen  ; copy buffer to screen
     ei                          ; enable interupts
@@ -63,10 +68,11 @@ mloop:
     call control_keyboard       ; check keyboard
     call player_drawplayer      ; draw player
     call tank_process           ; prcoess the tank
+    call rocks_processrocks     ; process falling rocks
 
     call game_incrementframe    ; increment the game frame
 
-    jp mloop
+    ret
 
 ;===========================================================================
 ; Stack. 

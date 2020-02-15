@@ -78,7 +78,7 @@ sprites_drawsprite6:
 ; 9,1 will be at memory offset 8+1
 ; 8,0 will be at memory offset 256
 ; 9,0 will be at memory offset 257   
-; Inputs:
+; Outputs:
 ; de - coords
 ;
 sprites_scadd: 

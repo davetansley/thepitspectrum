@@ -9,10 +9,11 @@ sprites:
     defb    255,255,255,255,255,255,255,255   ; 6, slime block
     defb    255,255,  0,  0,  0,  0,  0,  0   ; 7, trapdoor
     defb    24, 44, 78,143,241,114, 52,  24    ; 8, gem
-    defb    28,126,255,127,254,252,127,  62    ; 9, rock	
-    defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 10, sky block, tank background
+    defb    60,126,255,127,254,254,255,126    ; 9, rock	
+	defb	60,126,255,254,127,127,255,126    ; 10, rock 2
     defb    0  ,  0,  0,  0,  0,  0,255,255   ; 11, sky block, pixel trapdoor
 	defb    153,219,126, 36,255,126, 60, 24   ; 12, missile
+    defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 13, sky block, tank background
     
 sprite_attrs:
     defb    070 ; 0, space
@@ -25,9 +26,10 @@ sprite_attrs:
     defb    066 ; 7, trapdoor
     defb    070 ; 8, gem
     defb    066 ; 9, rock
-    defb    074 ; 10, sky, red ink (tank)
+    defb    066 ; 10, rock 2
 	defb    073 ; 11, sky, trapdoor
 	defb    067 ; 12, missile
+    defb    074 ; 13, sky, red ink (tank)
 
 player_sprite:
 	defb	 16, 57,146,252, 56, 61,195,128 ; 0 up/down 1
