@@ -127,6 +127,10 @@ rocks_fall1:
     and 7               ; divisible by 8?
     cp 0
     jp nz,rocks_fall4   ; if not, carry on
+    call screen_getattraddressfromscreencoords ; get the attr address into de
+    ld hl,de
+    ld (hl),66          ; load this square with the yellow colour
+    ld bc,(ix)
     ld a,c              ; get vertical
     sub 8               ; look up one square
     ld c,a              ; put a back in c
