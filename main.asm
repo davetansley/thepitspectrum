@@ -35,6 +35,7 @@
     include "game\tank.asm"
     include "game\rocks.asm"
     include "game\scores.asm"
+    include "game\diamonds.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -54,6 +55,7 @@ main:
     call player_init
     call ship_land              ; land the ship
     call tank_init
+    call diamonds_init
     
 mloop:    
     halt 
@@ -70,6 +72,7 @@ main_loop_processing:
     call player_drawplayer      ; draw player
     call tank_process           ; prcoess the tank
     call rocks_processrocks     ; process falling rocks
+    call diamonds_twinkle       ; make the diamonds twinkle
 
     call game_incrementframe    ; increment the game frame
 

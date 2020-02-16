@@ -73,5 +73,3 @@ utilities_waitforkey_forframes1:
     djnz utilities_waitforkey_forframes0 ; loop again
     ld e,0              ; nothing pressed in time
     ret
-
-

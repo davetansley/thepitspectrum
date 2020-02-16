@@ -179,6 +179,14 @@ screen_draw0:
     ld (hl),12                  ; load the block number into memory
     ld ix,level01missiles       ; missile memory
     call screen_initobjects     ; draw missiles
+    ld hl, screen_tmp
+    ld (hl),08                  ; load the block number into memory
+    ld ix,level01diamonds       ; diamond memory
+    call screen_initobjects     ; draw diamonds
+    ld hl, screen_tmp
+    ld (hl),14                  ; load the block number into memory
+    ld ix,level01gems           ; gems memory
+    call screen_initobjects     ; draw gems
     call screen_setuptext       ; draws text on the screen
     ret
 
@@ -228,6 +236,8 @@ screen_initobjects:
     
 screen_initobjects1:
     inc ix                      ; move past state
+    inc ix
+    inc ix                      ; move past mem
     jp screen_initobjects      
 screen_initobjects2:
     ret
