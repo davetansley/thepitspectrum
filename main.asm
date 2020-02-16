@@ -34,6 +34,7 @@
     include "game\ship.asm"
     include "game\tank.asm"
     include "game\rocks.asm"
+    include "game\scores.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.

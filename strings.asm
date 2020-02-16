@@ -13,6 +13,30 @@ string_scorenumbers2:
 string_titlescreen_copyright:
     defb 4,22, 127,' 1982 AW ZILEC ELC LTD',255
 
+
+string_alttitlescreen_1:
+    defb 12,0,'CREDITS 1',255
+string_alttitlescreen_2:
+    defb 0,2,'           THE OBJECT',254
+    defb 0,3,'          OF THIS GAME',254
+    defb 0,4,'         IS TO DIG DOWN',254
+    defb 0,5,'        TO THE BOTTOM PIT',254
+    defb 0,6,'               AND',254
+    defb 0,7,'        COLLECT AT LEAST',254
+    defb 0,8,'         ONE LARGE JEWEL',254
+    defb 0,9,'              THEN',254
+    defb 0,10,'         RETURN TO SHIP',254
+    defb 0,11,'         THRU UPPER PIT',255
+string_alttitlescreen_3:
+    defb 0,13,'    SINGLE BONUS  5000 POINTS',254
+    defb 0,14,'      COLLECT 1 LARGE JEWEL',254
+    defb 0,15,'       AND RETURN TO SHIP',254
+    defb 0,17,'    DOUBLE BONUS  10000 POINTS',254
+    defb 0,18,'    COLLECT ALL 3 LARGE JEWELS',254
+    defb 0,19,'       OR   ALL 4 SMALL JEWELS',254
+    defb 0,21,'    TRIPLE BONUS  15000 POINTS',254
+    defb 0,22,'       COLLECT ALL 7 JEWELS',255
+
 ;
 ; Prints specified string
 ; Inputs:

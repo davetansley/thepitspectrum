@@ -247,7 +247,7 @@ control_pl_movedown:
     ld a,c                  ; load c into the acc
     cp 224
     jp z,control_pl_movedown0 ; are we at the edge of the screen
-    cp 144
+    cp 128
     call nc, control_scroll_down
     call movement_checkcanmove_down ; check we can move down, e will be 1 if we can
     push af
@@ -333,7 +333,7 @@ control_pl_moveright0:
 ;
 control_scroll_down:
     push af
-    ld a,7
+    ld a,8
     ld (screen_offset),a
     pop af
     ret

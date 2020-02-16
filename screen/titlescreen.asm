@@ -4,7 +4,19 @@
 titlescreen_show:
     call titlescreen_init
     call titlescreen_drawtitle
-    call utilities_waitforkey   ; wait for keypress
+    ld a,250                              ; wait for 200 frames
+    call utilities_waitforkey_forframes   ; wait for keypress
+    ld a,e
+    cp 1                                  ; was anything pressed?
+    ret z                                 ; end titlescreen if so
+
+    call titlescreen_alt_init             ; otherwise, draw alt screen
+    call titlescreen_alt_drawtitle
+    ld a,250                              ; wait for 200 frames
+    call utilities_waitforkey_forframes   ; wait for keypress
+    ld a,e
+    cp 1                                  ; was anything pressed?
+    jp nz,titlescreen_show                ; start again if not
     ret
 
 ;
@@ -28,6 +40,38 @@ titlescreen_drawtitle0:
     ret
 
 ;
+; Draws the alternate title screen
+;
+titlescreen_alt_drawtitle:
+    ld hl,string_alttitlescreen_1
+    call string_print
+    ld hl,string_alttitlescreen_2
+    call string_print
+    ld hl,string_alttitlescreen_3
+    call string_print
+    ld a,67
+    ld de,22528                         ; top row attrs here 
+    call titlescreen_alt_setcolours
+    ld a,70
+    ld de,22528+416                     ; 13th row attrs here 
+    call titlescreen_alt_setcolours
+    ld a,67
+    ld de,22528+544                         ; 17th row attrs here 
+    call titlescreen_alt_setcolours
+    ld a,66
+    ld de,22528+672                         ; 21st row attrs here 
+    call titlescreen_alt_setcolours
+    ret
+
+titlescreen_alt_setcolours:
+    ld b,32                     
+titlescreen_alt_setcolours0:
+    ld (de),a
+    inc de
+    djnz titlescreen_alt_setcolours0
+    ret
+
+;
 ; Initialises the screen
 ;
 titlescreen_init:
@@ -43,6 +87,21 @@ titlescreen_init:
     ld hl,string_titlescreen_copyright
     call string_print
     
+    ret
+
+;
+; Initialises the screen
+;
+titlescreen_alt_init:
+; We want a black screen.
+    call $0D6B
+    ld a,71             ; white ink (7) on black paper (0),
+                        ; bright (64).
+    ld (23693),a        ; set our screen colours.
+    ld a,0              ; 2 is the code for red.
+    out (254),a         ; write to port 254.
+    call 3503           ; ROM routine - clears screen, opens chan 2.
+
     ret
 
 ;

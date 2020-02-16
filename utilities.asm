@@ -50,3 +50,28 @@ utilities_waitforkey0:
     cp 0                ; is it still zero?
     jr z,utilities_waitforkey0           ; yes, so no key pressed.
     ret                 ; key was pressed.
+
+;
+; Waits number of frames for keypress. If got, returns 1, if not 0
+; Inputs:
+; a - number of frames to waits
+; Ouputs:
+; e - 0 not pressed, 1 pressed
+utilities_waitforkey_forframes:
+    ld hl,23560         ; LAST K system variable.
+    ld (hl),0           ; put null value there.
+    ld b,a              ; number of frames to wait
+utilities_waitforkey_forframes0: 
+    ld a,(hl)           ; new value of LAST K.
+    cp 0                ; is it still zero?
+    jr z,utilities_waitforkey_forframes1           ; yes, so no key pressed.
+    ld e,1              ; set the pressed flag
+    ret                 ; key was pressed.
+utilities_waitforkey_forframes1:
+    halt                ; wait for frame
+    halt                ; wait for frame
+    djnz utilities_waitforkey_forframes0 ; loop again
+    ld e,0              ; nothing pressed in time
+    ret
+
+

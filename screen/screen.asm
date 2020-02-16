@@ -26,7 +26,9 @@ screen_buffertoscreen:
     ld hl,16384+80              ; where the actual screen is, but as we're using the stack it's the right hand side of the buffer (16+32+32)
 screen_buffertoscreen0:       
     exx                         ; hl is now buffer
-    ld sp,hl                    ; do first sixteen for left hand side
+    inc hl 
+    inc hl                      ; move hl forward 2 to skip first two blocks
+    ld sp,hl                    ; do first fourteen for left hand side, sp pointing at buffer
     pop af
     pop bc
     pop de
@@ -36,9 +38,7 @@ screen_buffertoscreen0:
     pop af
     pop bc
     pop de
-    pop iy
-    ld sp,hl
-    push iy
+    ld sp,hl                    ; sp pointing at screen
     push de
     push bc
     push af
@@ -48,25 +48,26 @@ screen_buffertoscreen0:
     push de
     push bc
     push af
-    ld e,16                    ; do another sixteen for right hand side
+    ld e,14                    ; do another fourteen for right hand side
     ld d,0
     add hl,de
-    ld sp,hl    
+    ld sp,hl                    ; sp pointing at buffer
     pop af
     pop bc
     pop de
     pop ix
+    ;pop ix
     exx                         ; hl is now screen
     ex af,af'
-    ld e,16
+    ld e,14
     ld d,0
     add hl,de
     pop af
     pop bc
     pop de
-    pop iy
-    ld sp,hl
-    push iy
+    ;pop iy
+    ld sp,hl                    ; sp pointing at screen
+    ;push iy
     push de
     push bc
     push af
@@ -80,25 +81,32 @@ screen_buffertoscreen0:
     ld d,0
     add hl,de
     exx                         ; hl is now screen
-    ld e,16
+    ld e,14
     ld d,0
     sbc hl,de
     inc h
     ld a,h
     and 0x07                    ; check if this is multiple of 8, if so, end of cell line
-    jr nz,screen_buffertoscreen0 ; next line in cell
+    jp nz,screen_buffertoscreen0 ; next line in cell
     ld a,h
     sub 8
     ld h,a
+                                ; check h for the bottom segment
+    cp 80                       ; 80 is the bottom segment
+    jp nz, screen_buffertoscreen2 ; no need to check if not
+    ld a,l                      ; check if a is 144
+    cp 208                      ; means we're at the bottom row which we leave blank for high score_colours
+    jp z,screen_buffertoscreen1 ; if so, end
+screen_buffertoscreen2:
     ld a,l
     add a,32
     ld l,a
-    jr nc,screen_buffertoscreen0
+    jp nc,screen_buffertoscreen0
     ld a,h
     add a,8
     ld h,a
-    cp 0x58
-    jr nz,screen_buffertoscreen0
+    cp 0x58                     ; 88 in dec
+    jp nz,screen_buffertoscreen0
 screen_buffertoscreen1:        
     ld sp,0
     exx
@@ -113,7 +121,7 @@ screen_buffertoattrs:
     ld hl,screen_attr_buffer
     add hl,de                       ; add the offset
     ld de,22528+64                  ; add 32x2 to the attr memory address to account for the top two rows                      
-    ld bc,928
+    ld bc,672
     ldir
     ret
 
@@ -124,6 +132,12 @@ screen_setscorecolours:
     ldir
     ret
 
+screen_sethighscorecolours:
+    ld hl,high_score_colours
+    ld de,22528+736                 ; attrs here                      
+    ld bc,32
+    ldir
+    ret
 
 ; Draw the screen
 ; Inputs:
@@ -172,6 +186,8 @@ screen_draw0:
 ; Sets up text on the screen
 ;
 screen_setuptext:
+    call scores_showtable
+    call screen_sethighscorecolours
     ld hl, string_score1
     call string_print
     ld hl, string_scorenumbers1
