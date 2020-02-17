@@ -20,6 +20,7 @@
     include "init.asm"
     include "utilities.asm"
     include "strings.asm"
+    include "screen\buffer.asm"
     include "screen\screen.asm"
     include "screen\sprites.asm"
     include "screen\titlescreen.asm"
@@ -52,6 +53,7 @@ main:
 
     call init_start
     call screen_draw
+    call buffer_allbuffertoscreen
     call player_init
     call ship_land              ; land the ship
     call tank_init
@@ -63,10 +65,8 @@ mloop:
     jp mloop
 
 main_loop_processing:
-    di
-    call screen_buffertoscreen  ; copy buffer to screen
-    ei                          ; enable interupts
-    
+    call buffer_buffertoscreen  ; copy buffer to screen
+    call buffer_clearlist       ; zero the updated lines list
     call player_drawplayer      ; delete player
     call control_keyboard       ; check keyboard
     call player_drawplayer      ; draw player
@@ -75,7 +75,7 @@ main_loop_processing:
     call diamonds_twinkle       ; make the diamonds twinkle
 
     call game_incrementframe    ; increment the game frame
-
+    
     ret
 
 ;===========================================================================

@@ -89,9 +89,15 @@ ship_change_frame1:
     ret
 
 ship_draw_screen:
+    ld a,0
+    call buffer_marklineforupdate
+    ld a,1
+    call buffer_marklineforupdate
+    ld a,2
+    call buffer_marklineforupdate   ; mark the first three rows for update
     halt 
     di
-    call screen_buffertoscreen  ; copy buffer to screen
+    call buffer_buffertoscreen  ; copy buffer to screen
     ei                          ; enable interupts
     ret
 

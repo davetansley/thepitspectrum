@@ -219,7 +219,7 @@ control_pl_moveup:
     cp 24
     jp z,control_pl_moveup0 ; are we at the edge of the screen
     cp 96
-    call c, control_scroll_up
+    call z, control_scroll_up
     call movement_checkcanmove_up ; check we can move up, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
@@ -248,7 +248,7 @@ control_pl_movedown:
     cp 224
     jp z,control_pl_movedown0 ; are we at the edge of the screen
     cp 128
-    call nc, control_scroll_down
+    call z, control_scroll_down
     call movement_checkcanmove_down ; check we can move down, e will be 1 if we can
     push af
     ld a,e                  ; put e in a
@@ -336,6 +336,8 @@ control_scroll_down:
     ld a,8
     ld (screen_offset),a
     pop af
+    ld hl,buffer_updateall
+    ld (hl),1         ; flag as screen needing update
     ret
 
 ;
@@ -345,7 +347,9 @@ control_scroll_up:
     push af
     ld a,0
     ld (screen_offset),a
-    pop af
+    pop af    
+    ld hl,buffer_updateall
+    ld (hl),1         ; flag as screen needing update
     ret
 
 

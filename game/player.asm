@@ -40,6 +40,7 @@ player_drawplayer2
     add hl,de                   ; load hl with the location of the player sprite data
     ld bc,(player)              ; load bc with the start coords
     call sprites_drawsprite     ; call the routine to draw the sprite
+    call player_storeupdatedlines ; log updated rows
     ret
 
 
@@ -72,4 +73,28 @@ player_justmoved1:
     ld (player+4),a
 player_justmoved3:
     exx;
+    ret
+
+;
+; Stores the updated rows associated with the player
+;
+player_storeupdatedlines:
+    ld bc,(player)          ; get the screen coords into bc 
+    ld a,c                  ; get the player block coords of current block
+    and 248                 ; find closest multiple of eight
+    rrca
+    rrca
+    rrca                    ; divide by 8
+    ld de,(screen_offset)          ; load the screen offset, this is in rows
+    sub e
+    push af
+    call buffer_marklineforupdate  ; store current row in updated lines 
+    pop af
+    dec a 
+    push af
+    call buffer_marklineforupdate  ; store line above 
+    pop af
+    inc a 
+    inc a 
+    call buffer_marklineforupdate  ; store line beneath   
     ret

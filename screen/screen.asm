@@ -1,129 +1,8 @@
-screen_buffer:
-    defs 7424                   ; area reserved for screen
-
-screen_attr_buffer:
-    defs 928                    ; attrs buffer area
-
 screen_offset:
     defb 0                      ; offset from top of screen in lines
 
 screen_tmp:
     defb 0                      ; temporary memory
-
-;
-; Copies the buffer to the screen. Use stack.
-; Inputs: none
-;
-screen_buffertoscreen:
-    ld a,(screen_offset)          ; load the screen offset, this is in rows, want it *256
-    ld de,256
-    call utilities_multiply
-    ld de,hl
-    ld hl,screen_buffer
-    add hl,de                   ; add the offset
-    ld (screen_buffertoscreen1+1),sp ; this is some self-modifying code; stores the stack pointer in an ld sp,nn instruction at the end
-    exx
-    ld hl,16384+80              ; where the actual screen is, but as we're using the stack it's the right hand side of the buffer (16+32+32)
-screen_buffertoscreen0:       
-    exx                         ; hl is now buffer
-    inc hl 
-    inc hl                      ; move hl forward 2 to skip first two blocks
-    ld sp,hl                    ; do first fourteen for left hand side, sp pointing at buffer
-    pop af
-    pop bc
-    pop de
-    pop ix
-    exx                         ; hl is now screen
-    ex af,af'
-    pop af
-    pop bc
-    pop de
-    ld sp,hl                    ; sp pointing at screen
-    push de
-    push bc
-    push af
-    ex af,af'
-    exx                         ; hl is now buffer
-    push ix
-    push de
-    push bc
-    push af
-    ld e,14                    ; do another fourteen for right hand side
-    ld d,0
-    add hl,de
-    ld sp,hl                    ; sp pointing at buffer
-    pop af
-    pop bc
-    pop de
-    pop ix
-    ;pop ix
-    exx                         ; hl is now screen
-    ex af,af'
-    ld e,14
-    ld d,0
-    add hl,de
-    pop af
-    pop bc
-    pop de
-    ;pop iy
-    ld sp,hl                    ; sp pointing at screen
-    ;push iy
-    push de
-    push bc
-    push af
-    ex af,af'
-    exx                         ; hl is now buffer
-    push ix
-    push de
-    push bc
-    push af
-    ld e,16
-    ld d,0
-    add hl,de
-    exx                         ; hl is now screen
-    ld e,14
-    ld d,0
-    sbc hl,de
-    inc h
-    ld a,h
-    and 0x07                    ; check if this is multiple of 8, if so, end of cell line
-    jp nz,screen_buffertoscreen0 ; next line in cell
-    ld a,h
-    sub 8
-    ld h,a
-                                ; check h for the bottom segment
-    cp 80                       ; 80 is the bottom segment
-    jp nz, screen_buffertoscreen2 ; no need to check if not
-    ld a,l                      ; check if a is 144
-    cp 208                      ; means we're at the bottom row which we leave blank for high score_colours
-    jp z,screen_buffertoscreen1 ; if so, end
-screen_buffertoscreen2:
-    ld a,l
-    add a,32
-    ld l,a
-    jp nc,screen_buffertoscreen0
-    ld a,h
-    add a,8
-    ld h,a
-    cp 0x58                     ; 88 in dec
-    jp nz,screen_buffertoscreen0
-screen_buffertoscreen1:        
-    ld sp,0
-    exx
-    call screen_buffertoattrs
-    ret
-
-screen_buffertoattrs:
-    ld a,(screen_offset)            ; get the screen offset in rows, so want *32
-    ld de,32
-    call utilities_multiply
-    ld de,hl
-    ld hl,screen_attr_buffer
-    add hl,de                       ; add the offset
-    ld de,22528+64                  ; add 32x2 to the attr memory address to account for the top two rows                      
-    ld bc,672
-    ldir
-    ret
 
 screen_setscorecolours:
     ld hl,score_colours
@@ -149,7 +28,7 @@ screen_draw:
     ld c,0                      ; horiz
     ld b,0                      ; vert, 0 at top
     ld ix,level01               ; point ix at level data
-    ld iy,screen_attr_buffer    ; point iy at attr data
+    ld iy,buffer_attr_buffer    ; point iy at attr data
 screen_draw0:
     ld a,(ix)                   ; load the block number
     push bc                     ; store bc, contains loop count
@@ -274,7 +153,7 @@ screen_getcelladdress:
 ; de: memory location
 ;
 screen_getcellattradress:
-    ld de,screen_attr_buffer ; memory is at base + horiz (c) + vert*32 (b)
+    ld de,buffer_attr_buffer ; memory is at base + horiz (c) + vert*32 (b)
     ld l,c      ; x position.
     ld h,0      ; 0 h
     add hl,de
@@ -349,7 +228,7 @@ screen_getattraddressfromscreencoords:
 ; Outputs:
 ; de - memory location of first byte
 screen_getbufferaddress:
-    ld hl, screen_buffer    ; first get screen buffer start
+    ld hl, buffer_buffer    ; first get screen buffer start
     ld d,b                  ; then work out vertical offset 
     ld e,0                  ; mult by 256, low byte becomes high byte, de now holds result
     add hl,de               ; add to base
