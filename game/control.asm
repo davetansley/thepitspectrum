@@ -4,10 +4,10 @@
 control_keyboard:
     ld a,(player+5)      ; first, check if the player has pixels left to move
     cp 0
-    jp z, control_keyboard1
+    jp z, control_keyboard5
     call control_automove
     ret
-control_keyboard1:
+control_keyboard5:
     ld a,(player+6)      ; next, check if the player is digging
     cp 0
     jp z, control_keyboard0
@@ -18,19 +18,31 @@ control_keyboard0:
     in a,(c)            ; read keyboard.
     ld b,a              ; store result in b register.
     rr b                ; check outermost key (q).
-    call nc,control_pl_moveup         ; player up.
+    jp nc,control_keyboard1
     ld bc,65022         ; port for keyboard row a-f.
     in a,(c)            ; read keyboard.
     ld b,a              ; store result in b register.
     rr b                ; check outermost key (a).
-    call nc,control_pl_movedown       ; player down.
+    jp nc,control_keyboard2
     ld bc,57342         ; port for keyboard row y-p.
     in a,(c)            ; read keyboard.
     ld b,a              ; store result in b register.
     rr b                ; check outermost key (p).
-    call nc,control_pl_moveright       ; player left.
+    jp nc,control_keyboard3   
     rr b                ; check next key.
-    call nc,control_pl_moveleft       ; player right.
+    jp nc,control_keyboard4
+    ret
+control_keyboard1:
+    call control_pl_moveup         ; player up.
+    ret
+control_keyboard2:
+    call control_pl_movedown       ; player down.
+    ret
+control_keyboard3:
+    call control_pl_moveright       ; player left.
+    ret
+control_keyboard4:
+    call control_pl_moveleft       ; player right.
     ret
 
 ;
