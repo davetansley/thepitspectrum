@@ -1,14 +1,66 @@
 ;
 ;   Data for current player
-;   horiz,vert,dir (0 up, 1 left, 2 right, 3 down), frame, frame transition count,move remaining, is digging (0 no), digging count, pixels to dig
+;   
 player:
-    defb    0,0,2,0,1,0,0,0,0
+    defb    0,0                 ; horiz,vert (+0,+1)
+    defb    2,0,1               ; dir (0 up, 1 left, 2 right, 3 down), frame, frame transition count (+2,+3,+4)
+    defb    0                   ; auto move remaining (+5)
+    defb    0,0,0               ; is digging (0 no), digging count, pixels to di (+6,+7,+8)
+    defb    0                   ; lives remaining (+9)
+    defb    0                   ; died this life (+10)
+
 ;
-; Initializes a player
+; Score for the current player
 ;
-player_init:
-    ld bc,(start_coord)
+player_score:
+    defb '000000'
+;
+; Initializes a player at start of game
+; Copy initial coords, copy lives, copy score
+;
+player_init_gamestart:
+    ld a,(game_numberlives)
+    ld (player1_lives),a
+    ld (player2_lives),a                        ; set the initial number of lives at game start
+    ret
+
+;
+; Initializes a player at start of a life
+; Copy initial coords, copy lives, copy score
+;
+player_init_lifestart:
+    ld bc,(init_coord)
     ld (player),bc
+    ld bc,player+9
+    ld a,(player1_lives)
+    ld (bc),a
+    ld bc,player+10
+    ld a,0
+    ld (bc),a
+    ret
+
+;
+; Player lives
+;
+player1_lives:
+    defb 3
+player2_lives:
+    defb 3
+
+;
+; Player scores
+;
+player1_score:
+    defb '000000'
+player2_score:
+    defb '000000'
+
+;
+; Kills a player this life
+;
+player_killplayer:
+    ld hl,player+10
+    ld (hl),1
     ret
 
 ;

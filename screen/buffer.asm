@@ -63,10 +63,10 @@ buffer_bufferlinetoscreen:
     ld a,c                      ; get original row back
     ld (buffer_bufferlinetoscreen1+1),sp ; this is some self-modifying code; stores the stack pointer in an ld sp,nn instruction at the end
     exx
+    ld c,0                      ; zero horizontal
     ld b,a                      ; load the row number into vertical coord
     inc b
     inc b                       ; move forward 2 to allow for scores
-    ld c,0                      ; zero horizontal
     call screen_getcelladdress  ; get the memory into de
     ld hl,16                    ; offset by 16 chars to get to the centre, since populating stack from right
     add hl,de

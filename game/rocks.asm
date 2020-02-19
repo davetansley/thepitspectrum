@@ -174,6 +174,8 @@ rocks_fall2:
     ld bc,(ix)          ; get the new coords
     call screen_getblock     ; get the memory into hl
     call sprites_drawsprite  ; draw the sprite - over the top of the current one
+    ld bc,(ix)          ; get the coords again
+    call rocks_checkforplayer ; check to see if we hit a player
     inc ix
     inc ix                  ; get ix back to state
     ret
@@ -185,6 +187,23 @@ rocks_fall3:
     ld hl,de
     ld (hl),66
     jp rocks_fall2      ; rejoin main loop
+
+;
+; Checks to see if the rock is hitting a player
+; Inputs:
+; bc - coords of rock we're checking
+rocks_checkforplayer:
+    ld de,(player)       ; get the player coords
+    ld a,e               ; get the vert coord first 
+    sub c                ; subtract the rock vertical coord from players 
+    cp 8                 ; the rock will only hit a player if the player is directly underneath, so this must be 8
+    ret nz               ; if not, hasn't hit
+    ld a,d               ; get the player horiz coord 
+    sub b                ; subtract rock coord 
+    add 7                ; add max distance
+    cp 13                ; compare to 13? if carry flag set, they've hit
+    call c, player_killplayer ; if so, jump out
+    ret
 
 ;
 ; Wobbles a rocks

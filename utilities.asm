@@ -73,3 +73,21 @@ utilities_waitforkey_forframes1:
     djnz utilities_waitforkey_forframes0 ; loop again
     ld e,0              ; nothing pressed in time
     ret
+
+;
+; Clears the screen
+; Inputs:
+; a - attribute colour
+utilities_clearscreen:
+    ld hl, 16384        ;pixels 
+    ld de, 16385        ;pixels + 1
+    ld bc, 6143         ;pixels area length - 1
+    ld (hl), 0          ;set first byte to '0'
+    ldir                ;copy bytes
+
+    ld hl,22528         ; attr
+    ld de,22529         ; attr+1
+    ld bc,768
+    ld (hl),a 
+    ldir 
+    ret

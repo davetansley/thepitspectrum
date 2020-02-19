@@ -37,6 +37,11 @@ string_alttitlescreen_3:
     defb 0,21,'    TRIPLE BONUS  15000 POINTS',254
     defb 0,22,'       COLLECT ALL 7 JEWELS',255
 
+string_lifescreen_player:
+    defb 11,0,' PLAYER 1 ',255
+string_lifescreen_lives:
+    defb 11,3,48,' MEN LEFT',255
+
 ;
 ; Prints specified string
 ; Inputs:

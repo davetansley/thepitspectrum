@@ -24,6 +24,7 @@
     include "screen\screen.asm"
     include "screen\sprites.asm"
     include "screen\titlescreen.asm"
+    include "screen\lifescreen.asm"
 
     include "leveldata\level01.asm"
     include "graphics\graphics.asm"
@@ -51,10 +52,27 @@ main:
     ; Draw the title screen
     call titlescreen_show
 
+    call player_init_gamestart
+
+main_lifestart:
+    ld hl,screen_offset
+    ld (hl),0
+    ld hl,screen_tmp
+    ld (hl),0
+    ld hl,buffer_tmp
+    ld (hl),0
+    inc hl
+    ld (hl),0
+  
+    call player_init_lifestart
+    
+    call lifescreen_draw        ; show the lives remaining screen
+
     call init_start
     call screen_draw
+    
     call buffer_allbuffertoscreen
-    call player_init
+    
     call ship_land              ; land the ship
     call tank_init
     call diamonds_init
@@ -62,6 +80,12 @@ main:
 mloop:    
     halt 
     call main_loop_processing
+
+    ld hl,player+10
+    ld a,(hl)                   ; check if the player died this frame
+    cp 1
+    jp z,main_lifestart
+
     jp mloop
 
 main_loop_processing:
