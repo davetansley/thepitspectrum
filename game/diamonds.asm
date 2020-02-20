@@ -68,8 +68,8 @@ diamonds_checkforplayer:
     ld de,(player)       ; get the player coords
     ld a,e               ; get the vert coord first 
     sub b                ; subtract the diamond vertical coord from players 
-    add 9                ; add the max distance
-    cp 13                ; compare to 13? if carry flag set, they've hit
+    add 8                ; add the max distance
+    cp 15                ; compare to 13? if carry flag set, they've hit
     ret nc               ; if not, hasn't hit
     ld a,c               ; multiply c by 8
     rlca 
@@ -78,8 +78,8 @@ diamonds_checkforplayer:
     ld c,a
     ld a,d               ; get the player horiz coord 
     sub c                ; subtract rock coord 
-    add 9                ; add max distance
-    cp 13                ; compare to 13? if carry flag set, they've hit
+    add 8                ; add max distance
+    cp 15                ; compare to 13? if carry flag set, they've hit
     ret
 
 

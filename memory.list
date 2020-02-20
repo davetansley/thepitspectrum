@@ -2945,10 +2945,10 @@
 120+  B52B 3A B0 B4         ld a,(player+11)             ; get the dying flag
 121+  B52E FE 01            cp 1
 122+  B530 CA 42 B5         jp z,player_drawplayer3     ; if it's one, we're being crushed
-123+  B533 3A AB B4         ld a,(player+6)             ; get the dig flag
-124+  B536 FE 01            cp 1
-125+  B538 CA 5F B5         jp z,player_drawplayer1    ; get dig frame
-126+  B53B              player_drawplayer4:
+123+  B533              player_drawplayer4:
+124+  B533 3A AB B4         ld a,(player+6)             ; get the dig flag
+125+  B536 FE 01            cp 1
+126+  B538 CA 5F B5         jp z,player_drawplayer1    ; get dig frame
 127+  B53B 3A A8 B4         ld a,(player+3)             ; this is normal movement so get the current frame
 128+  B53E 83               add a,e
 129+  B53F C3 64 B5         jp player_drawplayer2
@@ -2959,7 +2959,7 @@
 134+  B548 C2 51 B5         jp nz,player_drawplayer5    ; if this isn't zero, then this isn't the first time round, so do the crush anim
 135+  B54B 3E 32            ld a,50
 136+  B54D 77               ld (hl),a                   ; otherwise, load up the anim frames
-137+  B54E C3 3B B5         jp player_drawplayer4       ; and return to the main loop to remove the current frame
+137+  B54E C3 33 B5         jp player_drawplayer4       ; and return to the main loop to remove the current frame
 138+  B551              player_drawplayer5:
 139+  B551 3D               dec a
 140+  B552 77               ld (hl),a
@@ -3683,8 +3683,8 @@
  68+  B977 ED 5B A5 B4      ld de,(player)       ; get the player coords
  69+  B97B 7B               ld a,e               ; get the vert coord first
  70+  B97C 90               sub b                ; subtract the diamond vertical coord from players
- 71+  B97D C6 09            add 9                ; add the max distance
- 72+  B97F FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
+ 71+  B97D C6 08            add 8                ; add the max distance
+ 72+  B97F FE 0F            cp 15                ; compare to 13? if carry flag set, they've hit
  73+  B981 D0               ret nc               ; if not, hasn't hit
  74+  B982 79               ld a,c               ; multiply c by 8
  75+  B983 07               rlca
@@ -3693,8 +3693,8 @@
  78+  B986 4F               ld c,a
  79+  B987 7A               ld a,d               ; get the player horiz coord
  80+  B988 91               sub c                ; subtract rock coord
- 81+  B989 C6 09            add 9                ; add max distance
- 82+  B98B FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
+ 81+  B989 C6 08            add 8                ; add max distance
+ 82+  B98B FE 0F            cp 15                ; compare to 13? if carry flag set, they've hit
  83+  B98D C9               ret
  84+  B98E
  85+  B98E

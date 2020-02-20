@@ -120,10 +120,10 @@ player_drawplayer0:
     ld a,(player+11)             ; get the dying flag
     cp 1
     jp z,player_drawplayer3     ; if it's one, we're being crushed
+player_drawplayer4:
     ld a,(player+6)             ; get the dig flag
     cp 1
     jp z,player_drawplayer1    ; get dig frame
-player_drawplayer4:
     ld a,(player+3)             ; this is normal movement so get the current frame
     add a,e
     jp player_drawplayer2
