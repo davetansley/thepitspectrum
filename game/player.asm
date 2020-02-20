@@ -47,6 +47,9 @@ player_init_lifestart:
     ld bc,player+2         ; frame
     ld a,2
     ld (bc),a
+    ld bc,player+6         ; frame
+    ld a,0
+    ld (bc),a
     call diamonds_init      ; initialise gems
     ret
 

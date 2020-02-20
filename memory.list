@@ -806,7 +806,7 @@
  73+  A610              ; Sets up text on the screen
  74+  A610              ;
  75+  A610              screen_setuptext:
- 76+  A610 CD FE B8         call scores_showtable
+ 76+  A610 CD 04 B9         call scores_showtable
  77+  A613 CD 9B A5         call screen_sethighscorecolours
  78+  A616 21 82 80         ld hl, string_score1
  79+  A619 CD 3F 83         call string_print
@@ -2172,7 +2172,7 @@
 152+  B197 DD 7E 00         ld a,(ix)     ; get the dig state
 153+  B19A FE 00            cp 0
 154+  B19C C1               pop bc
-155+  B19D CC 78 B7         call z, rocks_checkforfalling ; make the check if we're no longer digging
+155+  B19D CC 7E B7         call z, rocks_checkforfalling ; make the check if we're no longer digging
 156+  B1A0 C9               ret
 157+  B1A1
 158+  B1A1              ;
@@ -2241,7 +2241,7 @@
 221+  B1F8 3D               dec a               ; decrease by one
 222+  B1F9 21 AA B4         ld hl,player+5
 223+  B1FC 77               ld (hl),a           ; copy back
-224+  B1FD CD 73 B5         call player_justmoved
+224+  B1FD CD 79 B5         call player_justmoved
 225+  B200 C9               ret
 226+  B201
 227+  B201              ;
@@ -2625,7 +2625,7 @@
 230+  B3D6 7B               ld a,e                          ; check space empty flag
 231+  B3D7 FE 00            cp 0
 232+  B3D9 CA E2 B3         jp z, movement_checkcanmove_down1 ; can't move
-233+  B3DC CD 73 B5         call player_justmoved
+233+  B3DC CD 79 B5         call player_justmoved
 234+  B3DF C1               pop bc
 235+  B3E0 F1               pop af
 236+  B3E1 C9               ret
@@ -2659,7 +2659,7 @@
 264+  B403 FE 00            cp 0
 265+  B405 CA 10 B4         jp z, movement_checkcanmove_up1 ; can't move
 266+  B408 1E 01            ld e,1
-267+  B40A CD 73 B5         call player_justmoved
+267+  B40A CD 79 B5         call player_justmoved
 268+  B40D C1               pop bc
 269+  B40E F1               pop af
 270+  B40F C9               ret
@@ -2692,7 +2692,7 @@
 297+  B430 7B               ld a,e                          ; check space empty flag
 298+  B431 FE 00            cp 0
 299+  B433 CA 3C B4         jp z, movement_checkcanmove_right1 ; can't move
-300+  B436 CD 73 B5         call player_justmoved
+300+  B436 CD 79 B5         call player_justmoved
 301+  B439 C1               pop bc
 302+  B43A F1               pop af
 303+  B43B C9               ret
@@ -2724,7 +2724,7 @@
 329+  B458 7B               ld a,e                          ; check space empty flag
 330+  B459 FE 00            cp 0
 331+  B45B CA 64 B4         jp z, movement_checkcanmove_left1 ; can't move
-332+  B45E CD 73 B5         call player_justmoved
+332+  B45E CD 79 B5         call player_justmoved
 333+  B461 C1               pop bc
 334+  B462 F1               pop af
 335+  B463 C9               ret
@@ -2844,8 +2844,8 @@
  21+  B4B8              ;
  22+  B4B8              player_init_gamestart:
  23+  B4B8 3A 78 B4         ld a,(game_numberlives)
- 24+  B4BB 32 00 B5         ld (player1_lives),a
- 25+  B4BE 32 01 B5         ld (player2_lives),a                        ; set the initial number of lives at game start
+ 24+  B4BB 32 06 B5         ld (player1_lives),a
+ 25+  B4BE 32 07 B5         ld (player2_lives),a                        ; set the initial number of lives at game start
  26+  B4C1 C9               ret
  27+  B4C2
  28+  B4C2              ;
@@ -2856,7 +2856,7 @@
  33+  B4C2 ED 4B 22 80      ld bc,(init_coord)
  34+  B4C6 ED 43 A5 B4      ld (player),bc
  35+  B4CA 01 AE B4         ld bc,player+9
- 36+  B4CD 3A 00 B5         ld a,(player1_lives)
+ 36+  B4CD 3A 06 B5         ld a,(player1_lives)
  37+  B4D0 02               ld (bc),a
  38+  B4D1 01 AF B4         ld bc,player+10
  39+  B4D4 3E 00            ld a,0
@@ -2870,950 +2870,953 @@
  47+  B4E3 01 A7 B4         ld bc,player+2         ; frame
  48+  B4E6 3E 02            ld a,2
  49+  B4E8 02               ld (bc),a
- 50+  B4E9 CD 95 B9         call diamonds_init      ; initialise gems
- 51+  B4EC C9               ret
- 52+  B4ED
- 53+  B4ED              ;
- 54+  B4ED              ; Finalises a player at end of a life
- 55+  B4ED              ; Copy lives, copy score
- 56+  B4ED              ;
- 57+  B4ED              player_lifeend:
- 58+  B4ED 01 AE B4         ld bc,player+9
- 59+  B4F0 0A               ld a,(bc)
- 60+  B4F1 01 00 B5         ld bc,player1_lives
- 61+  B4F4 02               ld (bc),a
- 62+  B4F5 C9               ret
- 63+  B4F6
- 64+  B4F6              ;
- 65+  B4F6              ; Player just died, subtract a life
- 66+  B4F6              ;
- 67+  B4F6              player_died:
- 68+  B4F6 01 AE B4         ld bc,player+9
- 69+  B4F9 0A               ld a,(bc)
- 70+  B4FA 3D               dec a
- 71+  B4FB 02               ld (bc),a
- 72+  B4FC CD ED B4         call player_lifeend
- 73+  B4FF C9               ret
- 74+  B500
- 75+  B500              ;
- 76+  B500              ; Player lives
- 77+  B500              ;
- 78+  B500              player1_lives:
- 79+  B500 03               defb 3
- 80+  B501              player2_lives:
- 81+  B501 03               defb 3
- 82+  B502
- 83+  B502              ;
- 84+  B502              ; Player scores
- 85+  B502              ;
- 86+  B502              player1_score:
- 87+  B502 30 30 30 30      defb '000000'
- 87+  B506 30 30
- 88+  B508              player2_score:
- 89+  B508 30 30 30 30      defb '000000'
- 89+  B50C 30 30
- 90+  B50E
- 91+  B50E              ;
- 92+  B50E              ; Kills a player this life
- 93+  B50E              ;
- 94+  B50E              player_killplayer:
- 95+  B50E 21 AF B4         ld hl,player+10
- 96+  B511 36 01            ld (hl),1
- 97+  B513 C9               ret
- 98+  B514
- 99+  B514              ;
-100+  B514              ; Crush a player this life
-101+  B514              ;
-102+  B514              player_crushplayer:
-103+  B514 21 B0 B4         ld hl,player+11             ; mark as crushed
-104+  B517 36 01            ld (hl),1
-105+  B519 C9               ret
-106+  B51A
-107+  B51A              ;
-108+  B51A              ; Draws the player at the current position or deletes them
-109+  B51A              ;
-110+  B51A              player_drawplayer:
-111+  B51A 3A A7 B4         ld a,(player+2)             ; get the current direction
-112+  B51D FE 03            cp 3
-113+  B51F C2 24 B5         jp nz,player_drawplayer0
-114+  B522 3E 00            ld a,0                      ; if 3, then down, so set the direction to 0 since the sprite is the same as up
-115+  B524              player_drawplayer0:
-116+  B524 5F               ld e,a                      ; store in e
-117+  B525 3A B0 B4         ld a,(player+11)             ; get the dying flag
-118+  B528 FE 01            cp 1
-119+  B52A CA 3C B5         jp z,player_drawplayer3     ; if it's one, we're being crushed
-120+  B52D 3A AB B4         ld a,(player+6)             ; get the dig flag
-121+  B530 FE 01            cp 1
-122+  B532 CA 59 B5         jp z,player_drawplayer1    ; get dig frame
-123+  B535              player_drawplayer4:
-124+  B535 3A A8 B4         ld a,(player+3)             ; this is normal movement so get the current frame
-125+  B538 83               add a,e
-126+  B539 C3 5E B5         jp player_drawplayer2
-127+  B53C              player_drawplayer3:
-128+  B53C 21 B1 B4         ld hl,player+12
-129+  B53F 7E               ld a,(hl)                  ; crushing, so get the current anim flag
-130+  B540 FE 00            cp 0
-131+  B542 C2 4B B5         jp nz,player_drawplayer5    ; if this isn't zero, then this isn't the first time round, so do the crush anim
-132+  B545 3E 32            ld a,50
-133+  B547 77               ld (hl),a                   ; otherwise, load up the anim frames
-134+  B548 C3 35 B5         jp player_drawplayer4       ; and return to the main loop to remove the current frame
-135+  B54B              player_drawplayer5:
-136+  B54B 3D               dec a
-137+  B54C 77               ld (hl),a
-138+  B54D FE 00            cp 0
-139+  B54F CC 0E B5         call z,player_killplayer    ; final animation, so kill the player
-140+  B552 E6 01            and 1                       ; check for odd
-141+  B554 C6 0A            add 10                      ; add 10, to get either 10 or 11
-142+  B556 C3 5E B5         jp player_drawplayer2
-143+  B559              player_drawplayer1:
-144+  B559 3A A7 B4         ld a,(player+2)             ; digging, get the current direction again, because want all four
-145+  B55C C6 06            add a,6                     ; add direction to 6 to get frame
-146+  B55E              player_drawplayer2:
-147+  B55E 07               rlca
-148+  B55F 07               rlca
-149+  B560 07               rlca                        ; multiply by eight
-150+  B561 6F               ld l,a
-151+  B562 26 00            ld h,0
-152+  B564 11 99 AF         ld de,player_sprite
-153+  B567 19               add hl,de                   ; load hl with the location of the player sprite data
-154+  B568 ED 4B A5 B4      ld bc,(player)              ; load bc with the start coords
-155+  B56C CD 11 A7         call sprites_drawsprite     ; call the routine to draw the sprite
-156+  B56F CD 9F B5         call player_storeupdatedlines ; log updated rows
-157+  B572 C9               ret
-158+  B573
-159+  B573
-160+  B573              ;
-161+  B573              ; Runs after the player just moved. Changes animation frame if required
-162+  B573              ;
-163+  B573              player_justmoved:
-164+  B573 D9               exx
-165+  B574 3A A9 B4         ld a,(player+4)             ; get the transition count
-166+  B577 FE 00            cp 0
-167+  B579 CA 7F B5         jp z, player_justmoved2     ; if zero reset and change the frame
-168+  B57C C3 99 B5         jp player_justmoved1       ; otherwise decrease and continue
-169+  B57F              player_justmoved2:
-170+  B57F                  ; reset and change frame in here
-171+  B57F 3E 01            ld a,1
-172+  B581 32 A9 B4         ld (player+4),a            ; reset back to whatever
-173+  B584 3A A8 B4         ld a,(player+3)             ; load the frame
-174+  B587 FE 03            cp 3                       ; flip between 3 and 0
-175+  B589 C2 91 B5         jp nz, player_justmoved4
-176+  B58C 3E 00            ld a,0
-177+  B58E C3 93 B5         jp player_justmoved5
-178+  B591              player_justmoved4:
-179+  B591 3E 03            ld a,3
-180+  B593              player_justmoved5:
-181+  B593 32 A8 B4         ld (player+3),a           ; save back
-182+  B596 C3 9D B5         jp player_justmoved3
-183+  B599              player_justmoved1:
-184+  B599                  ; decrease count
-185+  B599 3D               dec a
-186+  B59A 32 A9 B4         ld (player+4),a
-187+  B59D              player_justmoved3:
-188+  B59D D9               exx;
-189+  B59E C9               ret
-190+  B59F
-191+  B59F              ;
-192+  B59F              ; Stores the updated rows associated with the player
-193+  B59F              ;
-194+  B59F              player_storeupdatedlines:
-195+  B59F ED 4B A5 B4      ld bc,(player)          ; get the screen coords into bc
-196+  B5A3 79               ld a,c                  ; get the player block coords of current block
-197+  B5A4 E6 F8            and 248                 ; find closest multiple of eight
-198+  B5A6 0F               rrca
-199+  B5A7 0F               rrca
-200+  B5A8 0F               rrca                    ; divide by 8
-201+  B5A9 ED 5B 8C A5      ld de,(screen_offset)          ; load the screen offset, this is in rows
-202+  B5AD 93               sub e
-203+  B5AE F5               push af
-204+  B5AF CD 3F A4         call buffer_marklineforupdate  ; store current row in updated lines
-205+  B5B2 F1               pop af
-206+  B5B3 3D               dec a
-207+  B5B4 F5               push af
-208+  B5B5 CD 3F A4         call buffer_marklineforupdate  ; store line above
-209+  B5B8 F1               pop af
-210+  B5B9 3C               inc a
-211+  B5BA 3C               inc a
-212+  B5BB CD 3F A4         call buffer_marklineforupdate  ; store line beneath
-213+  B5BE C9               ret
+ 50+  B4E9 01 AB B4         ld bc,player+6         ; frame
+ 51+  B4EC 3E 00            ld a,0
+ 52+  B4EE 02               ld (bc),a
+ 53+  B4EF CD 9B B9         call diamonds_init      ; initialise gems
+ 54+  B4F2 C9               ret
+ 55+  B4F3
+ 56+  B4F3              ;
+ 57+  B4F3              ; Finalises a player at end of a life
+ 58+  B4F3              ; Copy lives, copy score
+ 59+  B4F3              ;
+ 60+  B4F3              player_lifeend:
+ 61+  B4F3 01 AE B4         ld bc,player+9
+ 62+  B4F6 0A               ld a,(bc)
+ 63+  B4F7 01 06 B5         ld bc,player1_lives
+ 64+  B4FA 02               ld (bc),a
+ 65+  B4FB C9               ret
+ 66+  B4FC
+ 67+  B4FC              ;
+ 68+  B4FC              ; Player just died, subtract a life
+ 69+  B4FC              ;
+ 70+  B4FC              player_died:
+ 71+  B4FC 01 AE B4         ld bc,player+9
+ 72+  B4FF 0A               ld a,(bc)
+ 73+  B500 3D               dec a
+ 74+  B501 02               ld (bc),a
+ 75+  B502 CD F3 B4         call player_lifeend
+ 76+  B505 C9               ret
+ 77+  B506
+ 78+  B506              ;
+ 79+  B506              ; Player lives
+ 80+  B506              ;
+ 81+  B506              player1_lives:
+ 82+  B506 03               defb 3
+ 83+  B507              player2_lives:
+ 84+  B507 03               defb 3
+ 85+  B508
+ 86+  B508              ;
+ 87+  B508              ; Player scores
+ 88+  B508              ;
+ 89+  B508              player1_score:
+ 90+  B508 30 30 30 30      defb '000000'
+ 90+  B50C 30 30
+ 91+  B50E              player2_score:
+ 92+  B50E 30 30 30 30      defb '000000'
+ 92+  B512 30 30
+ 93+  B514
+ 94+  B514              ;
+ 95+  B514              ; Kills a player this life
+ 96+  B514              ;
+ 97+  B514              player_killplayer:
+ 98+  B514 21 AF B4         ld hl,player+10
+ 99+  B517 36 01            ld (hl),1
+100+  B519 C9               ret
+101+  B51A
+102+  B51A              ;
+103+  B51A              ; Crush a player this life
+104+  B51A              ;
+105+  B51A              player_crushplayer:
+106+  B51A 21 B0 B4         ld hl,player+11             ; mark as crushed
+107+  B51D 36 01            ld (hl),1
+108+  B51F C9               ret
+109+  B520
+110+  B520              ;
+111+  B520              ; Draws the player at the current position or deletes them
+112+  B520              ;
+113+  B520              player_drawplayer:
+114+  B520 3A A7 B4         ld a,(player+2)             ; get the current direction
+115+  B523 FE 03            cp 3
+116+  B525 C2 2A B5         jp nz,player_drawplayer0
+117+  B528 3E 00            ld a,0                      ; if 3, then down, so set the direction to 0 since the sprite is the same as up
+118+  B52A              player_drawplayer0:
+119+  B52A 5F               ld e,a                      ; store in e
+120+  B52B 3A B0 B4         ld a,(player+11)             ; get the dying flag
+121+  B52E FE 01            cp 1
+122+  B530 CA 42 B5         jp z,player_drawplayer3     ; if it's one, we're being crushed
+123+  B533 3A AB B4         ld a,(player+6)             ; get the dig flag
+124+  B536 FE 01            cp 1
+125+  B538 CA 5F B5         jp z,player_drawplayer1    ; get dig frame
+126+  B53B              player_drawplayer4:
+127+  B53B 3A A8 B4         ld a,(player+3)             ; this is normal movement so get the current frame
+128+  B53E 83               add a,e
+129+  B53F C3 64 B5         jp player_drawplayer2
+130+  B542              player_drawplayer3:
+131+  B542 21 B1 B4         ld hl,player+12
+132+  B545 7E               ld a,(hl)                  ; crushing, so get the current anim flag
+133+  B546 FE 00            cp 0
+134+  B548 C2 51 B5         jp nz,player_drawplayer5    ; if this isn't zero, then this isn't the first time round, so do the crush anim
+135+  B54B 3E 32            ld a,50
+136+  B54D 77               ld (hl),a                   ; otherwise, load up the anim frames
+137+  B54E C3 3B B5         jp player_drawplayer4       ; and return to the main loop to remove the current frame
+138+  B551              player_drawplayer5:
+139+  B551 3D               dec a
+140+  B552 77               ld (hl),a
+141+  B553 FE 00            cp 0
+142+  B555 CC 14 B5         call z,player_killplayer    ; final animation, so kill the player
+143+  B558 E6 01            and 1                       ; check for odd
+144+  B55A C6 0A            add 10                      ; add 10, to get either 10 or 11
+145+  B55C C3 64 B5         jp player_drawplayer2
+146+  B55F              player_drawplayer1:
+147+  B55F 3A A7 B4         ld a,(player+2)             ; digging, get the current direction again, because want all four
+148+  B562 C6 06            add a,6                     ; add direction to 6 to get frame
+149+  B564              player_drawplayer2:
+150+  B564 07               rlca
+151+  B565 07               rlca
+152+  B566 07               rlca                        ; multiply by eight
+153+  B567 6F               ld l,a
+154+  B568 26 00            ld h,0
+155+  B56A 11 99 AF         ld de,player_sprite
+156+  B56D 19               add hl,de                   ; load hl with the location of the player sprite data
+157+  B56E ED 4B A5 B4      ld bc,(player)              ; load bc with the start coords
+158+  B572 CD 11 A7         call sprites_drawsprite     ; call the routine to draw the sprite
+159+  B575 CD A5 B5         call player_storeupdatedlines ; log updated rows
+160+  B578 C9               ret
+161+  B579
+162+  B579
+163+  B579              ;
+164+  B579              ; Runs after the player just moved. Changes animation frame if required
+165+  B579              ;
+166+  B579              player_justmoved:
+167+  B579 D9               exx
+168+  B57A 3A A9 B4         ld a,(player+4)             ; get the transition count
+169+  B57D FE 00            cp 0
+170+  B57F CA 85 B5         jp z, player_justmoved2     ; if zero reset and change the frame
+171+  B582 C3 9F B5         jp player_justmoved1       ; otherwise decrease and continue
+172+  B585              player_justmoved2:
+173+  B585                  ; reset and change frame in here
+174+  B585 3E 01            ld a,1
+175+  B587 32 A9 B4         ld (player+4),a            ; reset back to whatever
+176+  B58A 3A A8 B4         ld a,(player+3)             ; load the frame
+177+  B58D FE 03            cp 3                       ; flip between 3 and 0
+178+  B58F C2 97 B5         jp nz, player_justmoved4
+179+  B592 3E 00            ld a,0
+180+  B594 C3 99 B5         jp player_justmoved5
+181+  B597              player_justmoved4:
+182+  B597 3E 03            ld a,3
+183+  B599              player_justmoved5:
+184+  B599 32 A8 B4         ld (player+3),a           ; save back
+185+  B59C C3 A3 B5         jp player_justmoved3
+186+  B59F              player_justmoved1:
+187+  B59F                  ; decrease count
+188+  B59F 3D               dec a
+189+  B5A0 32 A9 B4         ld (player+4),a
+190+  B5A3              player_justmoved3:
+191+  B5A3 D9               exx;
+192+  B5A4 C9               ret
+193+  B5A5
+194+  B5A5              ;
+195+  B5A5              ; Stores the updated rows associated with the player
+196+  B5A5              ;
+197+  B5A5              player_storeupdatedlines:
+198+  B5A5 ED 4B A5 B4      ld bc,(player)          ; get the screen coords into bc
+199+  B5A9 79               ld a,c                  ; get the player block coords of current block
+200+  B5AA E6 F8            and 248                 ; find closest multiple of eight
+201+  B5AC 0F               rrca
+202+  B5AD 0F               rrca
+203+  B5AE 0F               rrca                    ; divide by 8
+204+  B5AF ED 5B 8C A5      ld de,(screen_offset)          ; load the screen offset, this is in rows
+205+  B5B3 93               sub e
+206+  B5B4 F5               push af
+207+  B5B5 CD 3F A4         call buffer_marklineforupdate  ; store current row in updated lines
+208+  B5B8 F1               pop af
+209+  B5B9 3D               dec a
+210+  B5BA F5               push af
+211+  B5BB CD 3F A4         call buffer_marklineforupdate  ; store line above
+212+  B5BE F1               pop af
+213+  B5BF 3C               inc a
+214+  B5C0 3C               inc a
+215+  B5C1 CD 3F A4         call buffer_marklineforupdate  ; store line beneath
+216+  B5C4 C9               ret
 # file closed: game/player.asm
- 37   B5BF                  include "game\ship.asm"
+ 37   B5C5                  include "game\ship.asm"
 # file opened: game/ship.asm
-  1+  B5BF              ;
-  2+  B5BF              ; Ship initial position: vert,horiz
-  3+  B5BF              ;
-  4+  B5BF              ship_initpos:
-  5+  B5BF 00 24            defb 0,36
-  6+  B5C1              ship_initpos2:
-  7+  B5C1 00 00            defb 0,0
-  8+  B5C3              ship_frame:
-  9+  B5C3 00               defb 0
- 10+  B5C4              ;
- 11+  B5C4              ; The current memory location
- 12+  B5C4              ;
- 13+  B5C4              ship_current_sprite:
- 14+  B5C4 00 00            defb 0,0
- 15+  B5C6
- 16+  B5C6              ship_current_coords:
- 17+  B5C6 00 00            defb 0,0
- 18+  B5C8
- 19+  B5C8              ;
- 20+  B5C8              ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
- 21+  B5C8              ;
- 22+  B5C8              ship_land:
- 23+  B5C8 ED 4B BF B5      ld bc,(ship_initpos)
- 24+  B5CC ED 43 C1 B5      ld (ship_initpos2),bc        ; save the initial position for later use
- 25+  B5D0 1E 00            ld e,0                      ; store a flag to track first time round
- 26+  B5D2 06 09            ld b,9                      ; move down 8 pixels
- 27+  B5D4              ship_land0:
- 28+  B5D4 C5               push bc
- 29+  B5D5 7B               ld a,e
- 30+  B5D6 D5               push de                     ; store de for next time round
- 31+  B5D7 FE 01            cp 1                        ; check first time flag
- 32+  B5D9 C2 EE B5         jp nz,ship_land1             ; don't draw over previous one if first time
- 33+  B5DC CD 56 B6         call ship_draw_full         ; delete old one
- 34+  B5DF CD 2B B6         call ship_change_frame      ; increment the frame
- 35+  B5E2 ED 4B C1 B5      ld bc,(ship_initpos2)       ; get the current coords
- 36+  B5E6 81 C6 01         add c,1                     ; move down one pixels
- 37+  B5E9 4F               ld c,a
- 38+  B5EA ED 43 C1 B5      ld (ship_initpos2),bc
- 39+  B5EE              ship_land1:
- 40+  B5EE CD 56 B6         call ship_draw_full         ; draw the ship
- 41+  B5F1 CD 40 B6         call ship_draw_screen
- 42+  B5F4 D1               pop de
- 43+  B5F5 1E 01            ld e,1
- 44+  B5F7 C1               pop bc
- 45+  B5F8 10 DA            djnz ship_land0             ; repeat for downward movement
- 46+  B5FA                  ; done moving down
- 47+  B5FA                  ; now move across
- 48+  B5FA CD 1A B5         call player_drawplayer      ; draw player
- 49+  B5FD CD 56 B6         call ship_draw_full         ; delete old one
- 50+  B600 1E 00            ld e,0                      ; store a flag to track first time round
- 51+  B602 06 14            ld b,20                      ; move back 20 pixels pixels
- 52+  B604              ship_land3:
- 53+  B604 C5               push bc
- 54+  B605 7B               ld a,e
- 55+  B606 D5               push de                     ; store de for next time round
- 56+  B607 FE 01            cp 1                        ; check first time flag
- 57+  B609 C2 1E B6         jp nz,ship_land2             ; don't draw over previous one if first time
- 58+  B60C CD 56 B6         call ship_draw_full         ; delete old one
- 59+  B60F CD 2B B6         call ship_change_frame      ; increment the frame
- 60+  B612 ED 4B C1 B5      ld bc,(ship_initpos2)       ; get the current coords
- 61+  B616 78               ld a,b
- 62+  B617 D6 01            sub 1                       ; move back one pixels
- 63+  B619 47               ld b,a
- 64+  B61A ED 43 C1 B5      ld (ship_initpos2),bc
- 65+  B61E              ship_land2:
- 66+  B61E CD 56 B6         call ship_draw_full         ; draw the ship
- 67+  B621 CD 40 B6         call ship_draw_screen       ; draw the frame to screen by clearing the buffer
- 68+  B624 D1               pop de
- 69+  B625 1E 01            ld e,1                      ; set e to 1 to indicate >1 time
- 70+  B627 C1               pop bc
- 71+  B628 10 DA            djnz ship_land3             ; repeat for vertical movement
- 72+  B62A C9               ret
- 73+  B62B
- 74+  B62B              ;
- 75+  B62B              ; Swap the animation frame between 0 and 32. This will be added to the memory location later
- 76+  B62B              ;
- 77+  B62B              ship_change_frame:
- 78+  B62B F5               push af
- 79+  B62C 3A C3 B5         ld a,(ship_frame)
- 80+  B62F FE 00            cp 0
- 81+  B631 CA 39 B6         jp z,ship_change_frame0
- 82+  B634 3E 00            ld a,0                      ; flip to 0
- 83+  B636 C3 3B B6         jp ship_change_frame1
- 84+  B639              ship_change_frame0:
- 85+  B639 3E 20            ld a,32                      ; flip to 32
- 86+  B63B              ship_change_frame1:
- 87+  B63B 32 C3 B5         ld (ship_frame),a            ; save the frame
- 88+  B63E F1               pop af
- 89+  B63F C9               ret
- 90+  B640
- 91+  B640              ship_draw_screen:
- 92+  B640 3E 00            ld a,0
- 93+  B642 CD 3F A4         call buffer_marklineforupdate
- 94+  B645 3E 01            ld a,1
- 95+  B647 CD 3F A4         call buffer_marklineforupdate
- 96+  B64A 3E 02            ld a,2
- 97+  B64C CD 3F A4         call buffer_marklineforupdate   ; mark the first three rows for update
- 98+  B64F 76               halt
- 99+  B650 F3               di
-100+  B651 CD D3 A4         call buffer_buffertoscreen  ; copy buffer to screen
-101+  B654 FB               ei                          ; enable interupts
-102+  B655 C9               ret
-103+  B656
-104+  B656              ship_draw_full:
-105+  B656 21 F9 AF         ld hl,ship_sprite
-106+  B659 ED 4B C1 B5      ld bc,(ship_initpos2)         ; load bc with the start coords
-107+  B65D 22 C4 B5         ld (ship_current_sprite),hl  ; put into memory
-108+  B660 ED 43 C6 B5      ld (ship_current_coords),bc  ; put into memory
-109+  B664 CD 83 B6         call ship_draw
-110+  B667 08               ex af,af'
-111+  B668 3A C3 B5         ld a,(ship_frame)            ; get the animation frame
-112+  B66B 16 00            ld d,0
-113+  B66D 5F               ld e,a
-114+  B66E 19               add hl,de
-115+  B66F 22 C4 B5         ld (ship_current_sprite),hl  ; put into memory
-116+  B672 08               ex af,af'
-117+  B673 ED 4B C1 B5      ld bc,(ship_initpos2)         ; load bc with the start coords
-118+  B677 81 C6 08         add c,8                      ; move one line down
-119+  B67A 4F               ld c,a
-120+  B67B ED 43 C6 B5      ld (ship_current_coords),bc  ; put into memory
-121+  B67F CD 83 B6         call ship_draw
-122+  B682 C9               ret
-123+  B683
-124+  B683              ;
-125+  B683              ; Draw the ship
-126+  B683              ; Inputs:
-127+  B683              ; None, all in memory
-128+  B683              ;
-129+  B683              ship_draw:
-130+  B683 3E 04            ld a,4                              ; 4 pieces per half
-131+  B685              ship_draw0:
-132+  B685 F5               push af
-133+  B686 2A C4 B5         ld hl,(ship_current_sprite)
-134+  B689 ED 4B C6 B5      ld bc,(ship_current_coords)         ; load bc with the start coords
-135+  B68D CD 11 A7         call sprites_drawsprite
-136+  B690 2A C4 B5         ld hl,(ship_current_sprite)
-137+  B693 ED 4B C6 B5      ld bc,(ship_current_coords)         ; load bc with the start coords
-138+  B697 11 08 00         ld de,8
-139+  B69A 19               add hl,de
-140+  B69B 80 C6 08         add b,8
-141+  B69E 47               ld b,a
-142+  B69F 22 C4 B5         ld (ship_current_sprite),hl         ; put into memory
-143+  B6A2 ED 43 C6 B5      ld (ship_current_coords),bc         ; put into memory
-144+  B6A6 F1               pop af
-145+  B6A7 3D               dec a
-146+  B6A8 FE 00            cp 0
-147+  B6AA C2 85 B6         jp nz,ship_draw0
-148+  B6AD
-149+  B6AD C9               ret
-150+  B6AE
+  1+  B5C5              ;
+  2+  B5C5              ; Ship initial position: vert,horiz
+  3+  B5C5              ;
+  4+  B5C5              ship_initpos:
+  5+  B5C5 00 24            defb 0,36
+  6+  B5C7              ship_initpos2:
+  7+  B5C7 00 00            defb 0,0
+  8+  B5C9              ship_frame:
+  9+  B5C9 00               defb 0
+ 10+  B5CA              ;
+ 11+  B5CA              ; The current memory location
+ 12+  B5CA              ;
+ 13+  B5CA              ship_current_sprite:
+ 14+  B5CA 00 00            defb 0,0
+ 15+  B5CC
+ 16+  B5CC              ship_current_coords:
+ 17+  B5CC 00 00            defb 0,0
+ 18+  B5CE
+ 19+  B5CE              ;
+ 20+  B5CE              ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
+ 21+  B5CE              ;
+ 22+  B5CE              ship_land:
+ 23+  B5CE ED 4B C5 B5      ld bc,(ship_initpos)
+ 24+  B5D2 ED 43 C7 B5      ld (ship_initpos2),bc        ; save the initial position for later use
+ 25+  B5D6 1E 00            ld e,0                      ; store a flag to track first time round
+ 26+  B5D8 06 09            ld b,9                      ; move down 8 pixels
+ 27+  B5DA              ship_land0:
+ 28+  B5DA C5               push bc
+ 29+  B5DB 7B               ld a,e
+ 30+  B5DC D5               push de                     ; store de for next time round
+ 31+  B5DD FE 01            cp 1                        ; check first time flag
+ 32+  B5DF C2 F4 B5         jp nz,ship_land1             ; don't draw over previous one if first time
+ 33+  B5E2 CD 5C B6         call ship_draw_full         ; delete old one
+ 34+  B5E5 CD 31 B6         call ship_change_frame      ; increment the frame
+ 35+  B5E8 ED 4B C7 B5      ld bc,(ship_initpos2)       ; get the current coords
+ 36+  B5EC 81 C6 01         add c,1                     ; move down one pixels
+ 37+  B5EF 4F               ld c,a
+ 38+  B5F0 ED 43 C7 B5      ld (ship_initpos2),bc
+ 39+  B5F4              ship_land1:
+ 40+  B5F4 CD 5C B6         call ship_draw_full         ; draw the ship
+ 41+  B5F7 CD 46 B6         call ship_draw_screen
+ 42+  B5FA D1               pop de
+ 43+  B5FB 1E 01            ld e,1
+ 44+  B5FD C1               pop bc
+ 45+  B5FE 10 DA            djnz ship_land0             ; repeat for downward movement
+ 46+  B600                  ; done moving down
+ 47+  B600                  ; now move across
+ 48+  B600 CD 20 B5         call player_drawplayer      ; draw player
+ 49+  B603 CD 5C B6         call ship_draw_full         ; delete old one
+ 50+  B606 1E 00            ld e,0                      ; store a flag to track first time round
+ 51+  B608 06 14            ld b,20                      ; move back 20 pixels pixels
+ 52+  B60A              ship_land3:
+ 53+  B60A C5               push bc
+ 54+  B60B 7B               ld a,e
+ 55+  B60C D5               push de                     ; store de for next time round
+ 56+  B60D FE 01            cp 1                        ; check first time flag
+ 57+  B60F C2 24 B6         jp nz,ship_land2             ; don't draw over previous one if first time
+ 58+  B612 CD 5C B6         call ship_draw_full         ; delete old one
+ 59+  B615 CD 31 B6         call ship_change_frame      ; increment the frame
+ 60+  B618 ED 4B C7 B5      ld bc,(ship_initpos2)       ; get the current coords
+ 61+  B61C 78               ld a,b
+ 62+  B61D D6 01            sub 1                       ; move back one pixels
+ 63+  B61F 47               ld b,a
+ 64+  B620 ED 43 C7 B5      ld (ship_initpos2),bc
+ 65+  B624              ship_land2:
+ 66+  B624 CD 5C B6         call ship_draw_full         ; draw the ship
+ 67+  B627 CD 46 B6         call ship_draw_screen       ; draw the frame to screen by clearing the buffer
+ 68+  B62A D1               pop de
+ 69+  B62B 1E 01            ld e,1                      ; set e to 1 to indicate >1 time
+ 70+  B62D C1               pop bc
+ 71+  B62E 10 DA            djnz ship_land3             ; repeat for vertical movement
+ 72+  B630 C9               ret
+ 73+  B631
+ 74+  B631              ;
+ 75+  B631              ; Swap the animation frame between 0 and 32. This will be added to the memory location later
+ 76+  B631              ;
+ 77+  B631              ship_change_frame:
+ 78+  B631 F5               push af
+ 79+  B632 3A C9 B5         ld a,(ship_frame)
+ 80+  B635 FE 00            cp 0
+ 81+  B637 CA 3F B6         jp z,ship_change_frame0
+ 82+  B63A 3E 00            ld a,0                      ; flip to 0
+ 83+  B63C C3 41 B6         jp ship_change_frame1
+ 84+  B63F              ship_change_frame0:
+ 85+  B63F 3E 20            ld a,32                      ; flip to 32
+ 86+  B641              ship_change_frame1:
+ 87+  B641 32 C9 B5         ld (ship_frame),a            ; save the frame
+ 88+  B644 F1               pop af
+ 89+  B645 C9               ret
+ 90+  B646
+ 91+  B646              ship_draw_screen:
+ 92+  B646 3E 00            ld a,0
+ 93+  B648 CD 3F A4         call buffer_marklineforupdate
+ 94+  B64B 3E 01            ld a,1
+ 95+  B64D CD 3F A4         call buffer_marklineforupdate
+ 96+  B650 3E 02            ld a,2
+ 97+  B652 CD 3F A4         call buffer_marklineforupdate   ; mark the first three rows for update
+ 98+  B655 76               halt
+ 99+  B656 F3               di
+100+  B657 CD D3 A4         call buffer_buffertoscreen  ; copy buffer to screen
+101+  B65A FB               ei                          ; enable interupts
+102+  B65B C9               ret
+103+  B65C
+104+  B65C              ship_draw_full:
+105+  B65C 21 F9 AF         ld hl,ship_sprite
+106+  B65F ED 4B C7 B5      ld bc,(ship_initpos2)         ; load bc with the start coords
+107+  B663 22 CA B5         ld (ship_current_sprite),hl  ; put into memory
+108+  B666 ED 43 CC B5      ld (ship_current_coords),bc  ; put into memory
+109+  B66A CD 89 B6         call ship_draw
+110+  B66D 08               ex af,af'
+111+  B66E 3A C9 B5         ld a,(ship_frame)            ; get the animation frame
+112+  B671 16 00            ld d,0
+113+  B673 5F               ld e,a
+114+  B674 19               add hl,de
+115+  B675 22 CA B5         ld (ship_current_sprite),hl  ; put into memory
+116+  B678 08               ex af,af'
+117+  B679 ED 4B C7 B5      ld bc,(ship_initpos2)         ; load bc with the start coords
+118+  B67D 81 C6 08         add c,8                      ; move one line down
+119+  B680 4F               ld c,a
+120+  B681 ED 43 CC B5      ld (ship_current_coords),bc  ; put into memory
+121+  B685 CD 89 B6         call ship_draw
+122+  B688 C9               ret
+123+  B689
+124+  B689              ;
+125+  B689              ; Draw the ship
+126+  B689              ; Inputs:
+127+  B689              ; None, all in memory
+128+  B689              ;
+129+  B689              ship_draw:
+130+  B689 3E 04            ld a,4                              ; 4 pieces per half
+131+  B68B              ship_draw0:
+132+  B68B F5               push af
+133+  B68C 2A CA B5         ld hl,(ship_current_sprite)
+134+  B68F ED 4B CC B5      ld bc,(ship_current_coords)         ; load bc with the start coords
+135+  B693 CD 11 A7         call sprites_drawsprite
+136+  B696 2A CA B5         ld hl,(ship_current_sprite)
+137+  B699 ED 4B CC B5      ld bc,(ship_current_coords)         ; load bc with the start coords
+138+  B69D 11 08 00         ld de,8
+139+  B6A0 19               add hl,de
+140+  B6A1 80 C6 08         add b,8
+141+  B6A4 47               ld b,a
+142+  B6A5 22 CA B5         ld (ship_current_sprite),hl         ; put into memory
+143+  B6A8 ED 43 CC B5      ld (ship_current_coords),bc         ; put into memory
+144+  B6AC F1               pop af
+145+  B6AD 3D               dec a
+146+  B6AE FE 00            cp 0
+147+  B6B0 C2 8B B6         jp nz,ship_draw0
+148+  B6B3
+149+  B6B3 C9               ret
+150+  B6B4
 # file closed: game/ship.asm
- 38   B6AE                  include "game\tank.asm"
+ 38   B6B4                  include "game\tank.asm"
 # file opened: game/tank.asm
-  1+  B6AE              ;
-  2+  B6AE              ; tank initial position: vert,horiz
-  3+  B6AE              ;
-  4+  B6AE              tank_initpos:
-  5+  B6AE 10 D0            defb 16,208
-  6+  B6B0              tank_initpos2:
-  7+  B6B0 00 00            defb 0,0
-  8+  B6B2              tank_frame:
-  9+  B6B2 00               defb 0
- 10+  B6B3              tank_anim:
- 11+  B6B3 11               defb 17
- 12+  B6B4              ;
- 13+  B6B4              ; The current memory location
- 14+  B6B4              ;
- 15+  B6B4              tank_current_sprite:
- 16+  B6B4 00 00            defb 0,0
- 17+  B6B6
- 18+  B6B6              tank_current_coords:
- 19+  B6B6 00 00            defb 0,0
- 20+  B6B8
- 21+  B6B8              ;
- 22+  B6B8              ; Initialise the tank
- 23+  B6B8              ;
- 24+  B6B8              tank_init:
- 25+  B6B8 ED 4B AE B6      ld bc,(tank_initpos)
- 26+  B6BC ED 43 B0 B6      ld (tank_initpos2),bc       ; save the initial position for later use
- 27+  B6C0 21 B2 B6         ld hl,tank_frame
- 28+  B6C3 36 00            ld (hl),0
- 29+  B6C5 21 B3 B6         ld hl,tank_anim
- 30+  B6C8 36 11            ld (hl),17                  ; reset tank
- 31+  B6CA C9               ret
- 32+  B6CB
- 33+  B6CB              ;
- 34+  B6CB              ;   Draw and move the tank
- 35+  B6CB              ;   Start processing at frame 200
- 36+  B6CB              ;   Don't move if anim is zero
- 37+  B6CB              ;   Decrement frame if moved
- 38+  B6CB              ;
- 39+  B6CB              tank_process:
- 40+  B6CB 3A B3 B6         ld a,(tank_anim)
- 41+  B6CE FE 00            cp 0
- 42+  B6D0 C8               ret z                       ; return if we've already moved
- 43+  B6D1 CD 9B B4         call game_getcurrentframe   ; get the current frame number into a
- 44+  B6D4 FE 4B            cp 75
- 45+  B6D6 D8               ret c                       ; return if the frame number is below 100
- 46+  B6D7 CD E2 B6         call tank_move              ; move tank if not
- 47+  B6DA 3A B3 B6         ld a,(tank_anim)
- 48+  B6DD 3D               dec a
- 49+  B6DE 32 B3 B6         ld (tank_anim),a            ; decrease the anim count
- 50+  B6E1 C9               ret
- 51+  B6E2
- 52+  B6E2              tank_move:
- 53+  B6E2 ED 4B B0 B6      ld bc,(tank_initpos2)
- 54+  B6E6 C5               push bc
- 55+  B6E7 3A B3 B6         ld a,(tank_anim)
- 56+  B6EA FE 11            cp 17                       ; check first time flag
- 57+  B6EC CA FE B6         jp z,tank_move1             ; don't draw over previous one if first time
- 58+  B6EF CD 03 B7         call tank_draw_full         ; delete old one
- 59+  B6F2 ED 4B B0 B6      ld bc,(tank_initpos2)       ; get the current coords
- 60+  B6F6 78               ld a,b
- 61+  B6F7 D6 01            sub 1                       ; move back one pixels
- 62+  B6F9 47               ld b,a
- 63+  B6FA ED 43 B0 B6      ld (tank_initpos2),bc
- 64+  B6FE              tank_move1:
- 65+  B6FE CD 03 B7         call tank_draw_full         ; draw the tank
- 66+  B701 C1               pop bc
- 67+  B702 C9               ret
- 68+  B703
- 69+  B703              tank_draw_full:
- 70+  B703 21 59 B0         ld hl,tank_sprite
- 71+  B706 ED 4B B0 B6      ld bc,(tank_initpos2)         ; load bc with the start coords
- 72+  B70A 22 B4 B6         ld (tank_current_sprite),hl  ; put into memory
- 73+  B70D ED 43 B6 B6      ld (tank_current_coords),bc  ; put into memory
- 74+  B711 CD 3A B7         call tank_draw
- 75+  B714 08               ex af,af'
- 76+  B715 3A B2 B6         ld a,(tank_frame)            ; get the animation frame
- 77+  B718 16 00            ld d,0
- 78+  B71A 5F               ld e,a
- 79+  B71B 19               add hl,de
- 80+  B71C 22 B4 B6         ld (tank_current_sprite),hl  ; put into memory
- 81+  B71F 08               ex af,af'
- 82+  B720 ED 4B B0 B6      ld bc,(tank_initpos2)         ; load bc with the start coords
- 83+  B724 81 C6 08         add c,8                      ; move one line down
- 84+  B727 4F               ld c,a
- 85+  B728 ED 43 B6 B6      ld (tank_current_coords),bc  ; put into memory
- 86+  B72C CD 3A B7         call tank_draw
- 87+  B72F 3E 02            ld a,2
- 88+  B731 CD 3F A4         call buffer_marklineforupdate
- 89+  B734 3E 03            ld a,3
- 90+  B736 CD 3F A4         call buffer_marklineforupdate   ; mark the first two rows for update
- 91+  B739 C9               ret
- 92+  B73A
- 93+  B73A              ;
- 94+  B73A              ; Draw the tank
- 95+  B73A              ; Inputs:
- 96+  B73A              ; None, all in memory
- 97+  B73A              ;
- 98+  B73A              tank_draw:
- 99+  B73A 3E 04            ld a,4                              ; 4 pieces per half
-100+  B73C              tank_draw0:
-101+  B73C F5               push af
-102+  B73D 2A B4 B6         ld hl,(tank_current_sprite)
-103+  B740 ED 4B B6 B6      ld bc,(tank_current_coords)         ; load bc with the start coords
-104+  B744 CD 11 A7         call sprites_drawsprite
-105+  B747 2A B4 B6         ld hl,(tank_current_sprite)
-106+  B74A ED 4B B6 B6      ld bc,(tank_current_coords)         ; load bc with the start coords
-107+  B74E 11 08 00         ld de,8
-108+  B751 19               add hl,de
-109+  B752 80 C6 08         add b,8
-110+  B755 47               ld b,a
-111+  B756 22 B4 B6         ld (tank_current_sprite),hl         ; put into memory
-112+  B759 ED 43 B6 B6      ld (tank_current_coords),bc         ; put into memory
-113+  B75D F1               pop af
-114+  B75E 3D               dec a
-115+  B75F FE 00            cp 0
-116+  B761 C2 3C B7         jp nz,tank_draw0
-117+  B764
-118+  B764 C9               ret
-119+  B765
+  1+  B6B4              ;
+  2+  B6B4              ; tank initial position: vert,horiz
+  3+  B6B4              ;
+  4+  B6B4              tank_initpos:
+  5+  B6B4 10 D0            defb 16,208
+  6+  B6B6              tank_initpos2:
+  7+  B6B6 00 00            defb 0,0
+  8+  B6B8              tank_frame:
+  9+  B6B8 00               defb 0
+ 10+  B6B9              tank_anim:
+ 11+  B6B9 11               defb 17
+ 12+  B6BA              ;
+ 13+  B6BA              ; The current memory location
+ 14+  B6BA              ;
+ 15+  B6BA              tank_current_sprite:
+ 16+  B6BA 00 00            defb 0,0
+ 17+  B6BC
+ 18+  B6BC              tank_current_coords:
+ 19+  B6BC 00 00            defb 0,0
+ 20+  B6BE
+ 21+  B6BE              ;
+ 22+  B6BE              ; Initialise the tank
+ 23+  B6BE              ;
+ 24+  B6BE              tank_init:
+ 25+  B6BE ED 4B B4 B6      ld bc,(tank_initpos)
+ 26+  B6C2 ED 43 B6 B6      ld (tank_initpos2),bc       ; save the initial position for later use
+ 27+  B6C6 21 B8 B6         ld hl,tank_frame
+ 28+  B6C9 36 00            ld (hl),0
+ 29+  B6CB 21 B9 B6         ld hl,tank_anim
+ 30+  B6CE 36 11            ld (hl),17                  ; reset tank
+ 31+  B6D0 C9               ret
+ 32+  B6D1
+ 33+  B6D1              ;
+ 34+  B6D1              ;   Draw and move the tank
+ 35+  B6D1              ;   Start processing at frame 200
+ 36+  B6D1              ;   Don't move if anim is zero
+ 37+  B6D1              ;   Decrement frame if moved
+ 38+  B6D1              ;
+ 39+  B6D1              tank_process:
+ 40+  B6D1 3A B9 B6         ld a,(tank_anim)
+ 41+  B6D4 FE 00            cp 0
+ 42+  B6D6 C8               ret z                       ; return if we've already moved
+ 43+  B6D7 CD 9B B4         call game_getcurrentframe   ; get the current frame number into a
+ 44+  B6DA FE 4B            cp 75
+ 45+  B6DC D8               ret c                       ; return if the frame number is below 100
+ 46+  B6DD CD E8 B6         call tank_move              ; move tank if not
+ 47+  B6E0 3A B9 B6         ld a,(tank_anim)
+ 48+  B6E3 3D               dec a
+ 49+  B6E4 32 B9 B6         ld (tank_anim),a            ; decrease the anim count
+ 50+  B6E7 C9               ret
+ 51+  B6E8
+ 52+  B6E8              tank_move:
+ 53+  B6E8 ED 4B B6 B6      ld bc,(tank_initpos2)
+ 54+  B6EC C5               push bc
+ 55+  B6ED 3A B9 B6         ld a,(tank_anim)
+ 56+  B6F0 FE 11            cp 17                       ; check first time flag
+ 57+  B6F2 CA 04 B7         jp z,tank_move1             ; don't draw over previous one if first time
+ 58+  B6F5 CD 09 B7         call tank_draw_full         ; delete old one
+ 59+  B6F8 ED 4B B6 B6      ld bc,(tank_initpos2)       ; get the current coords
+ 60+  B6FC 78               ld a,b
+ 61+  B6FD D6 01            sub 1                       ; move back one pixels
+ 62+  B6FF 47               ld b,a
+ 63+  B700 ED 43 B6 B6      ld (tank_initpos2),bc
+ 64+  B704              tank_move1:
+ 65+  B704 CD 09 B7         call tank_draw_full         ; draw the tank
+ 66+  B707 C1               pop bc
+ 67+  B708 C9               ret
+ 68+  B709
+ 69+  B709              tank_draw_full:
+ 70+  B709 21 59 B0         ld hl,tank_sprite
+ 71+  B70C ED 4B B6 B6      ld bc,(tank_initpos2)         ; load bc with the start coords
+ 72+  B710 22 BA B6         ld (tank_current_sprite),hl  ; put into memory
+ 73+  B713 ED 43 BC B6      ld (tank_current_coords),bc  ; put into memory
+ 74+  B717 CD 40 B7         call tank_draw
+ 75+  B71A 08               ex af,af'
+ 76+  B71B 3A B8 B6         ld a,(tank_frame)            ; get the animation frame
+ 77+  B71E 16 00            ld d,0
+ 78+  B720 5F               ld e,a
+ 79+  B721 19               add hl,de
+ 80+  B722 22 BA B6         ld (tank_current_sprite),hl  ; put into memory
+ 81+  B725 08               ex af,af'
+ 82+  B726 ED 4B B6 B6      ld bc,(tank_initpos2)         ; load bc with the start coords
+ 83+  B72A 81 C6 08         add c,8                      ; move one line down
+ 84+  B72D 4F               ld c,a
+ 85+  B72E ED 43 BC B6      ld (tank_current_coords),bc  ; put into memory
+ 86+  B732 CD 40 B7         call tank_draw
+ 87+  B735 3E 02            ld a,2
+ 88+  B737 CD 3F A4         call buffer_marklineforupdate
+ 89+  B73A 3E 03            ld a,3
+ 90+  B73C CD 3F A4         call buffer_marklineforupdate   ; mark the first two rows for update
+ 91+  B73F C9               ret
+ 92+  B740
+ 93+  B740              ;
+ 94+  B740              ; Draw the tank
+ 95+  B740              ; Inputs:
+ 96+  B740              ; None, all in memory
+ 97+  B740              ;
+ 98+  B740              tank_draw:
+ 99+  B740 3E 04            ld a,4                              ; 4 pieces per half
+100+  B742              tank_draw0:
+101+  B742 F5               push af
+102+  B743 2A BA B6         ld hl,(tank_current_sprite)
+103+  B746 ED 4B BC B6      ld bc,(tank_current_coords)         ; load bc with the start coords
+104+  B74A CD 11 A7         call sprites_drawsprite
+105+  B74D 2A BA B6         ld hl,(tank_current_sprite)
+106+  B750 ED 4B BC B6      ld bc,(tank_current_coords)         ; load bc with the start coords
+107+  B754 11 08 00         ld de,8
+108+  B757 19               add hl,de
+109+  B758 80 C6 08         add b,8
+110+  B75B 47               ld b,a
+111+  B75C 22 BA B6         ld (tank_current_sprite),hl         ; put into memory
+112+  B75F ED 43 BC B6      ld (tank_current_coords),bc         ; put into memory
+113+  B763 F1               pop af
+114+  B764 3D               dec a
+115+  B765 FE 00            cp 0
+116+  B767 C2 42 B7         jp nz,tank_draw0
+117+  B76A
+118+  B76A C9               ret
+119+  B76B
 # file closed: game/tank.asm
- 39   B765                  include "game\rocks.asm"
+ 39   B76B                  include "game\rocks.asm"
 # file opened: game/rocks.asm
-  1+  B765              ;
-  2+  B765              ; A structure of falling rocks
-  3+  B765              ; Assume we'll never have more than 4 falling at any one time
-  4+  B765              ; (1,2 - 16 bit memory location for rock graphic),state (0 fell, 1 falling, 2 wobbling), countdown
-  5+  B765              ;
-  6+  B765              rocks_falling:
-  7+  B765 00 00 00 00      defb 0,0,0,0
-  8+  B769 00 00 00 00      defb 0,0,0,0
-  9+  B76D 00 00 00 00      defb 0,0,0,0
- 10+  B771 00 00 00 00      defb 0,0,0,0
- 11+  B775
- 12+  B775              rocks_tmp:
- 13+  B775 00               defb 0
- 14+  B776
- 15+  B776              rocks_tmp2:
- 16+  B776 00 00            defb 0,0
- 17+  B778
- 18+  B778              ;
- 19+  B778              ; Checks for a rock that needs to start falling. Takes a memory location of the first line at the bottom of the space.
- 20+  B778              ; Checks to see if the pixel row in that location is a rock bottom. If it is, mark this rock as ready to fall.
- 21+  B778              ; If the pixel row is not the rock bottom, stop checking.
- 22+  B778              ; Inputs:
- 23+  B778              ; hl- memory location
- 24+  B778              ;
- 25+  B778              rocks_checkforfalling:
- 26+  B778 7E               ld a,(hl)           ; get the pixel row in this memory location
- 27+  B779 FE 7E            cp 126              ; check against the bottom pixel row of the rock graphic
- 28+  B77B C2 81 B7         jp nz,rocks_checkforfalling2 ; not a rock, stop
- 29+  B77E CD 82 B7         call rocks_addrocktofalling ; mark the rock as falling
- 30+  B781              rocks_checkforfalling2:
- 31+  B781 C9               ret
- 32+  B782
- 33+  B782              ;
- 34+  B782              ; Adds the rock to the structure that tracks falling rocks
- 35+  B782              ; Inputs:
- 36+  B782              ; hl - memory location of falling rock graphic
- 37+  B782              ; bc - coords of rock, c vert
- 38+  B782              rocks_addrocktofalling:
- 39+  B782 C5               push bc             ; store the coords
- 40+  B783 11 65 B7         ld de,rocks_falling
- 41+  B786 06 04            ld b,4              ; number of possible falling rocks
- 42+  B788              rocks_addrocktofalling0:
- 43+  B788 13               inc de
- 44+  B789 13               inc de
- 45+  B78A 13               inc de              ; move three along to get the state
- 46+  B78B 1A               ld a,(de)           ; load the state
- 47+  B78C FE 00            cp 0                ; check if this is not falling
- 48+  B78E C2 A3 B7         jp nz,rocks_addrocktofalling1 ; continue the loop if not 0
- 49+  B791 3E 10            ld a,16             ; load the number of frames to wobble
- 50+  B793 12               ld (de),a
- 51+  B794 1B               dec de              ; move de back to state
- 52+  B795 3E 02            ld a,2
- 53+  B797 12               ld (de),a           ; set the state to wobbling
- 54+  B798 1B               dec de              ; move back coords
- 55+  B799 C1               pop bc              ; get back coords
- 56+  B79A 78               ld a,b
- 57+  B79B 12               ld (de),a           ; store the vertical
- 58+  B79C 1B               dec de
- 59+  B79D 79               ld a,c
- 60+  B79E 12               ld (de),a           ; store the horizontal
- 61+  B79F C5               push bc
- 62+  B7A0 C3 A6 B7         jp rocks_addrocktofalling2 ; done
- 63+  B7A3              rocks_addrocktofalling1:
- 64+  B7A3 13               inc de              ; move memory along to next rock
- 65+  B7A4 10 E2            djnz rocks_addrocktofalling0 ; try the next rock
- 66+  B7A6              rocks_addrocktofalling2: ; done, return
- 67+  B7A6 C1               pop bc              ; to tidy up
- 68+  B7A7 C9               ret
- 69+  B7A8
- 70+  B7A8              ;
- 71+  B7A8              ; Processes any falling rocks
- 72+  B7A8              ;
- 73+  B7A8              rocks_processrocks:
- 74+  B7A8 DD 21 65 B7      ld ix,rocks_falling
- 75+  B7AC 06 04            ld b,4              ; the number of rocks to check
- 76+  B7AE              rocks_processrocks0:
- 77+  B7AE C5               push bc             ; store loop count
- 78+  B7AF DD 4E 00 DD      ld bc,(ix)          ; load the coords for this rock into bc
- 78+  B7B3 46 01
- 79+  B7B5 DD 23            inc ix
- 80+  B7B7 DD 23            inc ix              ; move to the state
- 81+  B7B9 DD 7E 00         ld a,(ix)           ; load the state into a
- 82+  B7BC FE 00            cp 0
- 83+  B7BE CA E2 B7         jp z,rocks_processrocks3 ; if not falling, check next
- 84+  B7C1 FE 02            cp 2
- 85+  B7C3 C2 D3 B7         jp nz, rocks_processrocks2
- 86+  B7C6                  ; we're wobbling
- 87+  B7C6 DD 23            inc ix              ; get frame number for wobble
- 88+  B7C8 DD 7E 00         ld a,(ix)           ; get wobble frame into a
- 89+  B7CB CD 98 B8         call rocks_wobble
- 90+  B7CE DD 23            inc ix              ; increment for next
- 91+  B7D0 C3 E6 B7         jp rocks_processrocks1  ; do next rock
- 92+  B7D3              rocks_processrocks2:
- 93+  B7D3                  ; we're falling
- 94+  B7D3 C5               push bc
- 95+  B7D4 CD FF B7         call rocks_fall
- 96+  B7D7 C1               pop bc
- 97+  B7D8 CD EA B7         call rocks_storeupdatedlines
- 98+  B7DB DD 23            inc ix
- 99+  B7DD DD 23            inc ix              ; inc ix to get to next
-100+  B7DF C3 E6 B7         jp rocks_processrocks1
-101+  B7E2              rocks_processrocks3:
-102+  B7E2 DD 23            inc ix
-103+  B7E4 DD 23            inc ix
-104+  B7E6              rocks_processrocks1:
-105+  B7E6 C1               pop bc              ; get loop count back
-106+  B7E7 10 C5            djnz rocks_processrocks0
-107+  B7E9 C9               ret
-108+  B7EA
-109+  B7EA              ;
-110+  B7EA              ; Stores the updated rows associated with the rock
-111+  B7EA              ; Inputs:
-112+  B7EA              ; bc - coords
-113+  B7EA              ;
-114+  B7EA              rocks_storeupdatedlines:
-115+  B7EA 79               ld a,c                  ; get the player block coords of current block
-116+  B7EB E6 F8            and 248                 ; find closest multiple of eight
-117+  B7ED 0F               rrca
-118+  B7EE 0F               rrca
-119+  B7EF 0F               rrca                    ; divide by 8
-120+  B7F0 ED 5B 8C A5      ld de,(screen_offset)          ; load the screen offset, this is in rows
-121+  B7F4 93               sub e
-122+  B7F5 F5               push af
-123+  B7F6 CD 3F A4         call buffer_marklineforupdate  ; store current row in updated lines
-124+  B7F9 F1               pop af
-125+  B7FA 3C               inc a
-126+  B7FB CD 3F A4         call buffer_marklineforupdate  ; store line beneath
-127+  B7FE C9               ret
-128+  B7FF
-129+  B7FF              ;
-130+  B7FF              ; Falls a rock one pixel, checks the next square down to see if it is empty, if not, stop falling
-131+  B7FF              ; bc - coord of current rock graphic on screen
-132+  B7FF              ; ix - memory location of current rock in rock list, currently at the 3rd position (rock state)
-133+  B7FF              ;
-134+  B7FF              rocks_fall:
-135+  B7FF DD 2B            dec ix
-136+  B801 DD 2B            dec ix              ; decrease ix back to coords
-137+  B803 ED 43 76 B7      ld (rocks_tmp2),bc  ; store original coords
-138+  B807 3E 03            ld a,3              ; move this number of pixels
-139+  B809              rocks_fall1:
-140+  B809 08               ex af,af'
-141+  B80A DD 4E 00 DD      ld bc,(ix)          ; get current coords
-141+  B80E 46 01
-142+  B810 CD 54 A7         call sprites_scadd  ; get the memory of the coords into de
-143+  B813 14               inc d               ; add 256 to get next row
-144+  B814 1A               ld a,(de)           ; get the contents of the next row
-145+  B815 FE 00            cp 0
-146+  B817 C2 70 B8         jp nz,rocks_fall3    ; move the rock if the row is empty
-147+  B81A 0C               inc c               ; increment the vertical
-148+  B81B DD 71 00 DD      ld (ix),bc          ; store the new coords
-148+  B81F 70 01
-149+  B821 79               ld a,c              ; get the vertical coord into a
-150+  B822 E6 07            and 7               ; divisible by 8?
-151+  B824 FE 00            cp 0
-152+  B826 C2 41 B8         jp nz,rocks_fall4   ; if not, carry on
-153+  B829 CD B4 A6         call screen_getattraddressfromscreencoords ; get the attr address into de
-154+  B82C 62 6B            ld hl,de
-155+  B82E 36 42            ld (hl),66          ; load this square with the yellow colour
-156+  B830 DD 4E 00 DD      ld bc,(ix)
-156+  B834 46 01
-157+  B836 79               ld a,c              ; get vertical
-158+  B837 D6 08            sub 8               ; look up one square
-159+  B839 4F               ld c,a              ; put a back in c
-160+  B83A CD B4 A6         call screen_getattraddressfromscreencoords ; get the attr address into de
-161+  B83D 62 6B            ld hl,de
-162+  B83F 36 46            ld (hl),70          ; load this square with the yellow colour
-163+  B841              rocks_fall4:
-164+  B841 08               ex af,af'
-165+  B842 3D               dec a
-166+  B843 FE 00            cp 0
-167+  B845 C2 09 B8         jp nz,rocks_fall1   ; do another pixel if needed
-168+  B848              rocks_fall2:
-169+  B848 3E 09            ld a,9              ; rock graphic
-170+  B84A ED 4B 76 B7      ld bc,(rocks_tmp2)  ; get the original coords
-171+  B84E CD EF A6         call screen_getblock     ; get the memory into hl
-172+  B851 CD 11 A7         call sprites_drawsprite  ; draw the sprite - over the top of the current one
-173+  B854 3E 09            ld a,9
-174+  B856 DD 4E 00 DD      ld bc,(ix)          ; get the new coords
-174+  B85A 46 01
-175+  B85C CD EF A6         call screen_getblock     ; get the memory into hl
-176+  B85F CD 11 A7         call sprites_drawsprite  ; draw the sprite - over the top of the current one
-177+  B862 DD 4E 00 DD      ld bc,(ix)          ; get the coords again
-177+  B866 46 01
-178+  B868 CD 85 B8         call rocks_checkforplayer ; check to see if we hit a player
-179+  B86B DD 23            inc ix
-180+  B86D DD 23            inc ix                  ; get ix back to state
-181+  B86F C9               ret
-182+  B870              rocks_fall3:
-183+  B870 3E 00            ld a,0              ; set the state to fell
-184+  B872 DD 77 02         ld (ix+2),a           ; store the falling state
-185+  B875 DD 4E 00 DD      ld bc,(ix)          ; get the coords
-185+  B879 46 01
-186+  B87B CD B4 A6         call screen_getattraddressfromscreencoords ; get the attr address into de
-187+  B87E 62 6B            ld hl,de
-188+  B880 36 42            ld (hl),66
-189+  B882 C3 48 B8         jp rocks_fall2      ; rejoin main loop
-190+  B885
-191+  B885              ;
-192+  B885              ; Checks to see if the rock is hitting a player
-193+  B885              ; Inputs:
-194+  B885              ; bc - coords of rock we're checking
-195+  B885              rocks_checkforplayer:
-196+  B885 ED 5B A5 B4      ld de,(player)       ; get the player coords
-197+  B889 7B               ld a,e               ; get the vert coord first
-198+  B88A 91               sub c                ; subtract the rock vertical coord from players
-199+  B88B FE 08            cp 8                 ; the rock will only hit a player if the player is directly underneath, so this must be 8
-200+  B88D C0               ret nz               ; if not, hasn't hit
-201+  B88E 7A               ld a,d               ; get the player horiz coord
-202+  B88F 90               sub b                ; subtract rock coord
-203+  B890 C6 07            add 7                ; add max distance
-204+  B892 FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
-205+  B894 DC 14 B5         call c, player_crushplayer ; if so, jump out
-206+  B897 C9               ret
-207+  B898
-208+  B898              ;
-209+  B898              ; Wobbles a rocks
-210+  B898              ; Inputs:
-211+  B898              ; bc - coord of current rock graphic on screen
-212+  B898              ; ix - memory location of current rock in rock list, currently at the 4th position (wobble count)
-213+  B898              ; a - wobble frame
-214+  B898              rocks_wobble:
-215+  B898 3A 75 B7         ld a,(rocks_tmp)    ; get the frame toggle
-216+  B89B 1E 09            ld e,9              ; this is the rock frame
-217+  B89D 83               add a,e             ; add the frame toggle
-218+  B89E C5               push bc
-219+  B89F CD EF A6         call screen_getblock     ; get the memory into hl
-220+  B8A2 CD 11 A7         call sprites_drawsprite  ; draw the sprite - over the top of the current one
-221+  B8A5 3A 75 B7         ld a,(rocks_tmp)    ; get the frame toggle against
-222+  B8A8 EE 01            xor 1               ; flip to other state
-223+  B8AA 32 75 B7         ld (rocks_tmp),a    ; store
-224+  B8AD 1E 09            ld e,9              ; this is the rock frame
-225+  B8AF 83               add a,e             ; add the frame toggle
-226+  B8B0 CD EF A6         call screen_getblock     ; get the memory into hl
-227+  B8B3 C1               pop bc
-228+  B8B4 CD 11 A7         call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
-229+  B8B7 DD 7E 00         ld a,(ix)           ; get the wobble count back
-230+  B8BA 3D               dec a               ; decrease
-231+  B8BB DD 77 00         ld (ix),a           ; store
-232+  B8BE FE 00            cp 0
-233+  B8C0 C0               ret nz              ; if we're not at zero, return
-234+  B8C1 DD 2B            dec ix              ; otherwise look to state location
-235+  B8C3 3E 01            ld a,1              ; set the state to falling
-236+  B8C5 DD 77 00         ld (ix),a           ; store the falling state
-237+  B8C8 DD 23            inc ix              ; set ix back to location of wobble count, and we're done
-238+  B8CA C9               ret
-239+  B8CB
+  1+  B76B              ;
+  2+  B76B              ; A structure of falling rocks
+  3+  B76B              ; Assume we'll never have more than 4 falling at any one time
+  4+  B76B              ; (1,2 - 16 bit memory location for rock graphic),state (0 fell, 1 falling, 2 wobbling), countdown
+  5+  B76B              ;
+  6+  B76B              rocks_falling:
+  7+  B76B 00 00 00 00      defb 0,0,0,0
+  8+  B76F 00 00 00 00      defb 0,0,0,0
+  9+  B773 00 00 00 00      defb 0,0,0,0
+ 10+  B777 00 00 00 00      defb 0,0,0,0
+ 11+  B77B
+ 12+  B77B              rocks_tmp:
+ 13+  B77B 00               defb 0
+ 14+  B77C
+ 15+  B77C              rocks_tmp2:
+ 16+  B77C 00 00            defb 0,0
+ 17+  B77E
+ 18+  B77E              ;
+ 19+  B77E              ; Checks for a rock that needs to start falling. Takes a memory location of the first line at the bottom of the space.
+ 20+  B77E              ; Checks to see if the pixel row in that location is a rock bottom. If it is, mark this rock as ready to fall.
+ 21+  B77E              ; If the pixel row is not the rock bottom, stop checking.
+ 22+  B77E              ; Inputs:
+ 23+  B77E              ; hl- memory location
+ 24+  B77E              ;
+ 25+  B77E              rocks_checkforfalling:
+ 26+  B77E 7E               ld a,(hl)           ; get the pixel row in this memory location
+ 27+  B77F FE 7E            cp 126              ; check against the bottom pixel row of the rock graphic
+ 28+  B781 C2 87 B7         jp nz,rocks_checkforfalling2 ; not a rock, stop
+ 29+  B784 CD 88 B7         call rocks_addrocktofalling ; mark the rock as falling
+ 30+  B787              rocks_checkforfalling2:
+ 31+  B787 C9               ret
+ 32+  B788
+ 33+  B788              ;
+ 34+  B788              ; Adds the rock to the structure that tracks falling rocks
+ 35+  B788              ; Inputs:
+ 36+  B788              ; hl - memory location of falling rock graphic
+ 37+  B788              ; bc - coords of rock, c vert
+ 38+  B788              rocks_addrocktofalling:
+ 39+  B788 C5               push bc             ; store the coords
+ 40+  B789 11 6B B7         ld de,rocks_falling
+ 41+  B78C 06 04            ld b,4              ; number of possible falling rocks
+ 42+  B78E              rocks_addrocktofalling0:
+ 43+  B78E 13               inc de
+ 44+  B78F 13               inc de
+ 45+  B790 13               inc de              ; move three along to get the state
+ 46+  B791 1A               ld a,(de)           ; load the state
+ 47+  B792 FE 00            cp 0                ; check if this is not falling
+ 48+  B794 C2 A9 B7         jp nz,rocks_addrocktofalling1 ; continue the loop if not 0
+ 49+  B797 3E 10            ld a,16             ; load the number of frames to wobble
+ 50+  B799 12               ld (de),a
+ 51+  B79A 1B               dec de              ; move de back to state
+ 52+  B79B 3E 02            ld a,2
+ 53+  B79D 12               ld (de),a           ; set the state to wobbling
+ 54+  B79E 1B               dec de              ; move back coords
+ 55+  B79F C1               pop bc              ; get back coords
+ 56+  B7A0 78               ld a,b
+ 57+  B7A1 12               ld (de),a           ; store the vertical
+ 58+  B7A2 1B               dec de
+ 59+  B7A3 79               ld a,c
+ 60+  B7A4 12               ld (de),a           ; store the horizontal
+ 61+  B7A5 C5               push bc
+ 62+  B7A6 C3 AC B7         jp rocks_addrocktofalling2 ; done
+ 63+  B7A9              rocks_addrocktofalling1:
+ 64+  B7A9 13               inc de              ; move memory along to next rock
+ 65+  B7AA 10 E2            djnz rocks_addrocktofalling0 ; try the next rock
+ 66+  B7AC              rocks_addrocktofalling2: ; done, return
+ 67+  B7AC C1               pop bc              ; to tidy up
+ 68+  B7AD C9               ret
+ 69+  B7AE
+ 70+  B7AE              ;
+ 71+  B7AE              ; Processes any falling rocks
+ 72+  B7AE              ;
+ 73+  B7AE              rocks_processrocks:
+ 74+  B7AE DD 21 6B B7      ld ix,rocks_falling
+ 75+  B7B2 06 04            ld b,4              ; the number of rocks to check
+ 76+  B7B4              rocks_processrocks0:
+ 77+  B7B4 C5               push bc             ; store loop count
+ 78+  B7B5 DD 4E 00 DD      ld bc,(ix)          ; load the coords for this rock into bc
+ 78+  B7B9 46 01
+ 79+  B7BB DD 23            inc ix
+ 80+  B7BD DD 23            inc ix              ; move to the state
+ 81+  B7BF DD 7E 00         ld a,(ix)           ; load the state into a
+ 82+  B7C2 FE 00            cp 0
+ 83+  B7C4 CA E8 B7         jp z,rocks_processrocks3 ; if not falling, check next
+ 84+  B7C7 FE 02            cp 2
+ 85+  B7C9 C2 D9 B7         jp nz, rocks_processrocks2
+ 86+  B7CC                  ; we're wobbling
+ 87+  B7CC DD 23            inc ix              ; get frame number for wobble
+ 88+  B7CE DD 7E 00         ld a,(ix)           ; get wobble frame into a
+ 89+  B7D1 CD 9E B8         call rocks_wobble
+ 90+  B7D4 DD 23            inc ix              ; increment for next
+ 91+  B7D6 C3 EC B7         jp rocks_processrocks1  ; do next rock
+ 92+  B7D9              rocks_processrocks2:
+ 93+  B7D9                  ; we're falling
+ 94+  B7D9 C5               push bc
+ 95+  B7DA CD 05 B8         call rocks_fall
+ 96+  B7DD C1               pop bc
+ 97+  B7DE CD F0 B7         call rocks_storeupdatedlines
+ 98+  B7E1 DD 23            inc ix
+ 99+  B7E3 DD 23            inc ix              ; inc ix to get to next
+100+  B7E5 C3 EC B7         jp rocks_processrocks1
+101+  B7E8              rocks_processrocks3:
+102+  B7E8 DD 23            inc ix
+103+  B7EA DD 23            inc ix
+104+  B7EC              rocks_processrocks1:
+105+  B7EC C1               pop bc              ; get loop count back
+106+  B7ED 10 C5            djnz rocks_processrocks0
+107+  B7EF C9               ret
+108+  B7F0
+109+  B7F0              ;
+110+  B7F0              ; Stores the updated rows associated with the rock
+111+  B7F0              ; Inputs:
+112+  B7F0              ; bc - coords
+113+  B7F0              ;
+114+  B7F0              rocks_storeupdatedlines:
+115+  B7F0 79               ld a,c                  ; get the player block coords of current block
+116+  B7F1 E6 F8            and 248                 ; find closest multiple of eight
+117+  B7F3 0F               rrca
+118+  B7F4 0F               rrca
+119+  B7F5 0F               rrca                    ; divide by 8
+120+  B7F6 ED 5B 8C A5      ld de,(screen_offset)          ; load the screen offset, this is in rows
+121+  B7FA 93               sub e
+122+  B7FB F5               push af
+123+  B7FC CD 3F A4         call buffer_marklineforupdate  ; store current row in updated lines
+124+  B7FF F1               pop af
+125+  B800 3C               inc a
+126+  B801 CD 3F A4         call buffer_marklineforupdate  ; store line beneath
+127+  B804 C9               ret
+128+  B805
+129+  B805              ;
+130+  B805              ; Falls a rock one pixel, checks the next square down to see if it is empty, if not, stop falling
+131+  B805              ; bc - coord of current rock graphic on screen
+132+  B805              ; ix - memory location of current rock in rock list, currently at the 3rd position (rock state)
+133+  B805              ;
+134+  B805              rocks_fall:
+135+  B805 DD 2B            dec ix
+136+  B807 DD 2B            dec ix              ; decrease ix back to coords
+137+  B809 ED 43 7C B7      ld (rocks_tmp2),bc  ; store original coords
+138+  B80D 3E 03            ld a,3              ; move this number of pixels
+139+  B80F              rocks_fall1:
+140+  B80F 08               ex af,af'
+141+  B810 DD 4E 00 DD      ld bc,(ix)          ; get current coords
+141+  B814 46 01
+142+  B816 CD 54 A7         call sprites_scadd  ; get the memory of the coords into de
+143+  B819 14               inc d               ; add 256 to get next row
+144+  B81A 1A               ld a,(de)           ; get the contents of the next row
+145+  B81B FE 00            cp 0
+146+  B81D C2 76 B8         jp nz,rocks_fall3    ; move the rock if the row is empty
+147+  B820 0C               inc c               ; increment the vertical
+148+  B821 DD 71 00 DD      ld (ix),bc          ; store the new coords
+148+  B825 70 01
+149+  B827 79               ld a,c              ; get the vertical coord into a
+150+  B828 E6 07            and 7               ; divisible by 8?
+151+  B82A FE 00            cp 0
+152+  B82C C2 47 B8         jp nz,rocks_fall4   ; if not, carry on
+153+  B82F CD B4 A6         call screen_getattraddressfromscreencoords ; get the attr address into de
+154+  B832 62 6B            ld hl,de
+155+  B834 36 42            ld (hl),66          ; load this square with the yellow colour
+156+  B836 DD 4E 00 DD      ld bc,(ix)
+156+  B83A 46 01
+157+  B83C 79               ld a,c              ; get vertical
+158+  B83D D6 08            sub 8               ; look up one square
+159+  B83F 4F               ld c,a              ; put a back in c
+160+  B840 CD B4 A6         call screen_getattraddressfromscreencoords ; get the attr address into de
+161+  B843 62 6B            ld hl,de
+162+  B845 36 46            ld (hl),70          ; load this square with the yellow colour
+163+  B847              rocks_fall4:
+164+  B847 08               ex af,af'
+165+  B848 3D               dec a
+166+  B849 FE 00            cp 0
+167+  B84B C2 0F B8         jp nz,rocks_fall1   ; do another pixel if needed
+168+  B84E              rocks_fall2:
+169+  B84E 3E 09            ld a,9              ; rock graphic
+170+  B850 ED 4B 7C B7      ld bc,(rocks_tmp2)  ; get the original coords
+171+  B854 CD EF A6         call screen_getblock     ; get the memory into hl
+172+  B857 CD 11 A7         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+173+  B85A 3E 09            ld a,9
+174+  B85C DD 4E 00 DD      ld bc,(ix)          ; get the new coords
+174+  B860 46 01
+175+  B862 CD EF A6         call screen_getblock     ; get the memory into hl
+176+  B865 CD 11 A7         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+177+  B868 DD 4E 00 DD      ld bc,(ix)          ; get the coords again
+177+  B86C 46 01
+178+  B86E CD 8B B8         call rocks_checkforplayer ; check to see if we hit a player
+179+  B871 DD 23            inc ix
+180+  B873 DD 23            inc ix                  ; get ix back to state
+181+  B875 C9               ret
+182+  B876              rocks_fall3:
+183+  B876 3E 00            ld a,0              ; set the state to fell
+184+  B878 DD 77 02         ld (ix+2),a           ; store the falling state
+185+  B87B DD 4E 00 DD      ld bc,(ix)          ; get the coords
+185+  B87F 46 01
+186+  B881 CD B4 A6         call screen_getattraddressfromscreencoords ; get the attr address into de
+187+  B884 62 6B            ld hl,de
+188+  B886 36 42            ld (hl),66
+189+  B888 C3 4E B8         jp rocks_fall2      ; rejoin main loop
+190+  B88B
+191+  B88B              ;
+192+  B88B              ; Checks to see if the rock is hitting a player
+193+  B88B              ; Inputs:
+194+  B88B              ; bc - coords of rock we're checking
+195+  B88B              rocks_checkforplayer:
+196+  B88B ED 5B A5 B4      ld de,(player)       ; get the player coords
+197+  B88F 7B               ld a,e               ; get the vert coord first
+198+  B890 91               sub c                ; subtract the rock vertical coord from players
+199+  B891 FE 08            cp 8                 ; the rock will only hit a player if the player is directly underneath, so this must be 8
+200+  B893 C0               ret nz               ; if not, hasn't hit
+201+  B894 7A               ld a,d               ; get the player horiz coord
+202+  B895 90               sub b                ; subtract rock coord
+203+  B896 C6 07            add 7                ; add max distance
+204+  B898 FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
+205+  B89A DC 1A B5         call c, player_crushplayer ; if so, jump out
+206+  B89D C9               ret
+207+  B89E
+208+  B89E              ;
+209+  B89E              ; Wobbles a rocks
+210+  B89E              ; Inputs:
+211+  B89E              ; bc - coord of current rock graphic on screen
+212+  B89E              ; ix - memory location of current rock in rock list, currently at the 4th position (wobble count)
+213+  B89E              ; a - wobble frame
+214+  B89E              rocks_wobble:
+215+  B89E 3A 7B B7         ld a,(rocks_tmp)    ; get the frame toggle
+216+  B8A1 1E 09            ld e,9              ; this is the rock frame
+217+  B8A3 83               add a,e             ; add the frame toggle
+218+  B8A4 C5               push bc
+219+  B8A5 CD EF A6         call screen_getblock     ; get the memory into hl
+220+  B8A8 CD 11 A7         call sprites_drawsprite  ; draw the sprite - over the top of the current one
+221+  B8AB 3A 7B B7         ld a,(rocks_tmp)    ; get the frame toggle against
+222+  B8AE EE 01            xor 1               ; flip to other state
+223+  B8B0 32 7B B7         ld (rocks_tmp),a    ; store
+224+  B8B3 1E 09            ld e,9              ; this is the rock frame
+225+  B8B5 83               add a,e             ; add the frame toggle
+226+  B8B6 CD EF A6         call screen_getblock     ; get the memory into hl
+227+  B8B9 C1               pop bc
+228+  B8BA CD 11 A7         call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
+229+  B8BD DD 7E 00         ld a,(ix)           ; get the wobble count back
+230+  B8C0 3D               dec a               ; decrease
+231+  B8C1 DD 77 00         ld (ix),a           ; store
+232+  B8C4 FE 00            cp 0
+233+  B8C6 C0               ret nz              ; if we're not at zero, return
+234+  B8C7 DD 2B            dec ix              ; otherwise look to state location
+235+  B8C9 3E 01            ld a,1              ; set the state to falling
+236+  B8CB DD 77 00         ld (ix),a           ; store the falling state
+237+  B8CE DD 23            inc ix              ; set ix back to location of wobble count, and we're done
+238+  B8D0 C9               ret
+239+  B8D1
 # file closed: game/rocks.asm
- 40   B8CB                  include "game\scores.asm"
+ 40   B8D1                  include "game\scores.asm"
 # file opened: game/scores.asm
-  1+  B8CB              ;
-  2+  B8CB              ; The score of the current player
-  3+  B8CB              ;
-  4+  B8CB              scores_current:
-  5+  B8CB 30 30 30 30      defb '000000'
-  5+  B8CF 30 30
-  6+  B8D1
-  7+  B8D1              ;
-  8+  B8D1              ; The current high score table
-  9+  B8D1              ;
- 10+  B8D1              scores_table:
- 11+  B8D1 03 17 47 41      defb 3,23,'GAM',255
- 11+  B8D5 4D FF
- 12+  B8D7 06 17 30 30      defb 6,23,'00000 ',255
- 12+  B8DB 30 30 30 20
- 12+  B8DF FF
- 13+  B8E0 0C 17 47 41      defb 12,23,'GAM',255
- 13+  B8E4 4D FF
- 14+  B8E6 0F 17 30 30      defb 15,23,'00000 ',255
- 14+  B8EA 30 30 30 20
- 14+  B8EE FF
- 15+  B8EF 15 17 47 41      defb 21,23,'GAM',255
- 15+  B8F3 4D FF
- 16+  B8F5 18 17 30 30      defb 24,23,'00000 ',255
- 16+  B8F9 30 30 30 20
- 16+  B8FD FF
- 17+  B8FE
- 18+  B8FE              ;
- 19+  B8FE              ; Displays the high score table at the bottom of the screen
- 20+  B8FE              ;
- 21+  B8FE              scores_showtable:
- 22+  B8FE 21 D1 B8         ld hl, scores_table
- 23+  B901 CD 3F 83         call string_print
- 24+  B904 21 D7 B8         ld hl, scores_table+6
- 25+  B907 CD 3F 83         call string_print
- 26+  B90A 21 E0 B8         ld hl, scores_table+15
- 27+  B90D CD 3F 83         call string_print
- 28+  B910 21 E6 B8         ld hl, scores_table+21
- 29+  B913 CD 3F 83         call string_print
- 30+  B916 21 EF B8         ld hl, scores_table+30
- 31+  B919 CD 3F 83         call string_print
- 32+  B91C 21 F5 B8         ld hl, scores_table+36
- 33+  B91F CD 3F 83         call string_print
- 34+  B922 C9               ret
+  1+  B8D1              ;
+  2+  B8D1              ; The score of the current player
+  3+  B8D1              ;
+  4+  B8D1              scores_current:
+  5+  B8D1 30 30 30 30      defb '000000'
+  5+  B8D5 30 30
+  6+  B8D7
+  7+  B8D7              ;
+  8+  B8D7              ; The current high score table
+  9+  B8D7              ;
+ 10+  B8D7              scores_table:
+ 11+  B8D7 03 17 47 41      defb 3,23,'GAM',255
+ 11+  B8DB 4D FF
+ 12+  B8DD 06 17 30 30      defb 6,23,'00000 ',255
+ 12+  B8E1 30 30 30 20
+ 12+  B8E5 FF
+ 13+  B8E6 0C 17 47 41      defb 12,23,'GAM',255
+ 13+  B8EA 4D FF
+ 14+  B8EC 0F 17 30 30      defb 15,23,'00000 ',255
+ 14+  B8F0 30 30 30 20
+ 14+  B8F4 FF
+ 15+  B8F5 15 17 47 41      defb 21,23,'GAM',255
+ 15+  B8F9 4D FF
+ 16+  B8FB 18 17 30 30      defb 24,23,'00000 ',255
+ 16+  B8FF 30 30 30 20
+ 16+  B903 FF
+ 17+  B904
+ 18+  B904              ;
+ 19+  B904              ; Displays the high score table at the bottom of the screen
+ 20+  B904              ;
+ 21+  B904              scores_showtable:
+ 22+  B904 21 D7 B8         ld hl, scores_table
+ 23+  B907 CD 3F 83         call string_print
+ 24+  B90A 21 DD B8         ld hl, scores_table+6
+ 25+  B90D CD 3F 83         call string_print
+ 26+  B910 21 E6 B8         ld hl, scores_table+15
+ 27+  B913 CD 3F 83         call string_print
+ 28+  B916 21 EC B8         ld hl, scores_table+21
+ 29+  B919 CD 3F 83         call string_print
+ 30+  B91C 21 F5 B8         ld hl, scores_table+30
+ 31+  B91F CD 3F 83         call string_print
+ 32+  B922 21 FB B8         ld hl, scores_table+36
+ 33+  B925 CD 3F 83         call string_print
+ 34+  B928 C9               ret
 # file closed: game/scores.asm
- 41   B923                  include "game\diamonds.asm"
+ 41   B929                  include "game\diamonds.asm"
 # file opened: game/diamonds.asm
-  1+  B923              ;
-  2+  B923              ; Changes the attribute of gem and diamond cells based on the frame count
-  3+  B923              ; Inputs:
-  4+  B923              ; hl - memory location of gem type
-  5+  B923              diamonds_twinkle_type:
-  6+  B923 CD 9B B4         call game_getcurrentframe       ; get current frame number
-  7+  B926 E6 07            and 7                           ; want a number from 0-7
-  8+  B928 C6 40            add 64                          ; add to 60 to get attr colour
-  9+  B92A              diamonds_twinkle_type0:
- 10+  B92A 4E 23 46 2B      ld bc,(hl)                      ; get coords into bc
- 11+  B92E 08               ex af, af'
- 12+  B92F 79               ld a,c                          ; load c into a
- 13+  B930 FE FF            cp 255                          ; is this the end?
- 14+  B932 CA 4F B9         jp z,diamonds_twinkle_type1           ; step out if so
- 15+  B935 23               inc hl
- 16+  B936 23               inc hl
- 17+  B937 7E               ld a,(hl)                       ; check the state, don't process if collected
- 18+  B938 FE 01            cp 1
- 19+  B93A CA 50 B9         jp z,diamonds_twinkle_type2           ; step out if so
- 20+  B93D CD 6C B9         call diamonds_checkforplayer    ; check to see if we've collided with player
- 21+  B940 DC 57 B9         call c,diamonds_collect     ; we collided
- 22+  B943 23               inc hl
- 23+  B944 08               ex af,af'
- 24+  B945 5E 23 56 2B      ld de,(hl)                      ; get the memory location into de
- 25+  B949 12               ld (de),a                       ; set the value of attr
- 26+  B94A 23               inc hl
- 27+  B94B 23               inc hl                          ; move to next diamond
- 28+  B94C C3 2A B9         jp diamonds_twinkle_type0
- 29+  B94F              diamonds_twinkle_type1:
- 30+  B94F C9               ret
- 31+  B950              diamonds_twinkle_type2:
- 32+  B950 23               inc hl                          ; do stuff the we would have done anyway to get to next gem
- 33+  B951 23               inc hl
- 34+  B952 23               inc hl
- 35+  B953 08               ex af,af'
- 36+  B954 C3 2A B9         jp diamonds_twinkle_type0       ; rejoin main loop
- 37+  B957
- 38+  B957              ;
- 39+  B957              ; Collect the diamond we collided with
- 40+  B957              ; Inputs:
- 41+  B957              ; hl - memory location of current diamond, currently on state
- 42+  B957              ; Output:
- 43+  B957              ; a - 70 - for yellow on black
- 44+  B957              diamonds_collect:
- 45+  B957 36 01            ld (hl),1                       ; collected
- 46+  B959 E5               push hl
- 47+  B95A 2B               dec hl
- 48+  B95B 2B               dec hl
- 49+  B95C 4E 23 46 2B      ld bc,(hl)                      ; get the coords
- 50+  B960 21 12 AF         ld hl,sprites
- 51+  B963 CD D5 A6         call screen_showchar
- 52+  B966 E1               pop hl
- 53+  B967 08               ex af,af'
- 54+  B968 3E 46            ld a,70
- 55+  B96A 08               ex af,af'                       ; make sure a is in the af we'll use for the attr
- 56+  B96B C9               ret
- 57+  B96C
- 58+  B96C              ;
- 59+  B96C              ; Checks to see if the gem is hitting a player
- 60+  B96C              ; Inputs:
- 61+  B96C              ; bc - coords of diamond we're checking
- 62+  B96C              diamonds_checkforplayer:
- 63+  B96C 78               ld a,b               ; multiply b by 8
- 64+  B96D 07               rlca
- 65+  B96E 07               rlca
- 66+  B96F 07               rlca
- 67+  B970 47               ld b,a
- 68+  B971 ED 5B A5 B4      ld de,(player)       ; get the player coords
- 69+  B975 7B               ld a,e               ; get the vert coord first
- 70+  B976 90               sub b                ; subtract the diamond vertical coord from players
- 71+  B977 C6 09            add 9                ; add the max distance
- 72+  B979 FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
- 73+  B97B D0               ret nc               ; if not, hasn't hit
- 74+  B97C 79               ld a,c               ; multiply c by 8
- 75+  B97D 07               rlca
- 76+  B97E 07               rlca
- 77+  B97F 07               rlca
- 78+  B980 4F               ld c,a
- 79+  B981 7A               ld a,d               ; get the player horiz coord
- 80+  B982 91               sub c                ; subtract rock coord
- 81+  B983 C6 09            add 9                ; add max distance
- 82+  B985 FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
- 83+  B987 C9               ret
- 84+  B988
- 85+  B988
- 86+  B988              ;
- 87+  B988              ; Initialise diamonds and gems
- 88+  B988              ;
- 89+  B988              diamonds_twinkle
- 90+  B988 21 8D AE         ld hl, level01diamonds
- 91+  B98B CD 23 B9         call diamonds_twinkle_type
- 92+  B98E 21 9D AE         ld hl, level01gems
- 93+  B991 CD 23 B9         call diamonds_twinkle_type
- 94+  B994 C9               ret
- 95+  B995
- 96+  B995              ;
- 97+  B995              ; Initialise diamonds and gems
- 98+  B995              ;
- 99+  B995              diamonds_init:
-100+  B995 21 8D AE         ld hl, level01diamonds
-101+  B998 CD A2 B9         call diamonds_init_type
-102+  B99B 21 9D AE         ld hl, level01gems
-103+  B99E CD A2 B9         call diamonds_init_type
-104+  B9A1 C9               ret
-105+  B9A2
-106+  B9A2              ;
-107+  B9A2              ; Initialise diamonds or gems, get memory addresses
-108+  B9A2              ; Inputs:
-109+  B9A2              ; hl - memory location
-110+  B9A2              diamonds_init_type:
-111+  B9A2 4E               ld c,(hl)                      ; get coords into c
-112+  B9A3 79               ld a,c                          ; load c into add
-113+  B9A4 FE FF            cp 255                          ; is this the end?
-114+  B9A6 CA BD B9         jp z,diamonds_init_type1             ; step out if so
-115+  B9A9 23               inc hl
-116+  B9AA 46               ld b,(hl)                       ; get coords into b
-117+  B9AB E5               push hl
-118+  B9AC CD 84 A6         call screen_getcellattradress ; get memory of attr for this diamond into de
-119+  B9AF E1               pop hl
-120+  B9B0 23               inc hl                          ; move to state
-121+  B9B1 36 00            ld (hl),0
-122+  B9B3 23               inc hl                          ; move to memory
-123+  B9B4 73 23 72 2B      ld (hl),de                      ; store the memory location
-124+  B9B8 23               inc hl                          ; move to next diamond
-125+  B9B9 23               inc hl
-126+  B9BA C3 A2 B9         jp diamonds_init_type
-127+  B9BD              diamonds_init_type1:
-128+  B9BD C9               ret
+  1+  B929              ;
+  2+  B929              ; Changes the attribute of gem and diamond cells based on the frame count
+  3+  B929              ; Inputs:
+  4+  B929              ; hl - memory location of gem type
+  5+  B929              diamonds_twinkle_type:
+  6+  B929 CD 9B B4         call game_getcurrentframe       ; get current frame number
+  7+  B92C E6 07            and 7                           ; want a number from 0-7
+  8+  B92E C6 40            add 64                          ; add to 60 to get attr colour
+  9+  B930              diamonds_twinkle_type0:
+ 10+  B930 4E 23 46 2B      ld bc,(hl)                      ; get coords into bc
+ 11+  B934 08               ex af, af'
+ 12+  B935 79               ld a,c                          ; load c into a
+ 13+  B936 FE FF            cp 255                          ; is this the end?
+ 14+  B938 CA 55 B9         jp z,diamonds_twinkle_type1           ; step out if so
+ 15+  B93B 23               inc hl
+ 16+  B93C 23               inc hl
+ 17+  B93D 7E               ld a,(hl)                       ; check the state, don't process if collected
+ 18+  B93E FE 01            cp 1
+ 19+  B940 CA 56 B9         jp z,diamonds_twinkle_type2           ; step out if so
+ 20+  B943 CD 72 B9         call diamonds_checkforplayer    ; check to see if we've collided with player
+ 21+  B946 DC 5D B9         call c,diamonds_collect     ; we collided
+ 22+  B949 23               inc hl
+ 23+  B94A 08               ex af,af'
+ 24+  B94B 5E 23 56 2B      ld de,(hl)                      ; get the memory location into de
+ 25+  B94F 12               ld (de),a                       ; set the value of attr
+ 26+  B950 23               inc hl
+ 27+  B951 23               inc hl                          ; move to next diamond
+ 28+  B952 C3 30 B9         jp diamonds_twinkle_type0
+ 29+  B955              diamonds_twinkle_type1:
+ 30+  B955 C9               ret
+ 31+  B956              diamonds_twinkle_type2:
+ 32+  B956 23               inc hl                          ; do stuff the we would have done anyway to get to next gem
+ 33+  B957 23               inc hl
+ 34+  B958 23               inc hl
+ 35+  B959 08               ex af,af'
+ 36+  B95A C3 30 B9         jp diamonds_twinkle_type0       ; rejoin main loop
+ 37+  B95D
+ 38+  B95D              ;
+ 39+  B95D              ; Collect the diamond we collided with
+ 40+  B95D              ; Inputs:
+ 41+  B95D              ; hl - memory location of current diamond, currently on state
+ 42+  B95D              ; Output:
+ 43+  B95D              ; a - 70 - for yellow on black
+ 44+  B95D              diamonds_collect:
+ 45+  B95D 36 01            ld (hl),1                       ; collected
+ 46+  B95F E5               push hl
+ 47+  B960 2B               dec hl
+ 48+  B961 2B               dec hl
+ 49+  B962 4E 23 46 2B      ld bc,(hl)                      ; get the coords
+ 50+  B966 21 12 AF         ld hl,sprites
+ 51+  B969 CD D5 A6         call screen_showchar
+ 52+  B96C E1               pop hl
+ 53+  B96D 08               ex af,af'
+ 54+  B96E 3E 46            ld a,70
+ 55+  B970 08               ex af,af'                       ; make sure a is in the af we'll use for the attr
+ 56+  B971 C9               ret
+ 57+  B972
+ 58+  B972              ;
+ 59+  B972              ; Checks to see if the gem is hitting a player
+ 60+  B972              ; Inputs:
+ 61+  B972              ; bc - coords of diamond we're checking
+ 62+  B972              diamonds_checkforplayer:
+ 63+  B972 78               ld a,b               ; multiply b by 8
+ 64+  B973 07               rlca
+ 65+  B974 07               rlca
+ 66+  B975 07               rlca
+ 67+  B976 47               ld b,a
+ 68+  B977 ED 5B A5 B4      ld de,(player)       ; get the player coords
+ 69+  B97B 7B               ld a,e               ; get the vert coord first
+ 70+  B97C 90               sub b                ; subtract the diamond vertical coord from players
+ 71+  B97D C6 09            add 9                ; add the max distance
+ 72+  B97F FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
+ 73+  B981 D0               ret nc               ; if not, hasn't hit
+ 74+  B982 79               ld a,c               ; multiply c by 8
+ 75+  B983 07               rlca
+ 76+  B984 07               rlca
+ 77+  B985 07               rlca
+ 78+  B986 4F               ld c,a
+ 79+  B987 7A               ld a,d               ; get the player horiz coord
+ 80+  B988 91               sub c                ; subtract rock coord
+ 81+  B989 C6 09            add 9                ; add max distance
+ 82+  B98B FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
+ 83+  B98D C9               ret
+ 84+  B98E
+ 85+  B98E
+ 86+  B98E              ;
+ 87+  B98E              ; Initialise diamonds and gems
+ 88+  B98E              ;
+ 89+  B98E              diamonds_twinkle
+ 90+  B98E 21 8D AE         ld hl, level01diamonds
+ 91+  B991 CD 29 B9         call diamonds_twinkle_type
+ 92+  B994 21 9D AE         ld hl, level01gems
+ 93+  B997 CD 29 B9         call diamonds_twinkle_type
+ 94+  B99A C9               ret
+ 95+  B99B
+ 96+  B99B              ;
+ 97+  B99B              ; Initialise diamonds and gems
+ 98+  B99B              ;
+ 99+  B99B              diamonds_init:
+100+  B99B 21 8D AE         ld hl, level01diamonds
+101+  B99E CD A8 B9         call diamonds_init_type
+102+  B9A1 21 9D AE         ld hl, level01gems
+103+  B9A4 CD A8 B9         call diamonds_init_type
+104+  B9A7 C9               ret
+105+  B9A8
+106+  B9A8              ;
+107+  B9A8              ; Initialise diamonds or gems, get memory addresses
+108+  B9A8              ; Inputs:
+109+  B9A8              ; hl - memory location
+110+  B9A8              diamonds_init_type:
+111+  B9A8 4E               ld c,(hl)                      ; get coords into c
+112+  B9A9 79               ld a,c                          ; load c into add
+113+  B9AA FE FF            cp 255                          ; is this the end?
+114+  B9AC CA C3 B9         jp z,diamonds_init_type1             ; step out if so
+115+  B9AF 23               inc hl
+116+  B9B0 46               ld b,(hl)                       ; get coords into b
+117+  B9B1 E5               push hl
+118+  B9B2 CD 84 A6         call screen_getcellattradress ; get memory of attr for this diamond into de
+119+  B9B5 E1               pop hl
+120+  B9B6 23               inc hl                          ; move to state
+121+  B9B7 36 00            ld (hl),0
+122+  B9B9 23               inc hl                          ; move to memory
+123+  B9BA 73 23 72 2B      ld (hl),de                      ; store the memory location
+124+  B9BE 23               inc hl                          ; move to next diamond
+125+  B9BF 23               inc hl
+126+  B9C0 C3 A8 B9         jp diamonds_init_type
+127+  B9C3              diamonds_init_type1:
+128+  B9C3 C9               ret
 # file closed: game/diamonds.asm
- 42   B9BE
- 43   B9BE              ;===========================================================================
- 44   B9BE              ; main routine - the code execution starts here.
- 45   B9BE              ; Sets up the new interrupt routine, the memory
- 46   B9BE              ; banks and jumps to the start loop.
- 47   B9BE              ;===========================================================================
- 48   B9BE              main:
- 49   B9BE
- 50   B9BE                  ; Setup stack
- 51   B9BE 31 E7 BA         ld sp,stack_top
- 52   B9C1
- 53   B9C1                  ; Draw the title screen
- 54   B9C1              main_titlescreen:
- 55   B9C1 CD 7A A7         call titlescreen_show
- 56   B9C4 CD B8 B4         call player_init_gamestart
- 57   B9C7
- 58   B9C7              main_lifestart:
- 59   B9C7
- 60   B9C7 CD C2 B4         call player_init_lifestart
- 61   B9CA
- 62   B9CA CD DE A8         call lifescreen_draw        ; show the lives remaining screen
- 63   B9CD
- 64   B9CD CD 00 80         call init_start
- 65   B9D0 CD A7 A5         call screen_draw
- 66   B9D3 CD 05 A5         call buffer_allbuffertoscreen
- 67   B9D6
- 68   B9D6 CD C8 B5         call ship_land              ; land the ship
- 69   B9D9 CD B8 B6         call tank_init
- 70   B9DC CD 95 B9         call diamonds_init
- 71   B9DF              mloop:
- 72   B9DF 76               halt
- 73   B9E0 CD FB B9         call main_loop_processing
- 74   B9E3
- 75   B9E3 21 AF B4         ld hl,player+10
- 76   B9E6 7E               ld a,(hl)                   ; check if the player died this frame
- 77   B9E7 FE 01            cp 1
- 78   B9E9 C2 DF B9         jp nz,mloop
- 79   B9EC CD F6 B4         call player_died        ; do end of life housekeeping
- 80   B9EF 21 AE B4         ld hl,player+9        ; check lives remaining
- 81   B9F2 7E               ld a,(hl)
- 82   B9F3 FE 00            cp 0
- 83   B9F5 CA 17 BA         jp z,main_gameover   ; leave the loop if we're done
- 84   B9F8 C3 C7 B9         jp main_lifestart
- 85   B9FB
- 86   B9FB              main_loop_processing:
- 87   B9FB CD D3 A4         call buffer_buffertoscreen  ; copy buffer to screen
- 88   B9FE CD 53 A4         call buffer_clearlist       ; zero the updated lines list
- 89   BA01 CD 1A B5         call player_drawplayer      ; delete player
- 90   BA04 CD A1 B0         call control_keyboard       ; check keyboard
- 91   BA07 CD 1A B5         call player_drawplayer      ; draw player
- 92   BA0A CD CB B6         call tank_process           ; prcoess the tank
- 93   BA0D CD A8 B7         call rocks_processrocks     ; process falling rocks
- 94   BA10 CD 88 B9         call diamonds_twinkle       ; make the diamonds twinkle
- 95   BA13
- 96   BA13 CD 8C B4         call game_incrementframe    ; increment the game frame
- 97   BA16
- 98   BA16 C9               ret
- 99   BA17
-100   BA17              main_gameover:
-101   BA17 CD 31 A9         call gameover_draw          ; show the game over screen
-102   BA1A C3 C1 B9         jp main_titlescreen         ; go back to title
-103   BA1D
-104   BA1D              ;===========================================================================
-105   BA1D              ; Stack.
-106   BA1D              ;===========================================================================
-107   BA1D
-108   BA1D              ; Stack: this area is reserved for the stack
-109   BA1D              STACK_SIZE: equ 100    ; in words
-110   BA1D
-111   BA1D              ; Reserve stack space
-112   BA1D 00 00            defw 0  ; WPMEM, 2
-113   BA1F              stack_bottom:
-114   BA1F 00 00 00...      defs    STACK_SIZE*2, 0
-115   BAE7              stack_top:
-116   BAE7 00 00            defw 0  ; WPMEM, 2
-117   BAE9
-118   BAE9                     SAVESNA "ThePit.sna", main
+ 42   B9C4
+ 43   B9C4              ;===========================================================================
+ 44   B9C4              ; main routine - the code execution starts here.
+ 45   B9C4              ; Sets up the new interrupt routine, the memory
+ 46   B9C4              ; banks and jumps to the start loop.
+ 47   B9C4              ;===========================================================================
+ 48   B9C4              main:
+ 49   B9C4
+ 50   B9C4                  ; Setup stack
+ 51   B9C4 31 ED BA         ld sp,stack_top
+ 52   B9C7
+ 53   B9C7                  ; Draw the title screen
+ 54   B9C7              main_titlescreen:
+ 55   B9C7 CD 7A A7         call titlescreen_show
+ 56   B9CA CD B8 B4         call player_init_gamestart
+ 57   B9CD
+ 58   B9CD              main_lifestart:
+ 59   B9CD
+ 60   B9CD CD C2 B4         call player_init_lifestart
+ 61   B9D0
+ 62   B9D0 CD DE A8         call lifescreen_draw        ; show the lives remaining screen
+ 63   B9D3
+ 64   B9D3 CD 00 80         call init_start
+ 65   B9D6 CD A7 A5         call screen_draw
+ 66   B9D9 CD 05 A5         call buffer_allbuffertoscreen
+ 67   B9DC
+ 68   B9DC CD CE B5         call ship_land              ; land the ship
+ 69   B9DF CD BE B6         call tank_init
+ 70   B9E2 CD 9B B9         call diamonds_init
+ 71   B9E5              mloop:
+ 72   B9E5 76               halt
+ 73   B9E6 CD 01 BA         call main_loop_processing
+ 74   B9E9
+ 75   B9E9 21 AF B4         ld hl,player+10
+ 76   B9EC 7E               ld a,(hl)                   ; check if the player died this frame
+ 77   B9ED FE 01            cp 1
+ 78   B9EF C2 E5 B9         jp nz,mloop
+ 79   B9F2 CD FC B4         call player_died        ; do end of life housekeeping
+ 80   B9F5 21 AE B4         ld hl,player+9        ; check lives remaining
+ 81   B9F8 7E               ld a,(hl)
+ 82   B9F9 FE 00            cp 0
+ 83   B9FB CA 1D BA         jp z,main_gameover   ; leave the loop if we're done
+ 84   B9FE C3 CD B9         jp main_lifestart
+ 85   BA01
+ 86   BA01              main_loop_processing:
+ 87   BA01 CD D3 A4         call buffer_buffertoscreen  ; copy buffer to screen
+ 88   BA04 CD 53 A4         call buffer_clearlist       ; zero the updated lines list
+ 89   BA07 CD 20 B5         call player_drawplayer      ; delete player
+ 90   BA0A CD A1 B0         call control_keyboard       ; check keyboard
+ 91   BA0D CD 20 B5         call player_drawplayer      ; draw player
+ 92   BA10 CD D1 B6         call tank_process           ; prcoess the tank
+ 93   BA13 CD AE B7         call rocks_processrocks     ; process falling rocks
+ 94   BA16 CD 8E B9         call diamonds_twinkle       ; make the diamonds twinkle
+ 95   BA19
+ 96   BA19 CD 8C B4         call game_incrementframe    ; increment the game frame
+ 97   BA1C
+ 98   BA1C C9               ret
+ 99   BA1D
+100   BA1D              main_gameover:
+101   BA1D CD 31 A9         call gameover_draw          ; show the game over screen
+102   BA20 C3 C7 B9         jp main_titlescreen         ; go back to title
+103   BA23
+104   BA23              ;===========================================================================
+105   BA23              ; Stack.
+106   BA23              ;===========================================================================
+107   BA23
+108   BA23              ; Stack: this area is reserved for the stack
+109   BA23              STACK_SIZE: equ 100    ; in words
+110   BA23
+111   BA23              ; Reserve stack space
+112   BA23 00 00            defw 0  ; WPMEM, 2
+113   BA25              stack_bottom:
+114   BA25 00 00 00...      defs    STACK_SIZE*2, 0
+115   BAED              stack_top:
+116   BAED 00 00            defw 0  ; WPMEM, 2
+117   BAEF
+118   BAEF                     SAVESNA "ThePit.sna", main
 # file closed: main.asm
