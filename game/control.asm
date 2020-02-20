@@ -2,7 +2,10 @@
 ; Check the keyboard then move
 ;
 control_keyboard:
-    ld a,(player+5)      ; first, check if the player has pixels left to move
+    ld a,(player+11)    ; first, check if player is dying
+    cp 0
+    ret nz               ; if so, can't move
+    ld a,(player+5)      ; next, check if the player has pixels left to move
     cp 0
     jp z, control_keyboard5
     call control_automove

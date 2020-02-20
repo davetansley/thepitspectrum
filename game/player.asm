@@ -8,6 +8,7 @@ player:
     defb    0,0,0               ; is digging (0 no), digging count, pixels to di (+6,+7,+8)
     defb    0                   ; lives remaining (+9)
     defb    0                   ; died this life (+10)
+    defb    0,0                 ; crushed (+11), frames (+12)
 
 ;
 ; Score for the current player
@@ -37,6 +38,16 @@ player_init_lifestart:
     ld bc,player+10
     ld a,0
     ld (bc),a
+    ld bc,player+11         ; crushed
+    ld a,0
+    ld (bc),a
+    ld bc,player+12         ; crush count
+    ld a,0
+    ld (bc),a
+    ld bc,player+2         ; frame
+    ld a,2
+    ld (bc),a
+    call diamonds_init      ; initialise gems
     ret
 
 ;
@@ -86,6 +97,14 @@ player_killplayer:
     ret
 
 ;
+; Crush a player this life
+;
+player_crushplayer:
+    ld hl,player+11             ; mark as crushed
+    ld (hl),1
+    ret
+
+;
 ; Draws the player at the current position or deletes them
 ;
 player_drawplayer:
@@ -95,16 +114,36 @@ player_drawplayer:
     ld a,0                      ; if 3, then down, so set the direction to 0 since the sprite is the same as up
 player_drawplayer0:
     ld e,a                      ; store in e
+    ld a,(player+11)             ; get the dying flag
+    cp 1
+    jp z,player_drawplayer3     ; if it's one, we're being crushed
     ld a,(player+6)             ; get the dig flag
     cp 1
     jp z,player_drawplayer1    ; get dig frame
+player_drawplayer4:
     ld a,(player+3)             ; this is normal movement so get the current frame
     add a,e
     jp player_drawplayer2
-player_drawplayer1
-    ld a,(player+2)             ; get the current direction again, because want all four
+player_drawplayer3:
+    ld hl,player+12
+    ld a,(hl)                  ; crushing, so get the current anim flag
+    cp 0
+    jp nz,player_drawplayer5    ; if this isn't zero, then this isn't the first time round, so do the crush anim
+    ld a,50
+    ld (hl),a                   ; otherwise, load up the anim frames 
+    jp player_drawplayer4       ; and return to the main loop to remove the current frame
+player_drawplayer5:
+    dec a 
+    ld (hl),a
+    cp 0
+    call z,player_killplayer    ; final animation, so kill the player
+    and 1                       ; check for odd
+    add 10                      ; add 10, to get either 10 or 11
+    jp player_drawplayer2
+player_drawplayer1:
+    ld a,(player+2)             ; digging, get the current direction again, because want all four
     add a,6                     ; add direction to 6 to get frame    
-player_drawplayer2
+player_drawplayer2:
     rlca
     rlca
     rlca                        ; multiply by eight

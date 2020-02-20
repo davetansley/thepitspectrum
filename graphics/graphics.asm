@@ -44,6 +44,8 @@ player_sprite:
 	defb	 2,135, 66,191, 79,143, 25,  3  ; 7 shoot left
 	defb	 64,225, 66,253,242,241,152,192 ; 8 shoot right
 	defb	 250,191, 58,120, 72,  8, 20, 42 ; 9 shoot down
+	defb 	 146,186,148,120, 56,120, 68,195 ; 10 crushed 1
+	defb	  73, 93, 41, 30, 28, 30, 34,195 ; 11 crushed 2
 
 ;
 ; First 4 top half, next 4 bottom 1, next 4 bottom 2

@@ -202,7 +202,7 @@ rocks_checkforplayer:
     sub b                ; subtract rock coord 
     add 7                ; add max distance
     cp 13                ; compare to 13? if carry flag set, they've hit
-    call c, player_killplayer ; if so, jump out
+    call c, player_crushplayer ; if so, jump out
     ret
 
 ;
