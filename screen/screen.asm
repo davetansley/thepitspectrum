@@ -2,7 +2,7 @@ screen_offset:
     defb 0                      ; offset from top of screen in lines
 
 screen_tmp:
-    defb 0                      ; temporary memory
+    defb 0,0                      ; temporary memory
 
 screen_setscorecolours:
     ld hl,score_colours

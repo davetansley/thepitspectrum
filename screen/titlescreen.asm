@@ -76,14 +76,12 @@ titlescreen_alt_setcolours0:
 ;
 titlescreen_init:
 ; We want a black screen.
-    ;call $0D6B
     ld a,11             ; magenta ink (7) on blue paper (0),
                         ; bright (64).
     call utilities_clearscreen
     ld (23693),a        ; set our screen colours.
     ld a,1              ; 2 is the code for red.
     out (254),a         ; write to port 254.
-    ;call 3503           ; ROM routine - clears screen, opens chan 2.
     
     ld hl,string_titlescreen_copyright
     call string_print
@@ -95,16 +93,13 @@ titlescreen_init:
 ;
 titlescreen_alt_init:
 ; We want a black screen.
-    ;call $0D6B
     ld a,71             ; white ink (7) on black paper (0),
                         ; bright (64).
     call utilities_clearscreen
     ld (23693),a        ; set our screen colours.
     ld a,0              ; 2 is the code for red.
     out (254),a         ; write to port 254.
-    ;call 3503           ; ROM routine - clears screen, opens chan 2.
     
-
     ret
 
 ;

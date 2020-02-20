@@ -65,3 +65,11 @@ game_incrementframe0:
 game_getcurrentframe:
     ld a,(game_framenumber)
     ret
+
+;
+; Resets current frame
+;
+game_resetcurrentframe:
+    ld hl,game_framenumber
+    ld (hl),0
+    ret

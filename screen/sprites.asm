@@ -111,5 +111,5 @@ sprites_scadd:
 
 dispx   defb 0           ; general-use coordinates.
 dispy   defb 0      
-sprtmp  defb 0           ; sprite temporary address.
+sprtmp  defb 0,0           ; sprite temporary address.
 

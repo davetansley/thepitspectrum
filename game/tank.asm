@@ -24,6 +24,10 @@ tank_current_coords:
 tank_init:
     ld bc,(tank_initpos)
     ld (tank_initpos2),bc       ; save the initial position for later use
+    ld hl,tank_frame
+    ld (hl),0
+    ld hl,tank_anim
+    ld (hl),17                  ; reset tank
     ret
 
 ;

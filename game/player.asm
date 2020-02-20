@@ -40,6 +40,28 @@ player_init_lifestart:
     ret
 
 ;
+; Finalises a player at end of a life
+; Copy lives, copy score
+;
+player_lifeend:
+    ld bc,player+9
+    ld a,(bc)
+    ld bc,player1_lives
+    ld (bc),a
+    ret
+
+;
+; Player just died, subtract a life
+;
+player_died:
+    ld bc,player+9
+    ld a,(bc)
+    dec a
+    ld (bc),a
+    call player_lifeend
+    ret
+
+;
 ; Player lives
 ;
 player1_lives:
