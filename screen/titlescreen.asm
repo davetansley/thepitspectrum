@@ -49,26 +49,22 @@ titlescreen_alt_drawtitle:
     call string_print
     ld hl,string_alttitlescreen_3
     call string_print
+    ld b,32
     ld a,67
     ld de,22528                         ; top row attrs here 
-    call titlescreen_alt_setcolours
+    call screen_setcolours
+    ld b,32
     ld a,70
     ld de,22528+416                     ; 13th row attrs here 
-    call titlescreen_alt_setcolours
+    call screen_setcolours
+    ld b,32
     ld a,67
     ld de,22528+544                         ; 17th row attrs here 
-    call titlescreen_alt_setcolours
+    call screen_setcolours
+    ld b,32
     ld a,66
     ld de,22528+672                         ; 21st row attrs here 
-    call titlescreen_alt_setcolours
-    ret
-
-titlescreen_alt_setcolours:
-    ld b,32                     
-titlescreen_alt_setcolours0:
-    ld (de),a
-    inc de
-    djnz titlescreen_alt_setcolours0
+    call screen_setcolours
     ret
 
 ;

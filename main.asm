@@ -25,6 +25,7 @@
     include "screen\sprites.asm"
     include "screen\titlescreen.asm"
     include "screen\lifescreen.asm"
+    include "screen\gameover.asm"
 
     include "leveldata\level01.asm"
     include "graphics\graphics.asm"
@@ -79,7 +80,7 @@ mloop:
     ld hl,player+9        ; check lives remaining
     ld a,(hl)
     cp 0
-    jp z,main_titlescreen   ; leave the loop if we're done
+    jp z,main_gameover   ; leave the loop if we're done
     jp main_lifestart
 
 main_loop_processing:
@@ -95,6 +96,10 @@ main_loop_processing:
     call game_incrementframe    ; increment the game frame
     
     ret
+
+main_gameover:
+    call gameover_draw          ; show the game over screen
+    jp main_titlescreen         ; go back to title
 
 ;===========================================================================
 ; Stack. 

@@ -14,28 +14,31 @@ lifescreen_draw:
 
     ld a,(player+9)                       ; get the current player lives
     add 48                                ; add 48 to get the character
-    ld hl,string_lifescreen_lives+2
-    ld (hl),a                             ; load this to the string we're about to show
-    
+    cp 49
+    jp nz,lifescreen_draw0
+    ld hl,string_lifescreen_lastman 
 
+    ld b,8
+    ld a,10                                ; set red
+    ld de,22528+108                        ; attrs here 
+    call screen_setcolours
+
+    jp lifescreen_draw1
+lifescreen_draw0:
+    ld hl,string_lifescreen_lives+2       ; not last man, so use the normal view
+    ld (hl),a                             ; load this to the string we're about to show
     ld hl,string_lifescreen_lives
+lifescreen_draw1:
     call string_print
 
     ld a,134
     ld de, 22528+11     ; get the colour for the top text
-    call lifescreen_alt_setcolours
+    ld b,10
+    call screen_setcolours
 
     ld a,100                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
 
-    ret
-
-lifescreen_alt_setcolours:
-    ld b,10                     
-lifescreen_alt_setcolours0:
-    ld (de),a
-    inc de
-    djnz lifescreen_alt_setcolours0
     ret
 
 ;

@@ -89,6 +89,20 @@ screen_setuptext:
     call string_print
     call screen_setscorecolours
     ret
+
+;
+; Sets a line of colours
+; Inputs:
+; a - colour to set
+; b - number to set
+; de - start memory location
+;
+screen_setcolours: 
+    ld (de),a
+    inc de
+    djnz screen_setcolours
+    ret
+
 ;
 ; Draw initial object positions
 ; Inputs:

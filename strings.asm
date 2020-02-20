@@ -3,7 +3,7 @@ string_score1:
 string_scorenumbers1:
     defb 4,1,'000000',255  
 string_company:
-    defb 14,0,'ENV',255
+    defb 15,0,'ENV',255
 string_credits:
     defb 12,1,'PLAYER 1',255
 string_score2: 
@@ -41,6 +41,17 @@ string_lifescreen_player:
     defb 11,0,' PLAYER 1 ',255
 string_lifescreen_lives:
     defb 11,3,48,' MEN LEFT',255
+string_lifescreen_lastman:
+    defb 12,3,'LAST MAN',255
+
+string_gameoverscreen_gameover:
+    defb 12,6,'GAME OVER',255
+string_gameoverscreen_copyright:
+    defb 5,18,127,' 1982 AW ZILEC ELC LTD',255
+string_gameoverscreen_bestscores:
+    defb 7,22,'BEST SCORES TODAY',255
+string_gameover_credits:
+    defb 12,1,'CREDITS 0',255
 
 ;
 ; Prints specified string
