@@ -87,7 +87,7 @@ utilities_clearscreen:
 
     ld hl,22528         ; attr
     ld de,22529         ; attr+1
-    ld bc,768
+    ld bc,767
     ld (hl),a 
     ldir 
     ret
