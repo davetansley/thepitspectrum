@@ -63,6 +63,8 @@ gameover_enterhighscores:
     ld hl,scores_table
     add hl,de                               ; load memory into hl
     ex af,af'
+    ld b,15
+    call utilities_pauseforframes           ; pause for a little bit
     ld b,3                                  ; collect three chars
 gameover_draw2:
     push bc
@@ -99,7 +101,6 @@ gameover_enterhighscores_init0:
     ld hl,string_highscore_player2
 gameover_enterhighscores_init1:
     call string_print
-
     ld b,96
     ld a,67
     ld de,22528+160                         ; attrs here 

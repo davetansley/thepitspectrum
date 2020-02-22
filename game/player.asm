@@ -9,6 +9,7 @@ player:
     defb    0                   ; lives remaining (+9)
     defb    0                   ; died this life (+10)
     defb    0,0                 ; crushed (+11), frames (+12)
+    defb    0                   ; can finish level, whether can finish level or not (+13)
 
 ;
 ; Initializes a player at start of game
@@ -38,29 +39,19 @@ player_init_gamestart1:
 ; Copy initial coords, copy lives, copy score
 ;
 player_init_lifestart:
+    ld hl,player+5
+    ld b,9                      ; initialise 9 properties
+player_init_lifestart2:
+    ld (hl),0
+    inc hl
+    djnz player_init_lifestart2
+
     ld bc,(init_coord)
     ld (player),bc
     ld bc,player+9
     ld a,(player1_lives)
     ld (bc),a
-    ld bc,player+10
-    ld a,0
-    ld (bc),a
-    ld bc,player+11         ; crushed
-    ld a,0
-    ld (bc),a
-    ld bc,player+12         ; crush count
-    ld a,0
-    ld (bc),a
-    ld bc,player+2         ; frame
-    ld a,2
-    ld (bc),a
-    ld bc,player+6         ; frame
-    ld a,0
-    ld (bc),a
-    ld bc,player+5         ; automove
-    ld a,0
-    ld (bc),a
+    
     call diamonds_init      ; initialise gems
 
     ld bc,6
@@ -85,7 +76,13 @@ player_lifeend:
     ld a,(bc)
     ld bc,player1_lives
     ld (bc),a
+    call player_recordcurrentscore
+    ret
 
+;
+; Copies the current score in the current
+;
+player_recordcurrentscore:
     ld bc,6                  ; copy current score back to correct player
     ld hl,scores_current+2
     ld a,(game_currentplayer)
@@ -269,4 +266,24 @@ player_storeupdatedlines:
     inc a 
     inc a 
     call buffer_marklineforupdate  ; store line beneath   
+    ret
+
+;
+; Called if the player has collected a diamond. Checks the current coord. If it is the start coord, then return complete
+; Outputs:
+; a - 1 for completed level
+player_checkforexit:
+    ld bc,(player)                 ; get player coords
+    ld de,(init_coord)             ; get start coords
+    ld a,b
+    cp d                         ; compare horiz
+    jp nz,player_checkforexit1
+    ld a,c
+    cp e                        ; compare vert
+    jp nz,player_checkforexit1
+player_checkforexit0:
+    ld a,1                       ; hasn't completed
+    ret
+player_checkforexit1:
+    ld a,0                       ; has completed
     ret

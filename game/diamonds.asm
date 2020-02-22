@@ -57,12 +57,11 @@ diamonds_collect:
     dec hl
     ld bc,(hl)                      ; get the coords
     call screen_getscreencoordsfromcharcoords ; get the screen coords into bc
-    ld de,(diamonds_tmp)
+    ld de,(diamonds_tmp)            ; tmp stores the offset for this type of gem
     ld d,0
     ld hl,sprites
     add hl,de
     call sprites_drawsprite     ; call the routine to draw the sprite
-    ;call screen_showchar
     pop hl
     ex af,af'
     ld a,70
@@ -71,6 +70,12 @@ diamonds_collect:
     ld a,(diamonds_score)
     ld b,a
     call scores_addthousands
+    ld a,(diamonds_tmp)
+    cp 64                       ; check the gem type offset, if its 64 this is a diamond, so mark the level as completable
+    jp nz,diamonds_collect0      
+    ld hl,player+13
+    ld (hl),1                   ; mark the player as able to complete the level
+diamonds_collect0:  
     exx
     ret
 

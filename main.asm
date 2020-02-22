@@ -26,6 +26,7 @@
     include "screen\titlescreen.asm"
     include "screen\lifescreen.asm"
     include "screen\gameover.asm"
+    include "screen\endlevel.asm"
 
     include "leveldata\level01.asm"
     include "graphics\graphics.asm"
@@ -66,21 +67,36 @@ main_lifestart:
     call tank_init
     call diamonds_init  
 
-    
 mloop:    
     halt 
     call main_loop_processing
 
+    ;
+    ; Check if the player died
+    ;
     ld hl,player+10
     ld a,(hl)                   ; check if the player died this frame
     cp 1
-    jp nz,mloop
+    jp nz,mloop0
     call player_died        ; do end of life housekeeping
     ld hl,player+9        ; check lives remaining
     ld a,(hl)
     cp 0
     jp z,main_gameover   ; leave the loop if we're done
-    jp main_lifestart
+
+mloop0:
+    ;
+    ; Check if the player completed the level
+    ;
+    ld hl,player+13
+    ld a,(hl)
+    cp 1 
+    jp nz,mloop
+    call player_checkforexit
+    cp 1                        ; look at return, if 1, level has been completed
+    jp z,main_endlevel          ; jump to level transition screen
+    jp mloop                ; start the loop again
+
 
 main_loop_processing:
     call buffer_buffertoscreen  ; copy buffer to screen
@@ -99,6 +115,11 @@ main_loop_processing:
 main_gameover:
     call gameover_draw          ; show the game over screen
     jp main_titlescreen         ; go back to title
+
+main_endlevel:
+    call player_recordcurrentscore
+    call endlevel_draw          ; show the end level screen
+    jp main_lifestart           ; start a new life
 
 ;===========================================================================
 ; Stack. 

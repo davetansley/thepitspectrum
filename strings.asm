@@ -69,6 +69,23 @@ string_highscore_place3:
     defb 6,12,'THE 3RD BEST SCORE',255
 string_highscore_pleaseenter
     defb 3,15,'RECORD YOUR INITIALS BELOW',255
+
+string_endlevel_youhaveearned:
+    defb 8,11,'YOU HAVE EARNED',255
+string_endlevel_bonus1:
+    defb 9,13,'SINGLE BONUS',255
+string_endlevel_bonus2:
+    defb 9,13,'DOUBLE BONUS',255
+string_endlevel_bonus3:
+    defb 9,13,'TRIPLE BONUS',255
+string_endlevel_points1:
+    defb 10,15,'5000 POINTS',255
+string_endlevel_points2:
+    defb 9,15,'10000 POINTS',255
+string_endlevel_points3:
+    defb 9,15,'15000 POINTS',255
+string_endlevel_anothergo:
+    defb 8,18,'HAVE ANOTHER GO',255
 ;
 ; Prints specified string
 ; Inputs:
