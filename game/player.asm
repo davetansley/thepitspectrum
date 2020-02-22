@@ -50,6 +50,9 @@ player_init_lifestart:
     ld bc,player+6         ; frame
     ld a,0
     ld (bc),a
+    ld bc,player+5         ; automove
+    ld a,0
+    ld (bc),a
     call diamonds_init      ; initialise gems
     ret
 
@@ -132,7 +135,7 @@ player_drawplayer3:
     ld a,(hl)                  ; crushing, so get the current anim flag
     cp 0
     jp nz,player_drawplayer5    ; if this isn't zero, then this isn't the first time round, so do the crush anim
-    ld a,50
+    ld a,100
     ld (hl),a                   ; otherwise, load up the anim frames 
     jp player_drawplayer4       ; and return to the main loop to remove the current frame
 player_drawplayer5:
@@ -140,6 +143,26 @@ player_drawplayer5:
     ld (hl),a
     cp 0
     call z,player_killplayer    ; final animation, so kill the player
+    cp 20                        ; check if we should move the rock
+    jp nz,player_drawplayer8
+    exx 
+    ex af,af'
+    ld bc,(rocks_killerrock)    ; get the coords of the rock that killed us
+    ld hl,sprites+72
+    call sprites_drawsprite     ; draw a rock over current 
+    ex af,af'
+    exx
+    jp player_drawplayer6       ; continue drawing player
+player_drawplayer8:
+    cp 20
+    jp nc,player_drawplayer6    ; if not in last 10 frames, draw as normal
+    ld bc,(player)
+    call screen_getattraddressfromscreencoords ; get the attr address into de
+    ld hl,de
+    ld (hl),66
+    ld hl,sprites+72            ; otherwise, player is rock
+    jp player_drawplayer7
+player_drawplayer6:
     and 1                       ; check for odd
     add 10                      ; add 10, to get either 10 or 11
     jp player_drawplayer2
@@ -154,6 +177,7 @@ player_drawplayer2:
     ld h,0  
     ld de,player_sprite
     add hl,de                   ; load hl with the location of the player sprite data
+player_drawplayer7:
     ld bc,(player)              ; load bc with the start coords
     call sprites_drawsprite     ; call the routine to draw the sprite
     call player_storeupdatedlines ; log updated rows

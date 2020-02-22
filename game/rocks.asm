@@ -16,6 +16,12 @@ rocks_tmp2:
     defb 0,0
 
 ;
+; Coords of the rock that killed us
+;
+rocks_killerrock:
+    defb 0,0
+
+;
 ; Checks for a rock that needs to start falling. Takes a memory location of the first line at the bottom of the space.
 ; Checks to see if the pixel row in that location is a rock bottom. If it is, mark this rock as ready to fall.
 ; If the pixel row is not the rock bottom, stop checking.
@@ -202,7 +208,11 @@ rocks_checkforplayer:
     sub b                ; subtract rock coord 
     add 7                ; add max distance
     cp 13                ; compare to 13? if carry flag set, they've hit
-    call c, player_crushplayer ; if so, jump out
+    jp c,rocks_checkforplayer0
+    ret
+rocks_checkforplayer0:
+    ld (rocks_killerrock),bc; store the coords of the killer rock
+    call player_crushplayer ; if so, jump out
     ret
 
 ;

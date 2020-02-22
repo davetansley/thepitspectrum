@@ -46,9 +46,6 @@
 ; banks and jumps to the start loop.
 ;===========================================================================
 main:
-    
-    ; Setup stack
-    ld sp,stack_top
 
     ; Draw the title screen
 main_titlescreen:
@@ -56,7 +53,7 @@ main_titlescreen:
     call player_init_gamestart
 
 main_lifestart:
-  
+
     call player_init_lifestart
     
     call lifescreen_draw        ; show the lives remaining screen
@@ -67,7 +64,9 @@ main_lifestart:
     
     call ship_land              ; land the ship
     call tank_init
-    call diamonds_init   
+    call diamonds_init  
+
+    
 mloop:    
     halt 
     call main_loop_processing

@@ -1,3 +1,6 @@
+diamonds_tmp: 
+    defb 0
+
 ;
 ; Changes the attribute of gem and diamond cells based on the frame count
 ; Inputs:
@@ -47,8 +50,13 @@ diamonds_collect:
     dec hl
     dec hl
     ld bc,(hl)                      ; get the coords
+    call screen_getscreencoordsfromcharcoords ; get the screen coords into bc
+    ld de,(diamonds_tmp)
+    ld d,0
     ld hl,sprites
-    call screen_showchar
+    add hl,de
+    call sprites_drawsprite     ; call the routine to draw the sprite
+    ;call screen_showchar
     pop hl
     ex af,af'
     ld a,70
@@ -68,8 +76,8 @@ diamonds_checkforplayer:
     ld de,(player)       ; get the player coords
     ld a,e               ; get the vert coord first 
     sub b                ; subtract the diamond vertical coord from players 
-    add 8                ; add the max distance
-    cp 15                ; compare to 13? if carry flag set, they've hit
+    add 4                ; add the max distance
+    cp 9                ; compare to max*2+1? if carry flag set, they've hit
     ret nc               ; if not, hasn't hit
     ld a,c               ; multiply c by 8
     rlca 
@@ -78,8 +86,10 @@ diamonds_checkforplayer:
     ld c,a
     ld a,d               ; get the player horiz coord 
     sub c                ; subtract rock coord 
-    add 8                ; add max distance
-    cp 15                ; compare to 13? if carry flag set, they've hit
+    add 4                ; add max distance
+    cp 9                ; compare to max*2+1? if carry flag set, they've hit
+    ret nc
+    ld a,0
     ret
 
 
@@ -87,8 +97,12 @@ diamonds_checkforplayer:
 ; Initialise diamonds and gems
 ; 
 diamonds_twinkle
+    ld hl,diamonds_tmp
+    ld (hl),64         ; store the location the diamond sprite
     ld hl, level01diamonds
     call diamonds_twinkle_type
+    ld hl,diamonds_tmp
+    ld (hl),112         ; store the location the gem sprite
     ld hl, level01gems
     call diamonds_twinkle_type
     ret

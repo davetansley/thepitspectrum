@@ -233,6 +233,51 @@ screen_getattraddressfromscreencoords:
     call screen_getcellattradress   ; work out memory location of current block attributes, memory in de
     ret
 
+
+; Gets the nearest cell coords for a screen coord 
+; Will overwrite bc
+; Inputs:
+; bc - screen coords
+; Outputs:
+; bc - character coords
+;
+screen_getcharcoordsfromscreencoords:
+    ld a,b                          ; get the player block coords of current block
+    and 248                         ; find closest multiple of eight
+    rrca
+    rrca
+    rrca                ; divide by 8
+    ld b,a
+    ld a,c
+    ld c,b                         ; swap b and c
+    and 248
+    rrca
+    rrca
+    rrca                ; divide by 8
+    ld b,a
+    ret
+
+; Gets the screen coords for a cell coord 
+; Will overwrite bc
+; Inputs:
+; bc - char coords
+; Outputs:
+; bc - screen coords
+;
+screen_getscreencoordsfromcharcoords:
+    ld a,b                          ; get the player block coords of current block
+    rlca
+    rlca
+    rlca                ; multiply by 8
+    ld b,a
+    ld a,c
+    ld c,b                         ; swap b and c
+    rlca
+    rlca
+    rlca                ; divide by 8
+    ld b,a
+    ret
+
 ;
 ; Get buffer address for a character at b,c - b vert
 ; Buffer memory is stored as sequential block

@@ -7,6 +7,14 @@
 ; e - 0 if not empty, 1 if empty
 ;
 movement_spaceisempty:
+    push bc
+    push hl
+    call movement_spaceisgem        ; check if space is a gem
+    pop hl
+    pop bc
+    ld a,e 
+    cp 1
+    ret z                           ; if e is 1, space is a gem so can move here, return
     ld a,8                          ; 8 rows to check
 movement_spaceisempty0:
     ex af,af'                       ; store the loop counter
@@ -30,6 +38,63 @@ movement_spaceisempty1:
     ret
 
 ;
+; Check if a space contains a gem
+; Inputs:
+; bc - screen coords
+; Outputs:
+; e = 1 if gem
+movement_spaceisgem:
+    call screen_getcharcoordsfromscreencoords   ; get the char coords we're checking into bc
+    ld hl,level01diamonds           ; check diamonds first
+movement_spaceisgem0:
+    ld de,(hl)                      ; get gem coords into de
+    ld a,e                          ; check for end of data
+    cp 255
+    jp z,movement_spaceisgem1       ; if yes, done with diamonds
+    inc hl 
+    inc hl                          ; move to state
+    ld a,(hl)
+    inc hl
+    inc hl
+    inc hl                          ; get to next
+    cp 1                            ; check if collected
+    jp z,movement_spaceisgem0       ; if yes, move to next diamond
+    ld a,e                          ; load e again
+    cp c                            ; otherwise, compare c with e
+    jp nz,movement_spaceisgem0      ; if different, move to next diamond
+    ld a,d                          ; get d coord
+    cp b                            ; compare b with d
+    jp nz,movement_spaceisgem0      ; if different, move to next diamond
+    ld e,1                          ; otherwise, exit with e = 1
+    ret
+movement_spaceisgem1:
+    ld hl,level01gems              ; check gems
+movement_spaceisgem2:
+    ld de,(hl)                      ; get gem coords into de
+    ld a,e                          ; check for end of data
+    cp 255
+    jp z,movement_spaceisgem3       ; if yes, done with gems
+    inc hl 
+    inc hl                          ; move to state
+    ld a,(hl)
+    inc hl
+    inc hl
+    inc hl                          ; get to next
+    cp 1                            ; check if collected
+    jp z,movement_spaceisgem2       ; if yes, move to next diamond
+    ld a,e                          ; load e again
+    cp c                            ; otherwise, compare c with e
+    jp nz,movement_spaceisgem2      ; if different, move to next gem
+    ld a,d                          ; get d coord
+    cp b                            ; compare b with d
+    jp nz,movement_spaceisgem2      ; if different, move to next gem
+    ld e,1                          ; otherwise, exit with e = 1
+    ret
+movement_spaceisgem3:
+    ld e,0                          ; nothing found, return e = 0
+    ret
+
+;
 ; Checks the line of a cell below is empty - ie, first pixel rows is zero
 ; Inputs: 
 ; hl - memory location of top pixel row
@@ -38,6 +103,14 @@ movement_spaceisempty1:
 ; e - 0 if not empty, 1 if empty
 ;
 movement_linebelowisempty:
+    push bc
+    push hl
+    call movement_spaceisgem        ; check if space is a gem
+    pop hl
+    pop bc
+    ld a,e 
+    cp 1
+    ret z                           ; if e is 1, space is a gem so can move here, return
     ld a,(hl)                       ; get current pixel row
     cp 0
     jp nz, movement_linebelowisempty1    ; row is not empty, can't move here
@@ -58,6 +131,14 @@ movement_linebelowisempty1:
 ; e - 0 if not empty, 1 if empty
 ;
 movement_lineaboveisempty:
+    push bc
+    push hl
+    call movement_spaceisgem        ; check if space is a gem
+    pop hl
+    pop bc
+    ld a,e 
+    cp 1
+    ret z 
     ld a,(hl)                       ; get current pixel row
     cp 0
     jp nz, movement_lineaboveisempty1    ; row is not empty, can't move here
@@ -226,6 +307,9 @@ movement_checkcanmove_down:
     call sprites_scadd              ; get the memory location of cell into de
     ld hl,de                        ; look at cell directly underneath (add 256)
     inc h                       ; memory location of cell beneath now in hl
+    ld a,8                       ; look below
+    add c
+    ld c,a
     call movement_linebelowisempty       ; check space is empty
     ld a,e                          ; check space empty flag
     cp 0
@@ -259,6 +343,7 @@ movement_checkcanmove_up:
     ld hl,de                        ; look at cell directly above (subtract 32)
     ld de,32
     sbc hl,de                       ; memory location of line above now in hl
+    dec c                           ; look above
     call movement_lineaboveisempty       ; check space is empty
     ld a,e                          ; check space empty flag
     cp 0
@@ -292,6 +377,9 @@ movement_checkcanmove_right:
     push bc
     call sprites_scadd              ; get the memory location of cell into de
     ld hl,de                        ; look at cell directly to the right (add 1)
+    ld a,8
+    add b                           ; move one cell right
+    ld b,a
     inc hl                          ; memory location of cell to the right now in hl
     call movement_spaceisempty       ; check space is empty
     ld a,e                          ; check space empty flag
@@ -324,6 +412,10 @@ movement_checkcanmove_left:
     push bc
     call sprites_scadd              ; get the memory location of cell into de
     ld hl,de                        ; look at cell directly to the right (add 1)
+    ld a,b
+    ld b,8
+    sub b                           ; move one cell left
+    ld b,a
     dec hl                          ; memory location of cell to the right now in hl
     call movement_spaceisempty       ; check space is empty
     ld a,e                          ; check space empty flag

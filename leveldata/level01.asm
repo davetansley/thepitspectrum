@@ -119,6 +119,9 @@ level01missiles:
     defb 22,22,0,0,0
     defb 255
 
+;
+; Diamonds: x,y,state,mem1+mem2
+;
 level01diamonds:
     defb 12,27,0,0,0
     defb 16,27,0,0,0
