@@ -2,6 +2,12 @@ diamonds_tmp:
     defb 0
 
 ;
+; Holds the number of thousands for the current gem type
+;
+diamonds_score:
+    defb 0
+
+;
 ; Changes the attribute of gem and diamond cells based on the frame count
 ; Inputs:
 ; hl - memory location of gem type
@@ -61,6 +67,11 @@ diamonds_collect:
     ex af,af'
     ld a,70
     ex af,af'                       ; make sure a is in the af we'll use for the attr
+    exx
+    ld a,(diamonds_score)
+    ld b,a
+    call scores_addthousands
+    exx
     ret
 
 ;
@@ -97,10 +108,14 @@ diamonds_checkforplayer:
 ; Initialise diamonds and gems
 ; 
 diamonds_twinkle
+    ld hl,diamonds_score
+    ld (hl),2         ; store the score we'll add   
     ld hl,diamonds_tmp
     ld (hl),64         ; store the location the diamond sprite
     ld hl, level01diamonds
     call diamonds_twinkle_type
+    ld hl,diamonds_score
+    ld (hl),1         ; store the score we'll add
     ld hl,diamonds_tmp
     ld (hl),112         ; store the location the gem sprite
     ld hl, level01gems

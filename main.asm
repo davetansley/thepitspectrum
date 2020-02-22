@@ -91,7 +91,7 @@ main_loop_processing:
     call tank_process           ; prcoess the tank
     call rocks_processrocks     ; process falling rocks
     call diamonds_twinkle       ; make the diamonds twinkle
-
+    call scores_printscore      ; update the score on screen
     call game_incrementframe    ; increment the game frame
     
     ret

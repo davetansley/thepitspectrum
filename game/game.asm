@@ -20,7 +20,7 @@ game_currentplayer:
 ; The default number of lives
 ;
 game_numberlives:
-    defb 4
+    defb 1
 
 ;
 ; Moves to the next player

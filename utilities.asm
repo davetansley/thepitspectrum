@@ -93,3 +93,46 @@ utilities_clearscreen:
     ldir                ;copy bytes
 
     ret
+
+;
+; Wait for a number of frames
+; Inputs:
+; b - number of frames
+utilities_pauseforframes:
+    halt
+    djnz utilities_pauseforframes
+    ret
+
+utilities_readkey:          
+    LD HL,utilties_keymap              ; Point HL at the keyboard list
+    LD D,8                                  ; This is the number of ports (rows) to check
+    LD C,$FE                            ; C is always FEh for reading keyboard ports
+utilities_readkey_0:        
+    LD B,(HL)                               ; Get the keyboard port address from table
+    INC HL                                  ; Increment to list of keys
+    IN A,(C)                                ; Read the row of keys in
+    AND $1F                                     ; We are only interested in the first five bits
+    LD E,5                                  ; This is the number of keys in the row
+utilities_readkey_1:        
+    SRL A                                   ; Shift A right; bit 0 sets carry bit
+    JR NC,utilities_readkey_2   ; If the bit is 0, we've found our key
+    INC HL                                  ; Go to next table address
+    DEC E                                   ; Decrement key loop counter
+    JR NZ,utilities_readkey_1   ; Loop around until this row finished
+    DEC D                                   ; Decrement row loop counter
+    JR NZ,utilities_readkey_0   ; Loop around until we are done
+    AND A                                   ; Clear A (no key found)
+    jp utilities_readkey
+utilities_readkey_2:        
+    LD A,(HL)                               ; We've found a key at this point; fetch the character code!
+    RET
+ 
+utilties_keymap:           
+    defb $FE,"#","Z","X","C","V"
+    defb $FD,"A","S","D","F","G"
+    defb $FB,"Q","W","E","R","T"
+    defb $F7,"1","2","3","4","5"
+    defb $EF,"0","9","8","7","6"
+    defb $DF,"P","O","I","U","Y"
+    defb $BF,"#","L","K","J","H"
+    defb $7F," ","#","M","N","B"

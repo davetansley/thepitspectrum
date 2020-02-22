@@ -67,6 +67,7 @@ screen_draw0:
     ld ix,level01gems           ; gems memory
     call screen_initobjects     ; draw gems
     call screen_setuptext       ; draws text on the screen
+    call scores_printscores     ; print the current scores
     ret
 
 ;

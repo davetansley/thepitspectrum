@@ -11,11 +11,6 @@ player:
     defb    0,0                 ; crushed (+11), frames (+12)
 
 ;
-; Score for the current player
-;
-player_score:
-    defb '000000'
-;
 ; Initializes a player at start of game
 ; Copy initial coords, copy lives, copy score
 ;
@@ -23,6 +18,19 @@ player_init_gamestart:
     ld a,(game_numberlives)
     ld (player1_lives),a
     ld (player2_lives),a                        ; set the initial number of lives at game start
+
+    ld hl,player1_score+2
+    ld b,6
+player_init_gamestart0:
+    ld (hl),48
+    inc hl
+    djnz player_init_gamestart0                 ; zero out player 1 score
+    ld hl,player2_score+2
+    ld b,6
+player_init_gamestart1:
+    ld (hl),48
+    inc hl
+    djnz player_init_gamestart1                 ; zero out player 2 score
     ret
 
 ;
@@ -54,6 +62,18 @@ player_init_lifestart:
     ld a,0
     ld (bc),a
     call diamonds_init      ; initialise gems
+
+    ld bc,6
+    ld de,scores_current+2
+    ld a,(game_currentplayer)
+    cp 1
+    jp nz,player_init_lifestart0
+    ld hl,player1_score+2
+    jp player_init_lifestart1
+player_init_lifestart0:
+    ld hl,player2_score+2
+player_init_lifestart1:
+    ldir
     ret
 
 ;
@@ -65,6 +85,18 @@ player_lifeend:
     ld a,(bc)
     ld bc,player1_lives
     ld (bc),a
+
+    ld bc,6                  ; copy current score back to correct player
+    ld hl,scores_current+2
+    ld a,(game_currentplayer)
+    cp 1
+    jp nz,player_lifeend0
+    ld de,player1_score+2
+    jp player_lifeend1
+player_lifeend0:
+    ld de,player2_score+2
+player_lifeend1:
+    ldir
     ret
 
 ;
@@ -90,9 +122,9 @@ player2_lives:
 ; Player scores
 ;
 player1_score:
-    defb '000000'
+    defb 4,1,'000000',255
 player2_score:
-    defb '000000'
+    defb 22,1,'000000',255
 
 ;
 ; Kills a player this life

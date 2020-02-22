@@ -3,7 +3,7 @@ string_score1:
 string_scorenumbers1:
     defb 4,1,'000000',255  
 string_company:
-    defb 15,0,'ENV',255
+    defb 14,0,'ENV',255
 string_credits:
     defb 12,1,'PLAYER 1',255
 string_score2: 
@@ -53,6 +53,22 @@ string_gameoverscreen_bestscores:
 string_gameover_credits:
     defb 12,1,'CREDITS 0',255
 
+string_highscore_congratulations:
+    defb 8,5,'CONGRATULATIONS',255
+string_highscore_player1:
+    defb 12,7,'PLAYER 1',255
+string_highscore_player2:
+    defb 12,7,'PLAYER 2',255    
+string_highscore_youhaveearned:
+    defb 8,10,'YOU HAVE EARNED',255
+string_highscore_place1:
+    defb 6,12,'THE GREATEST SCORE',255
+string_highscore_place2:
+    defb 6,12,'THE 2ND BEST SCORE',255
+string_highscore_place3:
+    defb 6,12,'THE 3RD BEST SCORE',255
+string_highscore_pleaseenter
+    defb 3,15,'RECORD YOUR INITIALS BELOW',255
 ;
 ; Prints specified string
 ; Inputs:
