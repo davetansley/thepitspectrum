@@ -47,11 +47,12 @@ rocks_addrocktofalling:
     ld b,4              ; number of possible falling rocks
 rocks_addrocktofalling0:
     inc de
-    inc de
+    ;inc de
     inc de              ; move three along to get the state
     ld a,(de)           ; load the state
     cp 0                ; check if this is not falling
     jp nz,rocks_addrocktofalling1 ; continue the loop if not 0
+    inc de              ; move to frame
     ld a,16             ; load the number of frames to wobble
     ld (de),a
     dec de              ; move de back to state
@@ -67,6 +68,7 @@ rocks_addrocktofalling0:
     push bc
     jp rocks_addrocktofalling2 ; done
 rocks_addrocktofalling1:
+    inc de
     inc de              ; move memory along to next rock
     djnz rocks_addrocktofalling0 ; try the next rock
 rocks_addrocktofalling2: ; done, return
@@ -222,23 +224,27 @@ rocks_checkforplayer0:
 ; ix - memory location of current rock in rock list, currently at the 4th position (wobble count)
 ; a - wobble frame
 rocks_wobble:
-    ld a,(rocks_tmp)    ; get the frame toggle
+    ld a,(ix)           ; get the wobble count, which we'll use as frame toggle
+    and 1               ; is it odd or even, gets 1 or 0
     ld e,9              ; this is the rock frame
     add a,e             ; add the frame toggle
     push bc
     call screen_getblock     ; get the memory into hl
     call sprites_drawsprite  ; draw the sprite - over the top of the current one
-    ld a,(rocks_tmp)    ; get the frame toggle against
-    xor 1               ; flip to other state
-    ld (rocks_tmp),a    ; store
+    
+    ld a,(ix)           ; get the frame toggle again
+    dec a               ; decrease
+    ld (ix),a           ; store
+    
+    and 1
     ld e,9              ; this is the rock frame
     add a,e             ; add the frame toggle
     call screen_getblock     ; get the memory into hl
+    
     pop bc
     call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
+    
     ld a,(ix)           ; get the wobble count back
-    dec a               ; decrease
-    ld (ix),a           ; store
     cp 0
     ret nz              ; if we're not at zero, return
     dec ix              ; otherwise look to state location
