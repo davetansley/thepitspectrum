@@ -357,3 +357,61 @@ screen_getattr:
     ld hl,sprite_attrs          ; address of block attributes.
     add hl,de                   ; point to attribute.
     ret
+
+;
+; Checks whether a character block has anything in it
+; Inputs:
+; bc - char coords
+; Outputs:
+; a - 1, empty
+screen_ischarempty:
+    call screen_getbufferaddress ; get the current screen buffer pointer
+    ld b,8                      ; check 8 rows
+screen_ischarempty2:
+    ld a,(de)                   ; check line
+    cp 0
+    jp nz,screen_ischarempty1   ; if not zero, jump out with false
+    ld hl,32
+    add hl,de
+    ld de,hl                    ; move to next row
+    djnz screen_ischarempty2
+screen_ischarempty0:
+    ld a,1
+    ret
+screen_ischarempty1:
+    ld a,0
+    ret
+
+;
+; Copies a block from one place to another directly underneath, leaves the original empty
+; Inputs:
+; bc - coords of block to copy from
+screen_copyblockdown
+    call screen_getbufferaddress ; get the current screen buffer pointer for source
+    ld b,8                      ; copy 8 rows
+screen_copyblock0:
+    ld a,(de)                    ; get what we're copying
+    ex af,af'
+    ld a,0
+    ld (de),a                    ; replace with empty
+    ex af,af'
+    inc d                        ; add 256 to get to the next row
+    ld (de),a                    ; copy to the next row
+    dec d
+    ld hl,32
+    add hl,de                       ; return back to source, next row down
+    ld de,hl
+    djnz screen_copyblock0
+    ret
+
+;
+; Returns the first byte of a character. Useful for figuring out what's there
+; Inputs:
+; bc - coords
+; Outputs:
+; a - first byte
+;
+screen_getcharfirstbyte:
+    call screen_getbufferaddress ; get the current screen buffer pointer for source
+    ld a,(de)
+    ret

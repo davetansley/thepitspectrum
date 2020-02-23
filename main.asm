@@ -99,12 +99,14 @@ mloop0:
 
 
 main_loop_processing:
+
     call buffer_buffertoscreen  ; copy buffer to screen
     call buffer_clearlist       ; zero the updated lines list
     call player_drawplayer      ; delete player
     call control_keyboard       ; check keyboard
     call player_drawplayer      ; draw player
     call tank_process           ; prcoess the tank
+    call ship_process           ; proces the ship
     call rocks_processrocks     ; process falling rocks
     call diamonds_twinkle       ; make the diamonds twinkle
     call scores_printscore      ; update the score on screen

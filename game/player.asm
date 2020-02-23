@@ -139,6 +139,10 @@ player_crushplayer:
     ld (hl),1
     ret
 
+player_tankkillplayer
+    ld hl,player+11             ; mark as tanked
+    ld (hl),2
+    ret
 ;
 ; Draws the player at the current position or deletes them
 ;

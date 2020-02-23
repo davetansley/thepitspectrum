@@ -15,10 +15,16 @@ sprites:
 	defb    153,219,126, 36,255,126, 60, 24   ; 12, missile
     defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 13, sky block, tank background
 	defb    0,  0,  0,  0,  0, 60, 90, 52     ; 14, gem
+	defb	253,254,253,254,253,254,253,254   ; 15, damaged mountain
+	defb	244,248,244,248,244,248,244,248   ; 16, damaged mountain 2
+	defb	208,224,208,224,208,224,208,224   ; 17, damaged mountain 3
+	defb	 64,128, 64,128, 64,128, 64,128   ; 18, damaged mountain 4
+	defb	0,  0,  0,237,237,  0,  0,  0	  ; 19, tank missile
+
     
 sprite_attrs:
     defb    070 ; 0, space
-    defb    101 ; 1, cyan block
+    defb    077 ; 1, cyan block
     defb    077 ; 2, slope left
     defb    077 ; 3, slope right
     defb    070 ; 4, dirt
@@ -32,6 +38,10 @@ sprite_attrs:
 	defb    067 ; 12, missile
     defb    074 ; 13, sky, red ink (tank)
     defb    070 ; 14, gem
+    defb    077 ; 15, damaged mountain
+    defb    077 ; 16, damaged mountain 2
+    defb    077 ; 17, damaged mountain 3
+    defb    077 ; 18, damaged mountain 4
 
 player_sprite:
 	defb	 16, 57,146,252, 56, 61,195,128 ; 0 up/down 1
@@ -76,4 +86,4 @@ tank_sprite:
 	defb	255,255, 22, 82, 84, 22,255,255
 	defb	255,255,168,169,155,168,255,255
 	defb	252,254,143,175,159,175,254,252
-	defb	  0,  0,  0, 31, 31,  0,  0,  0
+	defb	  0,  0,  0, 31, 31,  0,  0,  0 ; +64

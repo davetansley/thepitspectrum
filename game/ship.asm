@@ -16,6 +16,17 @@ ship_current_sprite:
 ship_current_coords:
     defb 0,0
 
+ship_process:
+    ld a,(player+11)
+    cp 2                        ; has the player been killed by tank?
+    ret nz                      ; do nothing if not
+    call control_scroll_up           ; make sure the screen is on the top screen
+    call ship_takeoff           ; bye bye
+    call player_killplayer      ; killed
+    ld b,50
+    call utilities_pauseforframes
+    ret
+
 ;
 ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
 ;
@@ -69,6 +80,34 @@ ship_land2:
     ld e,1                      ; set e to 1 to indicate >1 time
     pop bc
     djnz ship_land3             ; repeat for vertical movement
+    ret
+
+;
+;   Take off the ship
+;
+ship_takeoff:
+    ld e,1                      ; store a flag to track first time round
+    ld b,8                      ; move up 8 pixels
+ship_takeoff0:
+    push bc
+    ld a,e
+    push de                     ; store de for next time round
+    cp 1                        ; check first time flag
+    jp nz,ship_takeoff1             ; don't draw over previous one if first time
+    ld bc,(ship_initpos2)       ; get the current coords
+    call ship_draw_full         ; delete old one
+    call ship_change_frame      ; increment the frame
+    ld bc,(ship_initpos2)       ; get the current coords
+    dec c                       ; move up one pixels
+    ld (ship_initpos2),bc
+ship_takeoff1:
+    call ship_draw_full         ; draw the ship
+    call ship_draw_screen
+    pop de
+    ld e,1
+    pop bc
+    djnz ship_takeoff0             ; repeat for upward movement
+    ; done moving up
     ret
 
 ;
