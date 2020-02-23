@@ -118,7 +118,7 @@ rocks_processrocks1:
 ; bc - coords
 ;
 rocks_storeupdatedlines:
-    ld a,c                  ; get the player block coords of current block
+    ld a,c                  ; get the rock block coords of current block
     and 248                 ; find closest multiple of eight
     rrca
     rrca

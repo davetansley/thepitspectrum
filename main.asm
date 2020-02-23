@@ -83,7 +83,7 @@ mloop:
     ld a,(hl)
     cp 0
     jp z,main_gameover   ; leave the loop if we're done
-
+    jp main_lifestart    ; otherwise, start a new life
 mloop0:
     ;
     ; Check if the player completed the level

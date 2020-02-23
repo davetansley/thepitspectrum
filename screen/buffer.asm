@@ -18,6 +18,8 @@ buffer_updateall:
 ; Inputs:
 ; a - row number
 buffer_marklineforupdate:
+    cp 21
+    ret nc                          ; dont store lines that we shouldn't draw
     ld e,a                          ; store in e
     ld b,21
     ld hl,buffer_updatedlines
