@@ -46,6 +46,13 @@ player_init_lifestart2:
     inc hl
     djnz player_init_lifestart2
 
+    ld hl,player+2              ; initialise some properties
+    ld (hl),2
+    inc hl 
+    ld (hl),0
+    inc hl
+    ld (hl),1
+
     ld bc,(init_coord)
     ld (player),bc
     ld bc,player+9
