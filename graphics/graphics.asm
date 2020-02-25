@@ -12,7 +12,7 @@ sprites:
     defb    60,126,255,127,254,254,255,126    ; 9, rock	
 	defb	126,255,127,127,254,255,126, 60    ; 10, rock 2
     defb    0  ,  0,  0,  0,  0,  0,255,255   ; 11, sky block, pixel trapdoor
-	defb    153,219,126, 36,255,126, 60, 24   ; 12, missile
+	defb    153,219,126, 36,255, 66, 36, 24   ; 12, missile
     defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 13, sky block, tank background
 	defb    0,  0,  0,  0,  0, 60, 90, 52     ; 14, gem
 	defb	253,254,253,254,253,254,253,254   ; 15, damaged mountain
@@ -20,6 +20,7 @@ sprites:
 	defb	208,224,208,224,208,224,208,224   ; 17, damaged mountain 3
 	defb	 64,128, 64,128, 64,128, 64,128   ; 18, damaged mountain 4
 	defb	0,  0,  0,237,237,  0,  0,  0	  ; 19, tank missile
+	defb    153,219,126, 36,255,126, 60, 24   ; 20, missile active
 
     
 sprite_attrs:
@@ -42,6 +43,9 @@ sprite_attrs:
     defb    077 ; 16, damaged mountain 2
     defb    077 ; 17, damaged mountain 3
     defb    077 ; 18, damaged mountain 4
+	defb 	000 ; 19, tank missile (not used
+	defb    067 ; 20, missile active
+    
 
 player_sprite:
 	defb	 16, 57,146,252, 56, 61,195,128 ; 0 up/down 1

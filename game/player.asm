@@ -11,6 +11,44 @@ player:
     defb    0,0                 ; crushed (+11), frames (+12)
     defb    0                   ; can finish level, whether can finish level or not (+13)
 
+player_location:
+    defb 0                      ; 0 normal, 1 diamond cavern, 2 the pit
+
+;
+; Works out which part of the screen the player is in
+; Pit is between 3,9 and 8,9
+; Diamond cavern is between 11,22 and 22,28
+;
+player_getlocation:
+    ld bc,(player)              ; get screen coords
+    call screen_getcharcoordsfromscreencoords ; get char coords, c horiz
+    ld a,b                      ; check for pit first
+    cp 9                        ; if not on this row, not in the pit
+    jp nz,player_getlocation0
+    ld a,c                      ; check horizontal
+    cp 8
+    jp nc, player_getlocation0  ; if more than 8, not in the pit
+    ld hl,player_location
+    ld (hl),2                   ; load location with 2, the pit
+    ret                         ; done
+player_getlocation0:            ; check for diamond cavern
+    ld a,b                      ; first check vertical
+    cp 22                       ; if above row 22, then not in cavern
+    jp c,player_getlocation1
+    ld a,c                      ; get the horizontal next
+    cp 11
+    jp c,player_getlocation1    ; if less than 11 not in diamond cave
+    cp 22
+    jp nc,player_getlocation1    ; if less than 11 not in diamond cave
+    ld hl,player_location
+    ld (hl),1                   ; load location with 1, the cavern
+    ret  
+player_getlocation1:   
+    ld hl,player_location
+    ld (hl),0                   ; load location with 2, the pit
+    ret                         ; done
+    
+
 ;
 ; Initializes a player at start of game
 ; Copy initial coords, copy lives, copy score

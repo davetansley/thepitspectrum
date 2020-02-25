@@ -42,6 +42,7 @@
     include "game\rocks.asm"
     include "game\scores.asm"
     include "game\diamonds.asm"
+    include "game\missiles.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -64,7 +65,7 @@ main_lifestart:
     call init_start
     call screen_draw
     call buffer_allbuffertoscreen
-    
+    call missiles_init
     call ship_land              ; land the ship
     call tank_init
     call diamonds_init  
@@ -106,12 +107,14 @@ main_loop_processing:
 
     call buffer_buffertoscreen  ; copy buffer to screen
     call buffer_clearlist       ; zero the updated lines list
+    call player_getlocation     ; figure out where the player is
     call player_drawplayer      ; delete player
     call control_keyboard       ; check keyboard
     call player_drawplayer      ; draw player
     call tank_process           ; prcoess the tank
     call ship_process           ; proces the ship
     call rocks_processrocks     ; process falling rocks
+    call missiles_process       ; process missiles
     call diamonds_twinkle       ; make the diamonds twinkle
     call scores_printscore      ; update the score on screen
     call game_incrementframe    ; increment the game frame
