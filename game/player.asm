@@ -182,7 +182,9 @@ player_drawplayer5:
     dec a 
     ld (hl),a
     cp 0
-    call z,player_killplayer    ; final animation, so kill the player
+    call z,player_killplayer     ; final animation, so kill the player
+    cp 10                         ; play the sound
+    call z, sound_rockfell
     cp 20                        ; check if we should move the rock
     jp nz,player_drawplayer8
     exx 

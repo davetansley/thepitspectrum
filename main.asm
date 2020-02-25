@@ -28,6 +28,8 @@
     include "screen\gameover.asm"
     include "screen\endlevel.asm"
 
+    include "sound\sound.asm"
+
     include "leveldata\level01.asm"
     include "graphics\graphics.asm"
 
@@ -79,6 +81,8 @@ mloop:
     cp 1
     jp nz,mloop0
     call player_died        ; do end of life housekeeping
+    ld b,40
+    call utilities_pauseforframes
     ld hl,player+9        ; check lives remaining
     ld a,(hl)
     cp 0

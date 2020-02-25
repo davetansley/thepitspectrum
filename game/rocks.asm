@@ -186,6 +186,7 @@ rocks_fall2:
     call rocks_checkforplayer ; check to see if we hit a player
     inc ix
     inc ix                  ; get ix back to state
+    call rocks_makesound
     ret
 rocks_fall3:
     ld a,0              ; set the state to fell
@@ -195,6 +196,19 @@ rocks_fall3:
     ld hl,de
     ld (hl),66
     jp rocks_fall2      ; rejoin main loop
+
+;
+; Makes the rock sound if we're no longer falling, and if we didn't hit a player
+;
+rocks_makesound:
+    ld a,(ix)           ; get the state
+    cp 0
+    ret nz              ; if we haven't fallen, don't do anything
+    ld hl,player+11
+    ld a,(hl)
+    cp 1
+    call nz, sound_rockfell ; only make sound if didn't kill player
+    ret
 
 ;
 ; Checks to see if the rock is hitting a player

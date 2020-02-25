@@ -76,6 +76,7 @@ diamonds_collect:
     ld hl,player+13
     ld (hl),1                   ; mark the player as able to complete the level
 diamonds_collect0:  
+    call sound_gemcollected
     exx
     ret
 
