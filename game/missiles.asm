@@ -56,7 +56,7 @@ missiles_process:
     ld hl,missiles_count
     ld a,(hl)                   ; get the missiles count
     inc a
-    cp 75                                   ; have we reached the count yet
+    cp 50                                   ; have we reached the count yet
     jp z,missiles_process2                 ; if not, don't activate a new one
     ld (hl),a                               ; store the updated count, and continue without activating
     jp missiles_process0

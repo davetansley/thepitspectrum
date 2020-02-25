@@ -137,31 +137,15 @@ utilties_keymap:
     defb $BF,"#","L","K","J","H"
     defb $7F," ","#","M","N","B"
 
-;
-; Generates a random number
-; Outputs:
-; a - random 8 bit number
-;
-utilities_random:
-    ld hl,(utilities_seed) ; Pointer
-    ld a,h
-    and 31 ; keep it within first 8k of ROM.
-    ld h,a
-    ld a,(hl) ; Get "random" number from location.
-    inc hl ; Increment pointer.
-    ld (utilities_seed),hl
-    ret
-utilities_seed: 
-    defw 0
 
 ;
-; Generates a random number in the range 0 to e
+; Generates a randomish number in the range 0 to e
 ; Inputs:
 ; e - upper value
 ; Outputs:
 ; a - random number
 utilities_randomupper
-    call utilities_random
+    ld a,(game_framenumber)
     ld l,a
     ld h,0
     ld d,0
