@@ -43,6 +43,7 @@
     include "game\scores.asm"
     include "game\diamonds.asm"
     include "game\missiles.asm"
+    include "game\thepit.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -69,6 +70,7 @@ main_lifestart:
     call ship_land              ; land the ship
     call tank_init
     call diamonds_init  
+    call thepit_init
 
 mloop:    
     halt 
@@ -114,6 +116,7 @@ main_loop_processing:
     call tank_process           ; prcoess the tank
     call ship_process           ; proces the ship
     call rocks_processrocks     ; process falling rocks
+    call thepit_process         ; process the pit trap
     call missiles_process       ; process missiles
     call diamonds_twinkle       ; make the diamonds twinkle
     call scores_printscore      ; update the score on screen

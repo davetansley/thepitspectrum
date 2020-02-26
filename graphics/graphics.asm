@@ -7,7 +7,7 @@ sprites:
     defb    85,170, 85,170, 85,170, 85,170    ; 4, dirt
     defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 5, sky block
     defb    255,255,255,255,255,255,255,255   ; 6, slime block
-    defb    255,255,  0,  0,  0,  0,  0,  0   ; 7, trapdoor
+    defb    0  ,0  ,  0,  0,  0,  0,  0,  0   ; 7, for reuse
     defb    24, 44, 78,143,241,114, 52,  24    ; 8, diamond
     defb    60,126,255,127,254,254,255,126    ; 9, rock	
 	defb	126,255,127,127,254,255,126, 60    ; 10, rock 2
@@ -21,6 +21,11 @@ sprites:
 	defb	 64,128, 64,128, 64,128, 64,128   ; 18, damaged mountain 4
 	defb	0,  0,  0,237,237,  0,  0,  0	  ; 19, tank missile
 	defb    153,219,126, 36,255,126, 60, 24   ; 20, missile active
+    defb	255,255,  0,  0,  0,  0,  0,  0	  ; 21, the pit 1
+	defb	252,252,  0,  0,  0,  0,  0,  0	  ; 22, the pit 2
+	defb	240,240,  0,  0,  0,  0,  0,  0	  ; 23, the pit 3
+	defb	192,192,  0,  0,  0,  0,  0,  0	  ; 24, the pit 4
+	defb	0,0,  0,  0,  0,  0,  0,  0	  	  ; 25, the pit 5
 
     
 sprite_attrs:
@@ -45,6 +50,11 @@ sprite_attrs:
     defb    077 ; 18, damaged mountain 4
 	defb 	000 ; 19, tank missile (not used
 	defb    067 ; 20, missile active
+	defb	066	; 21, the pit 1
+	defb	066	; 22, the pit 2
+	defb	066	; 23, the pit 3
+	defb	066	; 24, the pit 4
+	defb	066	; 25, the pit 5
     
 
 player_sprite:
