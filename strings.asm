@@ -86,6 +86,9 @@ string_endlevel_points3:
     defb 9,15,'15000 POINTS',255
 string_endlevel_anothergo:
     defb 8,18,'HAVE ANOTHER GO',255
+
+string_zonk:
+    defb 0,0,'ZONK!',255
 ;
 ; Prints specified string
 ; Inputs:

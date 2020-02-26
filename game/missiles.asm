@@ -16,18 +16,23 @@ missiles_falling:
     defb 0,0,0
 
 ;
+; The coords of the missile that killed us
+;
+missiles_killermissile:
+    defb 0,0
+
+;
 ; Zeroes the state of each missile
 ;
 missiles_init:
     ld b,12
-    ld hl,level01missiles
+    ld ix,level01missiles
 missiles_init0:
-    inc hl
-    inc hl
-    ld (hl),0               ; set the state to zero
-    inc hl
-    inc hl
-    inc hl
+    ld (ix+2),0               ; set the state to zero
+    ld de,5
+    add ix,de
+    ld (ix+2),0
+    add ix,de
     djnz missiles_init0
     ld b,4                  ; reset four falling missiles
     ld hl,missiles_falling
@@ -46,6 +51,12 @@ missiles_init1:
 ; Processes any already falling missiles
 ;
 missiles_process:
+    ld a,(player+11)                        ; check if the player was hit by a missile previously
+    cp 3
+    jp nz,missiles_process3                 ; if not, continue
+    call missiles_zonkplayer
+    ret
+missiles_process3:
     ld a,(player_location)
     cp 1
     jp nz, missiles_process0                ; if not 1 we're not in the cavern so no need to make any more fall
@@ -113,6 +124,10 @@ missiles_fall0:
     ld a,(ix+2)
     cp 0
     jp z,missiles_fall1 ; not falling move to next
+    cp 1                ; is this ready to fall
+    jp z, missiles_fall3
+    jp missiles_fall4   ; if not, decrease the countdown
+missiles_fall3:
     ld bc,(ix)          ; load coords into bc
     call sprites_scadd  ; get the memory of the coords into de 
     inc d               ; add 256 to get next row
@@ -146,6 +161,8 @@ missiles_fall0:
     ld hl,de
     ld (hl),70          ; load this square with the yellow colour
 missiles_fall1:         ; hl at state
+    ld bc,(ix)          ; get coords back
+    call missiles_checkforplayer ; check for player
     inc ix
     inc ix
     inc ix              ; get to next missile
@@ -155,6 +172,10 @@ missiles_fall1:         ; hl at state
 missiles_fall2:
     ld (ix+2),0
     jp missiles_fall1   ; rejoin the loop
+missiles_fall4:
+    dec a               ; decrease the countdown
+    ld (ix+2),a         ; store back
+    jp missiles_fall1   ; do next missile
 
 ;
 ; Stores the updated rows associated with the missiles
@@ -190,8 +211,8 @@ missiles_addmissiletofalling0:
     ld a,(de)           ; load the state
     cp 0                ; check if this is not falling
     jp nz,missiles_addmissiletofalling1 ; continue the loop if not 0
-    ld a,1
-    ld (de),a           ; set the state to falling
+    ld a,25
+    ld (de),a           ; set the state to pre-falling
     dec de              ; move back coords
     pop bc              ; get back coords
     ld a,b
@@ -206,4 +227,54 @@ missiles_addmissiletofalling1:
     djnz missiles_addmissiletofalling0 ; try the next missile
 missiles_addmissiletofalling2: ; done, return
     pop bc              ; to tidy up
+    ret
+
+;
+; Checks to see if the missile is hitting a player
+; Inputs:
+; bc - coords of missile we're checking
+missiles_checkforplayer:
+    ld de,(player)       ; get the player coords
+    ld a,e               ; get the vert coord first 
+    sub c                ; subtract the missile vertical coord from players 
+    cp 8                 ; the missile will only hit a player if the player is directly underneath, so this must be 8
+    ret nz               ; if not, hasn't hit
+    ld a,d               ; get the player horiz coord 
+    sub b                ; subtract missile coord 
+    add 7                ; add max distance
+    cp 13                ; compare to 13? if carry flag set, they've hit
+    jp c,missiles_checkforplayer0
+    ret
+missiles_checkforplayer0:
+    ld (missiles_killermissile),bc; store the coords of the killer missile
+    call player_zonkplayer ; if so, jump out
+    ret
+
+;
+; Player has been hit, so draw text over them and mark as dead
+;
+missiles_zonkplayer:
+    call player_killplayer      ; mark as dead
+    ld bc,(player)              ; get player coords
+    call screen_getcharcoordsfromscreencoords ; get char coords
+    dec c
+    dec c
+    push bc
+    call screen_getcellattradress ; attrs here
+    ld b,5
+    ld a,66
+    call screen_setcolours
+    call buffer_buffertoscreen  ; copy buffer to screen
+    pop bc
+    ld de,(screen_offset)
+    ld a,b
+    sub e
+    ld b,a                      ; subtract the offset
+    inc b
+    inc b                       ; add two for the score rows
+    ld (string_zonk),bc         ; set coords of string
+    ld hl,string_zonk
+    call string_print
+    ld b,20
+    call utilities_pauseforframes ; pause
     ret

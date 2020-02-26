@@ -188,6 +188,12 @@ player_tankkillplayer
     ld hl,player+11             ; mark as tanked
     ld (hl),2
     ret
+
+player_zonkplayer
+    ld hl,player+11             ; mark as zonked (missile)
+    ld (hl),3
+    ret
+
 ;
 ; Draws the player at the current position or deletes them
 ;
