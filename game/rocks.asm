@@ -145,7 +145,7 @@ rocks_fall:
     ld (rocks_tmp2),bc  ; store original coords
     ld a,3              ; move this number of pixels
 rocks_fall1:
-    ex af,af'
+    ld (rocks_tmp),a    ; store loop counter
     ld bc,(ix)          ; get current coords
     call sprites_scadd  ; get the memory of the coords into de 
     inc d               ; add 256 to get next row
@@ -158,18 +158,18 @@ rocks_fall1:
     and 7               ; divisible by 8?
     cp 0
     jp nz,rocks_fall4   ; if not, carry on
-    call screen_getattraddressfromscreencoords ; get the attr address into de
-    ld hl,de
-    ld (hl),66          ; load this square with the yellow colour
+    call screen_getcharcoordsfromscreencoords ; get the char coords into bc
+    ld a,66             ; load red
+    call screen_setattr
     ld bc,(ix)
     ld a,c              ; get vertical
     sub 8               ; look up one square
     ld c,a              ; put a back in c
-    call screen_getattraddressfromscreencoords ; get the attr address into de
-    ld hl,de
-    ld (hl),70          ; load this square with the yellow colour
+    call screen_getcharcoordsfromscreencoords ; get the char coords into bc
+    ld a,70             ; load yellow
+    call screen_setattr
 rocks_fall4:
-    ex af,af'
+    ld a,(rocks_tmp)    ; get the loop counter
     dec a
     cp 0
     jp nz,rocks_fall1   ; do another pixel if needed
@@ -192,9 +192,9 @@ rocks_fall3:
     ld a,0              ; set the state to fell
     ld (ix+2),a           ; store the falling state
     ld bc,(ix)          ; get the coords
-    call screen_getattraddressfromscreencoords ; get the attr address into de
-    ld hl,de
-    ld (hl),66
+    call screen_getcharcoordsfromscreencoords ; get the char coords into bc
+    ld a,66             ; load magenta
+    call screen_setattr
     jp rocks_fall2      ; rejoin main loop
 
 ;

@@ -70,6 +70,83 @@ sprites_drawsprite6:
     jp nz,sprites_drawsprite1 ; not reached bottom of sprite yet to repeat.
     ret                 ; job done.
 
+; Inputs:
+; hl - sprite data
+; bc - screen coords
+;
+sprites_draw2by2sprite7 
+    xor 7               ; complement last 3 bits.
+    inc a               ; add one for luck!
+sprites_draw2by2sprite3 
+    rl d                ; rotate left...
+    rl c                ; ...into middle byte...
+    rl e                ; ...and finally into left character cell.
+    dec a               ; count shifts we've done.
+    jr nz,sprites_draw2by2sprite3 ; return until all shifts complete.
+                        ; Line of sprite image is now in e + c + d, we need it in form c + d + e.
+    ld a,e              ; left edge of image is currently in e.
+    ld e,d              ; put right edge there instead.
+    ld d,c              ; middle bit goes in d.
+    ld c,a              ; and the left edge back into c.
+    jr sprites_draw2by2sprite0 ; we've done the switch so transfer to screen.
+sprites_draw2by2sprite 
+    ld (dispx),bc       ; store coords in dispx for now.
+    ld a,c
+    ld (sprtmp0),a         ; store vertical.
+    push hl
+    call sprites_scadd          ; calculate screen address.
+    pop hl
+    ld a,16             ; height of sprite in pixels.
+sprites_draw2by2sprite1 
+    ex af,af'           ; store loop counter.
+    push de             ; store screen address.
+    ld c,(hl)           ; first sprite graphic.
+    inc hl              ; increment poiinter to sprite data.
+    ld d,(hl)           ; next bit of sprite image.
+    inc hl              ; point to next row of sprite data.
+    ld (sprtmp),hl        ; store in tmp0 for later.
+    ld e,0              ; blank right byte for now.
+    ld a,b              ; b holds y position.
+    and 7               ; how are we straddling character cells?
+    jr z,sprites_draw2by2sprite0 ; we're not straddling them, don't bother shifting.
+    cp 5                ; 5 or more right shifts needed?
+    jr nc,sprites_draw2by2sprite7 ; yes, shift from left as it's quicker.
+    and a               ; oops, carry flag is set so clear it.
+sprites_draw2by2sprite2 
+    rr c                ; rotate left byte right...
+    rr d                ; ...through middle byte...
+    rr e                ; ...into right byte.
+    dec a               ; one less shift to do.
+    jr nz,sprites_draw2by2sprite2 ; return until all shifts complete.
+sprites_draw2by2sprite0 
+    pop hl              ; pop screen address from stack.
+    ld a,(hl)           ; what's there already.
+    xor c               ; merge in image data.
+    ld (hl),a           ; place onto screen.
+    inc hl               ; next character cell to right please.
+    ld a,(hl)           ; what's there already.
+    xor d               ; merge with middle bit of image.
+    ld (hl),a           ; put back onto screen.
+    inc hl              ; next bit of screen area.
+    ld a,(hl)           ; what's already there.
+    xor e               ; right edge of sprite image data.
+    ld (hl),a           ; plonk it on screen.
+    ld a,(sprtmp0)         ; temporary vertical coordinate.
+    inc a               ; next line down.
+    ld (sprtmp0),a         ; store new position.
+    dec hl 
+    dec hl              
+    ld de,32            ; add 32 to get to the next row
+    add hl,de           ; add 32
+sprites_draw2by2sprite6 
+    ex de,hl            ; screen address in de.
+    ld hl,(sprtmp)        ; restore graphic address.
+    ex af,af'           ; restore loop counter.
+    dec a               ; decrement it.
+    jp nz,sprites_draw2by2sprite1 ; not reached bottom of sprite yet to repeat.
+    ret                 ; job done.
+
+
 ;
 ; This routine returns a buffer address for (c, b) in de (c vert).
 ; For example: 0,0 will be at memory offset 0
@@ -112,4 +189,5 @@ sprites_scadd:
 dispx   defb 0           ; general-use coordinates.
 dispy   defb 0      
 sprtmp  defb 0,0           ; sprite temporary address.
+sprtmp0  defb 0,0           ; sprite temporary address.
 

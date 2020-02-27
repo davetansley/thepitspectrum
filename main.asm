@@ -44,6 +44,7 @@
     include "game\diamonds.asm"
     include "game\missiles.asm"
     include "game\thepit.asm"
+    include "game\monster.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -66,11 +67,13 @@ main_lifestart:
     call init_start
     call screen_draw
     call buffer_allbuffertoscreen
+    
     call missiles_init
     call ship_land              ; land the ship
     call tank_init
     call diamonds_init  
     call thepit_init
+    call monster_init
 
 mloop:    
     halt 
@@ -118,6 +121,7 @@ main_loop_processing:
     call rocks_processrocks     ; process falling rocks
     call thepit_process         ; process the pit trap
     call missiles_process       ; process missiles
+    call monster_process        ; process monster
     call diamonds_twinkle       ; make the diamonds twinkle
     call scores_printscore      ; update the score on screen
     call game_incrementframe    ; increment the game frame

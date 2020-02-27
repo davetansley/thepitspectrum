@@ -185,6 +185,28 @@ screen_getcellattradress:
     ret
 
 ;
+; Calculate buffer address offset of attribute for character at (b, c).
+; Inputs:
+; bc: coords
+; Outputs:
+; de: memory location
+;
+screen_getcellattroffset:
+    ld l,c      ; x position.
+    ld h,0      ; 0 h
+    ld de,hl    ; horiz done
+    ld a,b      ; do vert  
+    push de
+    push bc
+    ld de,32  
+    call utilities_multiply
+    pop bc
+    pop de
+    add hl,de
+    ld de,hl    ; vert done
+    ret
+
+;
 ; Calculate buffer address of attribute for character at (b, c).
 ; Inputs:
 ; bc: coords
@@ -342,6 +364,29 @@ screen_getblock:
     ld d,0                      ; no high byte.
     ld hl,sprites               ; address of character blocks.
     add hl,de                   ; point to block.
+    ret
+
+;
+; Set a the attr of a coord
+; Inputs:
+; bc - char coords
+; a - attr
+;
+screen_setattr:
+    push ix
+    push bc
+    ex af, af'
+    call screen_getcellattroffset   ; get offset into de
+    ld hl,buffer_attr_buffer
+    add hl,de                       ; get the memory location    
+    ex af, af'                      ; get attr back
+    ld (hl),a                         ; set the attr 
+    pop bc
+    pop ix
+    ret
+screen_setattr0:
+    pop bc
+    pop ix
     ret
 
 ;

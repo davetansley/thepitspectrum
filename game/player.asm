@@ -243,9 +243,9 @@ player_drawplayer8:
     cp 20
     jp nc,player_drawplayer6    ; if not in last 10 frames, draw as normal
     ld bc,(player)
-    call screen_getattraddressfromscreencoords ; get the attr address into de
-    ld hl,de
-    ld (hl),66
+    call screen_getcharcoordsfromscreencoords ; get the char coords into bc
+    ld a,66             ; load red
+    call screen_setattr
     ld hl,sprites+72            ; otherwise, player is rock
     jp player_drawplayer7
 player_drawplayer6:

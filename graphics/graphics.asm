@@ -26,6 +26,7 @@ sprites:
 	defb	240,240,  0,  0,  0,  0,  0,  0	  ; 23, the pit 3
 	defb	192,192,  0,  0,  0,  0,  0,  0	  ; 24, the pit 4
 	defb	0,0,  0,  0,  0,  0,  0,  0	  	  ; 25, the pit 5
+    defb    255,255,255,255,255,255,255,255   ; 26, slime block, green on green
 
     
 sprite_attrs:
@@ -55,6 +56,7 @@ sprite_attrs:
 	defb	066	; 23, the pit 3
 	defb	066	; 24, the pit 4
 	defb	066	; 25, the pit 5
+	defb    100 ; 26, slime, green on green
     
 
 player_sprite:
@@ -101,3 +103,13 @@ tank_sprite:
 	defb	255,255,168,169,155,168,255,255
 	defb	252,254,143,175,159,175,254,252
 	defb	  0,  0,  0, 31, 31,  0,  0,  0 ; +64
+
+monster_sprite:
+	defb	  2, 64,  6, 96, 11,208, 22,104
+	defb	 25,152, 23,232, 53,172,127,254
+	defb	254,127,236, 55,143,241,143,241
+	defb	  8, 16,  8, 16, 24, 24,  0,  0		; frame 1
+	defb	  2, 64,  6, 96, 11,208, 22,104
+	defb	 25,152, 23,232,245,175,255,255
+	defb	188, 61, 14,112, 15,240, 15,240
+	defb	 16,  8, 48, 12,  0,  0,  0,  0		; frame 2

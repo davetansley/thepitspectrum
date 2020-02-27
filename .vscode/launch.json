@@ -24,6 +24,10 @@
                 //"-sprites",
                 //"-patterns"
             ],
+            "history": {
+                "reverseDebugInstructionCount": 10000,
+                "codeCoverageEnabled": false
+            },
             "disassemblerArgs": {
                 "esxdosRst": true
             },

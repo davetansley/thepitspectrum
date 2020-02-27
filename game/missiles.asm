@@ -150,9 +150,9 @@ missiles_fall3:
     and 7               ; divisible by 8?
     cp 0
     jp nz,missiles_fall1   ; if not, carry on
-    call screen_getattraddressfromscreencoords ; get the attr address into de
-    ld hl,de
-    ld (hl),67          ; load this square with the magenta colour
+    call screen_getcharcoordsfromscreencoords ; get the char coords into bc
+    ld a,67             ; load magenta
+    call screen_setattr
     ld bc,(ix)
     ld a,c              ; get vertical
     sub 8               ; look up one square

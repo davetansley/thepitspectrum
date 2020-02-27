@@ -1,6 +1,9 @@
 diamonds_tmp: 
     defb 0
 
+diamonds_tmp2:
+    defb 0
+
 ;
 ; Holds the number of thousands for the current gem type
 ;
@@ -15,9 +18,9 @@ diamonds_twinkle_type:
     call game_getcurrentframe       ; get current frame number
     and 7                           ; want a number from 0-7
     add 64                          ; add to 60 to get attr colour
+    ld (diamonds_tmp2),a             ; store the colour
 diamonds_twinkle_type0:
     ld bc,(hl)                      ; get coords into bc
-    ex af, af'
     ld a,c                          ; load c into a
     cp 255                          ; is this the end?
     jp z,diamonds_twinkle_type1           ; step out if so
@@ -29,9 +32,12 @@ diamonds_twinkle_type0:
     call diamonds_checkforplayer    ; check to see if we've collided with player
     call c,diamonds_collect     ; we collided
     inc hl 
-    ex af,af'
-    ld de,(hl)                      ; get the memory location into de
-    ld (de),a                       ; set the value of attr
+    push hl
+    ld ix,hl
+    ld bc,(ix-3)                    ; get coords again
+    ld a,(diamonds_tmp2)
+    call screen_setattr
+    pop hl
     inc hl
     inc hl                          ; move to next diamond 
     jp diamonds_twinkle_type0
@@ -63,9 +69,8 @@ diamonds_collect:
     add hl,de
     call sprites_drawsprite     ; call the routine to draw the sprite
     pop hl
-    ex af,af'
-    ld a,70
-    ex af,af'                       ; make sure a is in the af we'll use for the attr
+    ld a,70                     ; pass this back to overwrite the attr
+    ld (diamonds_tmp2),a
     exx
     ld a,(diamonds_score)
     ld b,a
@@ -150,7 +155,7 @@ diamonds_init_type:
     inc hl
     ld b,(hl)                       ; get coords into b
     push hl
-    call screen_getcellattradress ; get memory of attr for this diamond into de 
+    call screen_getcellattroffset ; get memory of attr for this diamond into de 
     pop hl
     inc hl                          ; move to state 
     ld (hl),0
