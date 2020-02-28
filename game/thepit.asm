@@ -48,6 +48,8 @@ thepit_process:
     ld a,0
     ld (thepit_trapcount),a         ; reset the trap count
     ld a,(thepit_trapcoord)         ; get the trap horiz coord
+    cp 2
+    jp z,thepit_process0
     dec a
     ld (thepit_trapcoord),a         ; store the reduced coord
 

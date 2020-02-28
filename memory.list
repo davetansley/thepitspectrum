@@ -5371,7 +5371,7 @@
  54+  C383 3A 18 BB         ld a,(player+11)                        ; check if the player was hit by a missile previously
  55+  C386 FE 03            cp 3
  56+  C388 C2 8F C3         jp nz,missiles_process3                 ; if not, continue
- 57+  C38B CD CE C4         call missiles_zonkplayer
+ 57+  C38B CD CC C4         call missiles_zonkplayer
  58+  C38E C9               ret
  59+  C38F              missiles_process3:
  60+  C38F 3A 1B BB         ld a,(player_location)
@@ -5423,7 +5423,7 @@
 105+  C3F8 CD 15 A9         call screen_getblock
 106+  C3FB CD 9A A9         call sprites_drawsprite                 ; draw the sprite over the old one
 107+  C3FE C1               pop bc
-108+  C3FF CD 92 C4         call missiles_addmissiletofalling
+108+  C3FF CD 90 C4         call missiles_addmissiletofalling
 109+  C402              missiles_process0:
 110+  C402 CD 06 C4         call missiles_fall
 111+  C405 C9               ret
@@ -5438,10 +5438,10 @@
 120+  C40C C5               push bc
 121+  C40D DD 7E 02         ld a,(ix+2)
 122+  C410 FE 00            cp 0
-123+  C412 CA 71 C4         jp z,missiles_fall1 ; not falling move to next
+123+  C412 CA 6F C4         jp z,missiles_fall1 ; not falling move to next
 124+  C415 FE 01            cp 1                ; is this ready to fall
 125+  C417 CA 1D C4         jp z, missiles_fall3
-126+  C41A C3 8B C4         jp missiles_fall4   ; if not, decrease the countdown
+126+  C41A C3 89 C4         jp missiles_fall4   ; if not, decrease the countdown
 127+  C41D              missiles_fall3:
 128+  C41D DD 4E 00 DD      ld bc,(ix)          ; load coords into bc
 128+  C421 46 01
@@ -5449,7 +5449,7 @@
 130+  C426 14               inc d               ; add 256 to get next row
 131+  C427 1A               ld a,(de)           ; get the contents of the next row
 132+  C428 FE 00            cp 0
-133+  C42A C2 84 C4         jp nz,missiles_fall2 ; if this is not empty, stop this missile falling
+133+  C42A C2 82 C4         jp nz,missiles_fall2 ; if this is not empty, stop this missile falling
 134+  C42D 3E 14            ld a,20                                 ; active missile sprite
 135+  C42F CD 15 A9         call screen_getblock
 136+  C432 CD 9A A9         call sprites_drawsprite                 ; draw the sprite over the old one
@@ -5466,391 +5466,397 @@
 144+  C450 79               ld a,c              ; get the vertical coord into a
 145+  C451 E6 07            and 7               ; divisible by 8?
 146+  C453 FE 00            cp 0
-147+  C455 C2 71 C4         jp nz,missiles_fall1   ; if not, carry on
+147+  C455 C2 6F C4         jp nz,missiles_fall1   ; if not, carry on
 148+  C458 CD C8 A8         call screen_getcharcoordsfromscreencoords ; get the char coords into bc
 149+  C45B 3E 43            ld a,67             ; load magenta
 150+  C45D CD 20 A9         call screen_setattr
 151+  C460 DD 4E 00 DD      ld bc,(ix)
 151+  C464 46 01
-152+  C466 79               ld a,c              ; get vertical
-153+  C467 D6 08            sub 8               ; look up one square
-154+  C469 4F               ld c,a              ; put a back in c
-155+  C46A CD B5 A8         call screen_getattraddressfromscreencoords ; get the attr address into de
-156+  C46D 62 6B            ld hl,de
-157+  C46F 36 46            ld (hl),70          ; load this square with the yellow colour
-158+  C471              missiles_fall1:         ; hl at state
-159+  C471 DD 4E 00 DD      ld bc,(ix)          ; get coords back
-159+  C475 46 01
-160+  C477 CD B3 C4         call missiles_checkforplayer ; check for player
-161+  C47A DD 23            inc ix
-162+  C47C DD 23            inc ix
-163+  C47E DD 23            inc ix              ; get to next missile
-164+  C480 C1               pop bc
-165+  C481 10 89            djnz missiles_fall0
-166+  C483 C9               ret
-167+  C484              missiles_fall2:
-168+  C484 DD 36 02 00      ld (ix+2),0
-169+  C488 C3 71 C4         jp missiles_fall1   ; rejoin the loop
-170+  C48B              missiles_fall4:
-171+  C48B 3D               dec a               ; decrease the countdown
-172+  C48C DD 77 02         ld (ix+2),a         ; store back
-173+  C48F C3 71 C4         jp missiles_fall1   ; do next missile
-174+  C492
-175+  C492              ;
-176+  C492              ; Adds the missile to the structure that tracks falling missile
-177+  C492              ; Inputs:
-178+  C492              ; bc - coords of missile, c vert
-179+  C492              missiles_addmissiletofalling:
-180+  C492 C5               push bc             ; store the coords
-181+  C493 11 4D C3         ld de,missiles_falling
-182+  C496 06 04            ld b,4              ; number of possible falling missiles
-183+  C498              missiles_addmissiletofalling0:
-184+  C498 13               inc de
-185+  C499 13               inc de              ; move three along to get the state
-186+  C49A 1A               ld a,(de)           ; load the state
-187+  C49B FE 00            cp 0                ; check if this is not falling
-188+  C49D C2 AE C4         jp nz,missiles_addmissiletofalling1 ; continue the loop if not 0
-189+  C4A0 3E 19            ld a,25
-190+  C4A2 12               ld (de),a           ; set the state to pre-falling
-191+  C4A3 1B               dec de              ; move back coords
-192+  C4A4 C1               pop bc              ; get back coords
-193+  C4A5 78               ld a,b
-194+  C4A6 12               ld (de),a           ; store the vertical
-195+  C4A7 1B               dec de
-196+  C4A8 79               ld a,c
-197+  C4A9 12               ld (de),a           ; store the horizontal
-198+  C4AA C5               push bc
-199+  C4AB C3 B1 C4         jp missiles_addmissiletofalling2 ; done
-200+  C4AE              missiles_addmissiletofalling1:
-201+  C4AE 13               inc de              ; move memory along to next rock
-202+  C4AF 10 E7            djnz missiles_addmissiletofalling0 ; try the next missile
-203+  C4B1              missiles_addmissiletofalling2: ; done, return
-204+  C4B1 C1               pop bc              ; to tidy up
-205+  C4B2 C9               ret
-206+  C4B3
-207+  C4B3              ;
-208+  C4B3              ; Checks to see if the missile is hitting a player
-209+  C4B3              ; Inputs:
-210+  C4B3              ; bc - coords of missile we're checking
-211+  C4B3              missiles_checkforplayer:
-212+  C4B3 ED 5B 0D BB      ld de,(player)       ; get the player coords
-213+  C4B7 7B               ld a,e               ; get the vert coord first
-214+  C4B8 91               sub c                ; subtract the missile vertical coord from players
-215+  C4B9 FE 08            cp 8                 ; the missile will only hit a player if the player is directly underneath, so this must be 8
-216+  C4BB C0               ret nz               ; if not, hasn't hit
-217+  C4BC 7A               ld a,d               ; get the player horiz coord
-218+  C4BD 90               sub b                ; subtract missile coord
-219+  C4BE C6 07            add 7                ; add max distance
-220+  C4C0 FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
-221+  C4C2 DA C6 C4         jp c,missiles_checkforplayer0
-222+  C4C5 C9               ret
-223+  C4C6              missiles_checkforplayer0:
-224+  C4C6 ED 43 59 C3      ld (missiles_killermissile),bc; store the coords of the killer missile
-225+  C4CA CD 07 BC         call player_zonkplayer ; if so, jump out
-226+  C4CD C9               ret
-227+  C4CE
-228+  C4CE              ;
-229+  C4CE              ; Player has been hit, so draw text over them and mark as dead
-230+  C4CE              ;
-231+  C4CE              missiles_zonkplayer:
-232+  C4CE CD F5 BB         call player_killplayer      ; mark as dead
-233+  C4D1 ED 4B 0D BB      ld bc,(player)              ; get player coords
-234+  C4D5 CD C8 A8         call screen_getcharcoordsfromscreencoords ; get char coords
-235+  C4D8 0D               dec c
-236+  C4D9 0D               dec c
-237+  C4DA C5               push bc
-238+  C4DB CD 71 A8         call screen_getcellattradress ; attrs here
-239+  C4DE 06 05            ld b,5
-240+  C4E0 3E 42            ld a,66
-241+  C4E2 CD 2B A8         call screen_setcolours
-242+  C4E5 CD 9F A6         call buffer_buffertoscreen  ; copy buffer to screen
-243+  C4E8 C1               pop bc
-244+  C4E9 ED 5B 76 A7      ld de,(screen_offset)
-245+  C4ED 78               ld a,b
-246+  C4EE 93               sub e
-247+  C4EF 47               ld b,a                      ; subtract the offset
-248+  C4F0 04               inc b
-249+  C4F1 04               inc b                       ; add two for the score rows
-250+  C4F2 ED 43 BC 84      ld (string_zonk),bc         ; set coords of string
-251+  C4F6 21 BC 84         ld hl,string_zonk
-252+  C4F9 CD C4 84         call string_print
-253+  C4FC 06 14            ld b,20
-254+  C4FE CD 82 80         call utilities_pauseforframes ; pause
-255+  C501 C9               ret
-256+  C502
+152+  C466 CD C8 A8         call screen_getcharcoordsfromscreencoords ; get the attr address into de
+153+  C469 05               dec b               ; look one square above
+154+  C46A 3E 46            ld a,70             ; load yellow
+155+  C46C CD 20 A9         call screen_setattr
+156+  C46F              missiles_fall1:         ; hl at state
+157+  C46F DD 4E 00 DD      ld bc,(ix)          ; get coords back
+157+  C473 46 01
+158+  C475 CD B1 C4         call missiles_checkforplayer ; check for player
+159+  C478 DD 23            inc ix
+160+  C47A DD 23            inc ix
+161+  C47C DD 23            inc ix              ; get to next missile
+162+  C47E C1               pop bc
+163+  C47F 10 8B            djnz missiles_fall0
+164+  C481 C9               ret
+165+  C482              missiles_fall2:
+166+  C482 DD 36 02 00      ld (ix+2),0
+167+  C486 C3 6F C4         jp missiles_fall1   ; rejoin the loop
+168+  C489              missiles_fall4:
+169+  C489 3D               dec a               ; decrease the countdown
+170+  C48A DD 77 02         ld (ix+2),a         ; store back
+171+  C48D C3 6F C4         jp missiles_fall1   ; do next missile
+172+  C490
+173+  C490              ;
+174+  C490              ; Adds the missile to the structure that tracks falling missile
+175+  C490              ; Inputs:
+176+  C490              ; bc - coords of missile, c vert
+177+  C490              missiles_addmissiletofalling:
+178+  C490 C5               push bc             ; store the coords
+179+  C491 11 4D C3         ld de,missiles_falling
+180+  C494 06 04            ld b,4              ; number of possible falling missiles
+181+  C496              missiles_addmissiletofalling0:
+182+  C496 13               inc de
+183+  C497 13               inc de              ; move three along to get the state
+184+  C498 1A               ld a,(de)           ; load the state
+185+  C499 FE 00            cp 0                ; check if this is not falling
+186+  C49B C2 AC C4         jp nz,missiles_addmissiletofalling1 ; continue the loop if not 0
+187+  C49E 3E 19            ld a,25
+188+  C4A0 12               ld (de),a           ; set the state to pre-falling
+189+  C4A1 1B               dec de              ; move back coords
+190+  C4A2 C1               pop bc              ; get back coords
+191+  C4A3 78               ld a,b
+192+  C4A4 12               ld (de),a           ; store the vertical
+193+  C4A5 1B               dec de
+194+  C4A6 79               ld a,c
+195+  C4A7 12               ld (de),a           ; store the horizontal
+196+  C4A8 C5               push bc
+197+  C4A9 C3 AF C4         jp missiles_addmissiletofalling2 ; done
+198+  C4AC              missiles_addmissiletofalling1:
+199+  C4AC 13               inc de              ; move memory along to next rock
+200+  C4AD 10 E7            djnz missiles_addmissiletofalling0 ; try the next missile
+201+  C4AF              missiles_addmissiletofalling2: ; done, return
+202+  C4AF C1               pop bc              ; to tidy up
+203+  C4B0 C9               ret
+204+  C4B1
+205+  C4B1              ;
+206+  C4B1              ; Checks to see if the missile is hitting a player
+207+  C4B1              ; Inputs:
+208+  C4B1              ; bc - coords of missile we're checking
+209+  C4B1              missiles_checkforplayer:
+210+  C4B1 ED 5B 0D BB      ld de,(player)       ; get the player coords
+211+  C4B5 7B               ld a,e               ; get the vert coord first
+212+  C4B6 91               sub c                ; subtract the missile vertical coord from players
+213+  C4B7 FE 08            cp 8                 ; the missile will only hit a player if the player is directly underneath, so this must be 8
+214+  C4B9 C0               ret nz               ; if not, hasn't hit
+215+  C4BA 7A               ld a,d               ; get the player horiz coord
+216+  C4BB 90               sub b                ; subtract missile coord
+217+  C4BC C6 07            add 7                ; add max distance
+218+  C4BE FE 0D            cp 13                ; compare to 13? if carry flag set, they've hit
+219+  C4C0 DA C4 C4         jp c,missiles_checkforplayer0
+220+  C4C3 C9               ret
+221+  C4C4              missiles_checkforplayer0:
+222+  C4C4 ED 43 59 C3      ld (missiles_killermissile),bc; store the coords of the killer missile
+223+  C4C8 CD 07 BC         call player_zonkplayer ; if so, jump out
+224+  C4CB C9               ret
+225+  C4CC
+226+  C4CC              ;
+227+  C4CC              ; Player has been hit, so draw text over them and mark as dead
+228+  C4CC              ;
+229+  C4CC              missiles_zonkplayer:
+230+  C4CC CD F5 BB         call player_killplayer      ; mark as dead
+231+  C4CF ED 4B 0D BB      ld bc,(player)              ; get player coords
+232+  C4D3 CD C8 A8         call screen_getcharcoordsfromscreencoords
+233+  C4D6 0D               dec c
+234+  C4D7 0D               dec c
+235+  C4D8 04               inc b
+236+  C4D9 C5               push bc
+237+  C4DA 3E 42            ld a,66
+238+  C4DC CD 20 A9         call screen_setattr
+239+  C4DF 0C               inc c
+240+  C4E0 CD 20 A9         call screen_setattr
+241+  C4E3 0C               inc c
+242+  C4E4 CD 20 A9         call screen_setattr
+243+  C4E7 0C               inc c
+244+  C4E8 CD 20 A9         call screen_setattr
+245+  C4EB 0C               inc c
+246+  C4EC CD 20 A9         call screen_setattr
+247+  C4EF C1               pop bc
+248+  C4F0 ED 5B 76 A7      ld de,(screen_offset)
+249+  C4F4 78               ld a,b
+250+  C4F5 93               sub e
+251+  C4F6 47               ld b,a                      ; subtract the offset
+252+  C4F7 04               inc b
+253+  C4F8 04               inc b                       ; add two for the score rows
+254+  C4F9 ED 43 BC 84      ld (string_zonk),bc         ; set coords of string
+255+  C4FD 21 BC 84         ld hl,string_zonk
+256+  C500 CD C4 84         call string_print
+257+  C503 06 14            ld b,20
+258+  C505 CD 82 80         call utilities_pauseforframes ; pause
+259+  C508 C9               ret
+260+  C509
 # file closed: game/missiles.asm
- 46   C502                  include "game\thepit.asm"
+ 46   C509                  include "game\thepit.asm"
 # file opened: game/thepit.asm
-  1+  C502              ;
-  2+  C502              ; Timer for deciding how fast the trap withdraws
-  3+  C502              ;
-  4+  C502              thepit_timer:
-  5+  C502 00               defb 0
-  6+  C503
-  7+  C503              ;
-  8+  C503              ; Ticks for the trap state. Will count to 3 then reset
-  9+  C503              ;
- 10+  C503              thepit_trapcount:
- 11+  C503 00               defb 0
- 12+  C504
- 13+  C504              ;
- 14+  C504              ; The horizontal coordinate of the current pit trap
- 15+  C504              ;
- 16+  C504              thepit_trapcoord:
- 17+  C504 08               defb 8
- 18+  C505
- 19+  C505              ;
- 20+  C505              ; Initialises the pit
- 21+  C505              ;
- 22+  C505              thepit_init:
- 23+  C505 21 04 C5         ld hl,thepit_trapcoord
- 24+  C508 36 08            ld (hl),8
- 25+  C50A 21 03 C5         ld hl,thepit_trapcount
- 26+  C50D 36 00            ld (hl),0
- 27+  C50F C9               ret
- 28+  C510
- 29+  C510              ;
- 30+  C510              ; Performs per frame processing on the pit room
- 31+  C510              ;
- 32+  C510              thepit_process:
- 33+  C510 3A 1B BB         ld a,(player_location)
- 34+  C513 FE 02            cp 2                            ; if two, the player is in the pit, so process the trap
- 35+  C515 C2 59 C5         jp nz,thepit_process0
- 36+  C518 3A 02 C5         ld a,(thepit_timer)             ; get the timer
- 37+  C51B 3C               inc a
- 38+  C51C 32 02 C5         ld (thepit_timer),a             ; store
- 39+  C51F FE 02            cp 2                           ; have we reached the trigger?
- 40+  C521 C2 59 C5         jp nz, thepit_process0          ; no need to do anything
- 41+  C524 3E 00            ld a,0
- 42+  C526 32 02 C5         ld (thepit_timer),a             ; zero the timer and process
- 43+  C529 3A 03 C5         ld a,(thepit_trapcount)         ; get the current count
- 44+  C52C 3C               inc a
- 45+  C52D 32 03 C5         ld (thepit_trapcount),a         ; reset the trap count
- 46+  C530 FE 04            cp 4                            ; do we need to begin another character?
- 47+  C532 C2 41 C5         jp nz,thepit_process1           ; if not, draw as normal
- 48+  C535 3E 00            ld a,0
- 49+  C537 32 03 C5         ld (thepit_trapcount),a         ; reset the trap count
- 50+  C53A 3A 04 C5         ld a,(thepit_trapcoord)         ; get the trap horiz coord
- 51+  C53D 3D               dec a
- 52+  C53E 32 04 C5         ld (thepit_trapcoord),a         ; store the reduced coord
- 53+  C541
- 54+  C541              thepit_process1:                    ; draw the trapdoor in current position
- 55+  C541 3A 04 C5         ld a,(thepit_trapcoord)
- 56+  C544 FE 02            cp 2
- 57+  C546 CA 59 C5         jp z, thepit_process0           ; don't process outside of the pit
- 58+  C549 4F               ld c,a
- 59+  C54A 06 0A            ld b,10                         ; vertical coord will always be the same
- 60+  C54C 3A 03 C5         ld a,(thepit_trapcount)         ; get the trap count
- 61+  C54F 5F               ld e,a                          ; store in e
- 62+  C550 3E 16            ld a,22                         ; 21 is full trapdoor
- 63+  C552 83               add a,e
- 64+  C553 CD 15 A9         call screen_getblock
- 65+  C556 CD F2 A8         call screen_showchar            ; show the char
- 66+  C559
- 67+  C559              thepit_process0:
- 68+  C559 C9               ret
- 69+  C55A
+  1+  C509              ;
+  2+  C509              ; Timer for deciding how fast the trap withdraws
+  3+  C509              ;
+  4+  C509              thepit_timer:
+  5+  C509 00               defb 0
+  6+  C50A
+  7+  C50A              ;
+  8+  C50A              ; Ticks for the trap state. Will count to 3 then reset
+  9+  C50A              ;
+ 10+  C50A              thepit_trapcount:
+ 11+  C50A 00               defb 0
+ 12+  C50B
+ 13+  C50B              ;
+ 14+  C50B              ; The horizontal coordinate of the current pit trap
+ 15+  C50B              ;
+ 16+  C50B              thepit_trapcoord:
+ 17+  C50B 08               defb 8
+ 18+  C50C
+ 19+  C50C              ;
+ 20+  C50C              ; Initialises the pit
+ 21+  C50C              ;
+ 22+  C50C              thepit_init:
+ 23+  C50C 21 0B C5         ld hl,thepit_trapcoord
+ 24+  C50F 36 08            ld (hl),8
+ 25+  C511 21 0A C5         ld hl,thepit_trapcount
+ 26+  C514 36 00            ld (hl),0
+ 27+  C516 C9               ret
+ 28+  C517
+ 29+  C517              ;
+ 30+  C517              ; Performs per frame processing on the pit room
+ 31+  C517              ;
+ 32+  C517              thepit_process:
+ 33+  C517 3A 1B BB         ld a,(player_location)
+ 34+  C51A FE 02            cp 2                            ; if two, the player is in the pit, so process the trap
+ 35+  C51C C2 65 C5         jp nz,thepit_process0
+ 36+  C51F 3A 09 C5         ld a,(thepit_timer)             ; get the timer
+ 37+  C522 3C               inc a
+ 38+  C523 32 09 C5         ld (thepit_timer),a             ; store
+ 39+  C526 FE 02            cp 2                           ; have we reached the trigger?
+ 40+  C528 C2 65 C5         jp nz, thepit_process0          ; no need to do anything
+ 41+  C52B 3E 00            ld a,0
+ 42+  C52D 32 09 C5         ld (thepit_timer),a             ; zero the timer and process
+ 43+  C530 3A 0A C5         ld a,(thepit_trapcount)         ; get the current count
+ 44+  C533 3C               inc a
+ 45+  C534 32 0A C5         ld (thepit_trapcount),a         ; reset the trap count
+ 46+  C537 FE 04            cp 4                            ; do we need to begin another character?
+ 47+  C539 C2 4D C5         jp nz,thepit_process1           ; if not, draw as normal
+ 48+  C53C 3E 00            ld a,0
+ 49+  C53E 32 0A C5         ld (thepit_trapcount),a         ; reset the trap count
+ 50+  C541 3A 0B C5         ld a,(thepit_trapcoord)         ; get the trap horiz coord
+ 51+  C544 FE 02            cp 2
+ 52+  C546 CA 65 C5         jp z,thepit_process0
+ 53+  C549 3D               dec a
+ 54+  C54A 32 0B C5         ld (thepit_trapcoord),a         ; store the reduced coord
+ 55+  C54D
+ 56+  C54D              thepit_process1:                    ; draw the trapdoor in current position
+ 57+  C54D 3A 0B C5         ld a,(thepit_trapcoord)
+ 58+  C550 FE 02            cp 2
+ 59+  C552 CA 65 C5         jp z, thepit_process0           ; don't process outside of the pit
+ 60+  C555 4F               ld c,a
+ 61+  C556 06 0A            ld b,10                         ; vertical coord will always be the same
+ 62+  C558 3A 0A C5         ld a,(thepit_trapcount)         ; get the trap count
+ 63+  C55B 5F               ld e,a                          ; store in e
+ 64+  C55C 3E 16            ld a,22                         ; 21 is full trapdoor
+ 65+  C55E 83               add a,e
+ 66+  C55F CD 15 A9         call screen_getblock
+ 67+  C562 CD F2 A8         call screen_showchar            ; show the char
+ 68+  C565
+ 69+  C565              thepit_process0:
+ 70+  C565 C9               ret
+ 71+  C566
 # file closed: game/thepit.asm
- 47   C55A                  include "game\monster.asm"
+ 47   C566                  include "game\monster.asm"
 # file opened: game/monster.asm
-  1+  C55A
-  2+  C55A              ;
-  3+  C55A              ; Where the monster currently is
-  4+  C55A              ;
-  5+  C55A              monster_currentcoords:
-  6+  C55A 00 00            defb 0,0
-  7+  C55C
-  8+  C55C              ;
-  9+  C55C              ; The start coords of the monster
- 10+  C55C              ;
- 11+  C55C              monster_initcoords:
- 12+  C55C 70 20            defb 112,32
- 13+  C55E
- 14+  C55E              ;
- 15+  C55E              ; Store the memory location of the current jump position
- 16+  C55E              ;
- 17+  C55E              monster_jumppos:
- 18+  C55E 00 00            defb 0,0
- 19+  C560
- 20+  C560              ;
- 21+  C560              ; The jump table for the monster.
- 22+  C560              ;
- 23+  C560              monster_jumptable:
- 24+  C560 FF 03 02 02      defb 255,3,2,2,2,2,2,2,2,2,1,1,1,1,1,1,255
- 24+  C564 02 02 02 02
- 24+  C568 02 02 01 01
- 24+  C56C 01 01 01 01
- 24+  C570 FF
- 25+  C571
- 26+  C571              ;
- 27+  C571              ; The vertical direction: 0 up, 1 down
- 28+  C571              ;
- 29+  C571              monster_jumpdirectionvert:
- 30+  C571 00               defb 0
- 31+  C572
- 32+  C572
- 33+  C572              ;
- 34+  C572              ; Initialises the pit monster
- 35+  C572              ;
- 36+  C572              monster_init:
- 37+  C572 ED 4B 5C C5      ld bc,(monster_initcoords)              ; load the initial coords
- 38+  C576 ED 43 5A C5      ld (monster_currentcoords),bc           ; save in current coords
- 39+  C57A 21 61 C5         ld hl,monster_jumptable+1
- 40+  C57D 22 5E C5         ld (monster_jumppos),hl                 ; store the initial position in the jump table
- 41+  C580 3E 00            ld a,0
- 42+  C582 32 71 C5         ld (monster_jumpdirectionvert),a        ; going up
- 43+  C585 CD C2 C5         call monster_draw                       ; the monster
- 44+  C588 C9               ret
- 45+  C589
- 46+  C589              ;
- 47+  C589              ; Animate the monster
- 48+  C589              ;
- 49+  C589              monster_process:
- 50+  C589 CD C2 C5         call monster_draw                       ; overwrite the old sprite
- 51+  C58C ED 4B 5A C5      ld bc,(monster_currentcoords)           ; get the current coords
- 52+  C590 2A 5E C5         ld hl,(monster_jumppos)                 ; get the position in the jump table
- 53+  C593 56               ld d,(hl)                               ; get the jump modifier
- 54+  C594 3A 71 C5         ld a,(monster_jumpdirectionvert)        ; get the vertical direction
- 55+  C597 FE 00            cp 0                                    ; if 0, going up, so dec vert
- 56+  C599 C2 A2 C5         jp nz,monster_process0
- 57+  C59C 79               ld a,c
- 58+  C59D 92               sub d
- 59+  C59E 23               inc hl                                  ; move forward a jump pos
- 60+  C59F C3 A5 C5         jp monster_process1
- 61+  C5A2              monster_process0:
- 62+  C5A2 79               ld a,c                                   ; going down so inc c
- 63+  C5A3 82               add a,d
- 64+  C5A4 2B               dec hl                                  ; move back a jump pos
- 65+  C5A5              monster_process1:
- 66+  C5A5 4F               ld c,a                                  ; get the vertical coord back
- 67+  C5A6 ED 43 5A C5      ld (monster_currentcoords),bc           ; store the new vertical coords
- 68+  C5AA 7E               ld a,(hl)                               ; check the next jump pos
- 69+  C5AB FE FF            cp 255                                  ; if 255 reverse
- 70+  C5AD CA B6 C5         jp z,monster_process3
- 71+  C5B0 22 5E C5         ld (monster_jumppos),hl                 ; store the new pos
- 72+  C5B3 C3 BE C5         jp monster_process2                     ; keep going
- 73+  C5B6              monster_process3:
- 74+  C5B6 3A 71 C5         ld a,(monster_jumpdirectionvert)        ; get the direction
- 75+  C5B9 EE 01            xor 1                                   ; flip it
- 76+  C5BB 32 71 C5         ld (monster_jumpdirectionvert),a        ; store it
- 77+  C5BE              monster_process2:
- 78+  C5BE CD C2 C5         call monster_draw                       ; finally, draw the monster
- 79+  C5C1 C9               ret
- 80+  C5C2
- 81+  C5C2              ;
- 82+  C5C2              ; Draw the monster at the current location
- 83+  C5C2              ;
- 84+  C5C2              monster_draw:
- 85+  C5C2 ED 4B 5A C5      ld bc,(monster_currentcoords)
- 86+  C5C6 21 4A B6         ld hl,monster_sprite                    ; load the first frame
- 87+  C5C9 CD F8 A9         call sprites_draw2by2sprite
- 88+  C5CC C9               ret
+  1+  C566
+  2+  C566              ;
+  3+  C566              ; Where the monster currently is
+  4+  C566              ;
+  5+  C566              monster_currentcoords:
+  6+  C566 00 00            defb 0,0
+  7+  C568
+  8+  C568              ;
+  9+  C568              ; The start coords of the monster
+ 10+  C568              ;
+ 11+  C568              monster_initcoords:
+ 12+  C568 70 20            defb 112,32
+ 13+  C56A
+ 14+  C56A              ;
+ 15+  C56A              ; Store the memory location of the current jump position
+ 16+  C56A              ;
+ 17+  C56A              monster_jumppos:
+ 18+  C56A 00 00            defb 0,0
+ 19+  C56C
+ 20+  C56C              ;
+ 21+  C56C              ; The jump table for the monster.
+ 22+  C56C              ;
+ 23+  C56C              monster_jumptable:
+ 24+  C56C FF 03 02 02      defb 255,3,2,2,2,2,2,2,2,2,1,1,1,1,1,1,255
+ 24+  C570 02 02 02 02
+ 24+  C574 02 02 01 01
+ 24+  C578 01 01 01 01
+ 24+  C57C FF
+ 25+  C57D
+ 26+  C57D              ;
+ 27+  C57D              ; The vertical direction: 0 up, 1 down
+ 28+  C57D              ;
+ 29+  C57D              monster_jumpdirectionvert:
+ 30+  C57D 00               defb 0
+ 31+  C57E
+ 32+  C57E
+ 33+  C57E              ;
+ 34+  C57E              ; Initialises the pit monster
+ 35+  C57E              ;
+ 36+  C57E              monster_init:
+ 37+  C57E ED 4B 68 C5      ld bc,(monster_initcoords)              ; load the initial coords
+ 38+  C582 ED 43 66 C5      ld (monster_currentcoords),bc           ; save in current coords
+ 39+  C586 21 6D C5         ld hl,monster_jumptable+1
+ 40+  C589 22 6A C5         ld (monster_jumppos),hl                 ; store the initial position in the jump table
+ 41+  C58C 3E 00            ld a,0
+ 42+  C58E 32 7D C5         ld (monster_jumpdirectionvert),a        ; going up
+ 43+  C591 CD CE C5         call monster_draw                       ; the monster
+ 44+  C594 C9               ret
+ 45+  C595
+ 46+  C595              ;
+ 47+  C595              ; Animate the monster
+ 48+  C595              ;
+ 49+  C595              monster_process:
+ 50+  C595 CD CE C5         call monster_draw                       ; overwrite the old sprite
+ 51+  C598 ED 4B 66 C5      ld bc,(monster_currentcoords)           ; get the current coords
+ 52+  C59C 2A 6A C5         ld hl,(monster_jumppos)                 ; get the position in the jump table
+ 53+  C59F 56               ld d,(hl)                               ; get the jump modifier
+ 54+  C5A0 3A 7D C5         ld a,(monster_jumpdirectionvert)        ; get the vertical direction
+ 55+  C5A3 FE 00            cp 0                                    ; if 0, going up, so dec vert
+ 56+  C5A5 C2 AE C5         jp nz,monster_process0
+ 57+  C5A8 79               ld a,c
+ 58+  C5A9 92               sub d
+ 59+  C5AA 23               inc hl                                  ; move forward a jump pos
+ 60+  C5AB C3 B1 C5         jp monster_process1
+ 61+  C5AE              monster_process0:
+ 62+  C5AE 79               ld a,c                                   ; going down so inc c
+ 63+  C5AF 82               add a,d
+ 64+  C5B0 2B               dec hl                                  ; move back a jump pos
+ 65+  C5B1              monster_process1:
+ 66+  C5B1 4F               ld c,a                                  ; get the vertical coord back
+ 67+  C5B2 ED 43 66 C5      ld (monster_currentcoords),bc           ; store the new vertical coords
+ 68+  C5B6 7E               ld a,(hl)                               ; check the next jump pos
+ 69+  C5B7 FE FF            cp 255                                  ; if 255 reverse
+ 70+  C5B9 CA C2 C5         jp z,monster_process3
+ 71+  C5BC 22 6A C5         ld (monster_jumppos),hl                 ; store the new pos
+ 72+  C5BF C3 CA C5         jp monster_process2                     ; keep going
+ 73+  C5C2              monster_process3:
+ 74+  C5C2 3A 7D C5         ld a,(monster_jumpdirectionvert)        ; get the direction
+ 75+  C5C5 EE 01            xor 1                                   ; flip it
+ 76+  C5C7 32 7D C5         ld (monster_jumpdirectionvert),a        ; store it
+ 77+  C5CA              monster_process2:
+ 78+  C5CA CD CE C5         call monster_draw                       ; finally, draw the monster
+ 79+  C5CD C9               ret
+ 80+  C5CE
+ 81+  C5CE              ;
+ 82+  C5CE              ; Draw the monster at the current location
+ 83+  C5CE              ;
+ 84+  C5CE              monster_draw:
+ 85+  C5CE ED 4B 66 C5      ld bc,(monster_currentcoords)
+ 86+  C5D2 21 4A B6         ld hl,monster_sprite                    ; load the first frame
+ 87+  C5D5 CD F8 A9         call sprites_draw2by2sprite
+ 88+  C5D8 C9               ret
 # file closed: game/monster.asm
- 48   C5CD
- 49   C5CD              ;===========================================================================
- 50   C5CD              ; main routine - the code execution starts here.
- 51   C5CD              ; Sets up the new interrupt routine, the memory
- 52   C5CD              ; banks and jumps to the start loop.
- 53   C5CD              ;===========================================================================
- 54   C5CD              main:
- 55   C5CD
- 56   C5CD                  ; Draw the title screen
- 57   C5CD              main_titlescreen:
- 58   C5CD CD B9 AA         call titlescreen_show
- 59   C5D0 CD 52 BB         call player_init_gamestart
- 60   C5D3
- 61   C5D3              main_lifestart:
- 62   C5D3
- 63   C5D3 CD 70 BB         call player_init_lifestart
- 64   C5D6
- 65   C5D6 CD 1F AC         call lifescreen_draw        ; show the lives remaining screen
- 66   C5D9
- 67   C5D9 CD 00 80         call init_start
- 68   C5DC CD 91 A7         call screen_draw
- 69   C5DF CD E0 A6         call buffer_allbuffertoscreen
- 70   C5E2
- 71   C5E2 CD 5B C3         call missiles_init
- 72   C5E5 CD F7 BC         call ship_land              ; land the ship
- 73   C5E8 CD 0A BE         call tank_init
- 74   C5EB CD 23 C3         call diamonds_init
- 75   C5EE CD 05 C5         call thepit_init
- 76   C5F1 CD 72 C5         call monster_init
- 77   C5F4
- 78   C5F4              mloop:
- 79   C5F4 76               halt
- 80   C5F5 CD 29 C6         call main_loop_processing
- 81   C5F8
- 82   C5F8                  ;
- 83   C5F8                  ; Check if the player died
- 84   C5F8                  ;
- 85   C5F8 21 17 BB         ld hl,player+10
- 86   C5FB 7E               ld a,(hl)                   ; check if the player died this frame
- 87   C5FC FE 01            cp 1
- 88   C5FE C2 15 C6         jp nz,mloop0
- 89   C601 CD D7 BB         call player_died        ; do end of life housekeeping
- 90   C604 06 28            ld b,40
- 91   C606 CD 82 80         call utilities_pauseforframes
- 92   C609 21 16 BB         ld hl,player+9        ; check lives remaining
- 93   C60C 7E               ld a,(hl)
- 94   C60D FE 00            cp 0
- 95   C60F CA 57 C6         jp z,main_gameover   ; leave the loop if we're done
- 96   C612 C3 D3 C5         jp main_lifestart    ; otherwise, start a new life
- 97   C615              mloop0:
- 98   C615                  ;
- 99   C615                  ; Check if the player completed the level
-100   C615                  ;
-101   C615 21 1A BB         ld hl,player+13
-102   C618 7E               ld a,(hl)
-103   C619 FE 01            cp 1
-104   C61B C2 F4 C5         jp nz,mloop
-105   C61E CD C1 BC         call player_checkforexit
-106   C621 FE 01            cp 1                        ; look at return, if 1, level has been completed
-107   C623 CA 5D C6         jp z,main_endlevel          ; jump to level transition screen
-108   C626 C3 F4 C5         jp mloop                ; start the loop again
-109   C629
-110   C629
-111   C629              main_loop_processing:
-112   C629
-113   C629 CD 9F A6         call buffer_buffertoscreen  ; copy buffer to screen
-114   C62C CD 04 A6         call buffer_clearlist       ; zero the updated lines list
-115   C62F CD 1C BB         call player_getlocation     ; figure out where the player is
-116   C632 CD 0D BC         call player_drawplayer      ; delete player
-117   C635 CD 8A B6         call control_keyboard       ; check keyboard
-118   C638 CD 0D BC         call player_drawplayer      ; draw player
-119   C63B CD 39 BE         call tank_process           ; prcoess the tank
-120   C63E CD E2 BC         call ship_process           ; proces the ship
-121   C641 CD 29 C0         call rocks_processrocks     ; process falling rocks
-122   C644 CD 10 C5         call thepit_process         ; process the pit trap
-123   C647 CD 83 C3         call missiles_process       ; process missiles
-124   C64A CD 89 C5         call monster_process        ; process monster
-125   C64D CD 02 C3         call diamonds_twinkle       ; make the diamonds twinkle
-126   C650 CD 8C C1         call scores_printscore      ; update the score on screen
-127   C653 CD F4 BA         call game_incrementframe    ; increment the game frame
-128   C656
-129   C656 C9               ret
-130   C657
-131   C657              main_gameover:
-132   C657 CD 72 AC         call gameover_draw          ; show the game over screen
-133   C65A C3 CD C5         jp main_titlescreen         ; go back to title
-134   C65D
-135   C65D              main_endlevel:
-136   C65D CD BD BB         call player_recordcurrentscore
-137   C660 CD 60 AD         call endlevel_draw          ; show the end level screen
-138   C663 C3 D3 C5         jp main_lifestart           ; start a new life
-139   C666
-140   C666              ;===========================================================================
-141   C666              ; Stack.
-142   C666              ;===========================================================================
-143   C666
-144   C666              ; Stack: this area is reserved for the stack
-145   C666              STACK_SIZE: equ 100    ; in words
-146   C666
-147   C666              ; Reserve stack space
-148   C666 00 00            defw 0  ; WPMEM, 2
-149   C668              stack_bottom:
-150   C668 00 00 00...      defs    STACK_SIZE*2, 0
-151   C730              stack_top:
-152   C730 00 00            defw 0  ; WPMEM, 2
-153   C732
-154   C732                     SAVESNA "ThePit.sna", main
+ 48   C5D9
+ 49   C5D9              ;===========================================================================
+ 50   C5D9              ; main routine - the code execution starts here.
+ 51   C5D9              ; Sets up the new interrupt routine, the memory
+ 52   C5D9              ; banks and jumps to the start loop.
+ 53   C5D9              ;===========================================================================
+ 54   C5D9              main:
+ 55   C5D9
+ 56   C5D9                  ; Draw the title screen
+ 57   C5D9              main_titlescreen:
+ 58   C5D9 CD B9 AA         call titlescreen_show
+ 59   C5DC CD 52 BB         call player_init_gamestart
+ 60   C5DF
+ 61   C5DF              main_lifestart:
+ 62   C5DF
+ 63   C5DF CD 70 BB         call player_init_lifestart
+ 64   C5E2
+ 65   C5E2 CD 1F AC         call lifescreen_draw        ; show the lives remaining screen
+ 66   C5E5
+ 67   C5E5 CD 00 80         call init_start
+ 68   C5E8 CD 91 A7         call screen_draw
+ 69   C5EB CD E0 A6         call buffer_allbuffertoscreen
+ 70   C5EE
+ 71   C5EE CD 5B C3         call missiles_init
+ 72   C5F1 CD F7 BC         call ship_land              ; land the ship
+ 73   C5F4 CD 0A BE         call tank_init
+ 74   C5F7 CD 23 C3         call diamonds_init
+ 75   C5FA CD 0C C5         call thepit_init
+ 76   C5FD CD 7E C5         call monster_init
+ 77   C600
+ 78   C600              mloop:
+ 79   C600 76               halt
+ 80   C601 CD 35 C6         call main_loop_processing
+ 81   C604
+ 82   C604                  ;
+ 83   C604                  ; Check if the player died
+ 84   C604                  ;
+ 85   C604 21 17 BB         ld hl,player+10
+ 86   C607 7E               ld a,(hl)                   ; check if the player died this frame
+ 87   C608 FE 01            cp 1
+ 88   C60A C2 21 C6         jp nz,mloop0
+ 89   C60D CD D7 BB         call player_died        ; do end of life housekeeping
+ 90   C610 06 28            ld b,40
+ 91   C612 CD 82 80         call utilities_pauseforframes
+ 92   C615 21 16 BB         ld hl,player+9        ; check lives remaining
+ 93   C618 7E               ld a,(hl)
+ 94   C619 FE 00            cp 0
+ 95   C61B CA 63 C6         jp z,main_gameover   ; leave the loop if we're done
+ 96   C61E C3 DF C5         jp main_lifestart    ; otherwise, start a new life
+ 97   C621              mloop0:
+ 98   C621                  ;
+ 99   C621                  ; Check if the player completed the level
+100   C621                  ;
+101   C621 21 1A BB         ld hl,player+13
+102   C624 7E               ld a,(hl)
+103   C625 FE 01            cp 1
+104   C627 C2 00 C6         jp nz,mloop
+105   C62A CD C1 BC         call player_checkforexit
+106   C62D FE 01            cp 1                        ; look at return, if 1, level has been completed
+107   C62F CA 69 C6         jp z,main_endlevel          ; jump to level transition screen
+108   C632 C3 00 C6         jp mloop                ; start the loop again
+109   C635
+110   C635
+111   C635              main_loop_processing:
+112   C635
+113   C635 CD 9F A6         call buffer_buffertoscreen  ; copy buffer to screen
+114   C638 CD 04 A6         call buffer_clearlist       ; zero the updated lines list
+115   C63B CD 1C BB         call player_getlocation     ; figure out where the player is
+116   C63E CD 0D BC         call player_drawplayer      ; delete player
+117   C641 CD 8A B6         call control_keyboard       ; check keyboard
+118   C644 CD 0D BC         call player_drawplayer      ; draw player
+119   C647 CD 39 BE         call tank_process           ; prcoess the tank
+120   C64A CD E2 BC         call ship_process           ; proces the ship
+121   C64D CD 29 C0         call rocks_processrocks     ; process falling rocks
+122   C650 CD 17 C5         call thepit_process         ; process the pit trap
+123   C653 CD 83 C3         call missiles_process       ; process missiles
+124   C656 CD 95 C5         call monster_process        ; process monster
+125   C659 CD 02 C3         call diamonds_twinkle       ; make the diamonds twinkle
+126   C65C CD 8C C1         call scores_printscore      ; update the score on screen
+127   C65F CD F4 BA         call game_incrementframe    ; increment the game frame
+128   C662
+129   C662 C9               ret
+130   C663
+131   C663              main_gameover:
+132   C663 CD 72 AC         call gameover_draw          ; show the game over screen
+133   C666 C3 D9 C5         jp main_titlescreen         ; go back to title
+134   C669
+135   C669              main_endlevel:
+136   C669 CD BD BB         call player_recordcurrentscore
+137   C66C CD 60 AD         call endlevel_draw          ; show the end level screen
+138   C66F C3 DF C5         jp main_lifestart           ; start a new life
+139   C672
+140   C672              ;===========================================================================
+141   C672              ; Stack.
+142   C672              ;===========================================================================
+143   C672
+144   C672              ; Stack: this area is reserved for the stack
+145   C672              STACK_SIZE: equ 100    ; in words
+146   C672
+147   C672              ; Reserve stack space
+148   C672 00 00            defw 0  ; WPMEM, 2
+149   C674              stack_bottom:
+150   C674 00 00 00...      defs    STACK_SIZE*2, 0
+151   C73C              stack_top:
+152   C73C 00 00            defw 0  ; WPMEM, 2
+153   C73E
+154   C73E                     SAVESNA "ThePit.sna", main
 # file closed: main.asm

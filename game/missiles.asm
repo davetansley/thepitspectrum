@@ -149,12 +149,10 @@ missiles_fall3:
     ld a,67             ; load magenta
     call screen_setattr
     ld bc,(ix)
-    ld a,c              ; get vertical
-    sub 8               ; look up one square
-    ld c,a              ; put a back in c
-    call screen_getattraddressfromscreencoords ; get the attr address into de
-    ld hl,de
-    ld (hl),70          ; load this square with the yellow colour
+    call screen_getcharcoordsfromscreencoords ; get the attr address into de
+    dec b               ; look one square above
+    ld a,70             ; load yellow
+    call screen_setattr
 missiles_fall1:         ; hl at state
     ld bc,(ix)          ; get coords back
     call missiles_checkforplayer ; check for player
@@ -231,15 +229,21 @@ missiles_checkforplayer0:
 missiles_zonkplayer:
     call player_killplayer      ; mark as dead
     ld bc,(player)              ; get player coords
-    call screen_getcharcoordsfromscreencoords ; get char coords
+    call screen_getcharcoordsfromscreencoords
     dec c
     dec c
+    inc b
     push bc
-    call screen_getcellattradress ; attrs here
-    ld b,5
     ld a,66
-    call screen_setcolours
-    call buffer_buffertoscreen  ; copy buffer to screen
+    call screen_setattr
+    inc c
+    call screen_setattr
+    inc c
+    call screen_setattr
+    inc c
+    call screen_setattr
+    inc c
+    call screen_setattr
     pop bc
     ld de,(screen_offset)
     ld a,b
