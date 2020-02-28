@@ -24,6 +24,7 @@ sprites_drawsprite3:
     ld d,a              ; and the left edge back into c.
     jr sprites_drawsprite0   ; we've done the switch so transfer to screen.
 sprites_drawsprite: 
+    ld (origcoords),bc  ; store coords
     ld (dispx),bc       ; store coords in dispx for now.
     push hl
     call sprites_scadd  ; calculate screen address.
@@ -68,6 +69,8 @@ sprites_drawsprite6:
     ex af,af'           ; restore loop counter.
     dec a               ; decrement it.
     jp nz,sprites_drawsprite1 ; not reached bottom of sprite yet to repeat.
+    ld l,2
+    call sprites_marklinesforupdatescreen
     ret                 ; job done.
 
 ; Inputs:
@@ -90,6 +93,7 @@ sprites_draw2by2sprite3
     ld c,a              ; and the left edge back into c.
     jr sprites_draw2by2sprite0 ; we've done the switch so transfer to screen.
 sprites_draw2by2sprite 
+    ld (origcoords),bc  ; store coords
     ld (dispx),bc       ; store coords in dispx for now.
     ld a,c
     ld (sprtmp0),a         ; store vertical.
@@ -144,8 +148,62 @@ sprites_draw2by2sprite6
     ex af,af'           ; restore loop counter.
     dec a               ; decrement it.
     jp nz,sprites_draw2by2sprite1 ; not reached bottom of sprite yet to repeat.
+    ld l,3
+    call sprites_marklinesforupdatescreen
     ret                 ; job done.
 
+;
+; Marks lines for update with screen coords
+; Inputs:
+; l - number to update
+;
+sprites_marklinesforupdatescreen:
+    push af
+    ld bc,(origcoords)
+    call screen_getcharcoordsfromscreencoords
+    ld (origcoords),bc
+    call sprites_marklinesforupdate
+    pop af
+    ret
+
+;
+; Marks lines for update with char coords
+; Inputs:
+; l - number to update
+;
+sprites_marklinesforupdatechar:
+    push af
+    ld (origcoords),bc
+    call sprites_marklinesforupdate
+    pop af
+    ret
+
+;
+; Marks lines for update
+; Inputs:
+; l - number to update
+;
+sprites_marklinesforupdate:
+    ld bc,(origcoords)
+    ld de,(screen_offset)          ; load the screen offset, this is in rows
+    ld a,b
+    sub e
+    ld b,a
+    ld a,l                          ; get loop counter
+sprites_marklinesforupdate0:
+    push bc
+    ex af,af'                     ; store loop counter
+    ld a,b
+    call buffer_marklineforupdate ; mark this line for update
+    ld bc,(origcoords)            ; move the coords for the next line
+    inc b
+    ld (origcoords),bc
+    pop bc
+    inc b
+    ex af,af'                     ; restore loop counter
+    dec a
+    jp nz,sprites_marklinesforupdate0
+    ret
 
 ;
 ; This routine returns a buffer address for (c, b) in de (c vert).
@@ -185,6 +243,8 @@ sprites_scadd:
     add hl,de
     ld de,hl
     ret
+
+origcoords   defb 0,0           ; general-use coordinates.
 
 dispx   defb 0           ; general-use coordinates.
 dispy   defb 0      

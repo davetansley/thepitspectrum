@@ -232,11 +232,11 @@ player_drawplayer5:
     cp 20                        ; check if we should move the rock
     jp nz,player_drawplayer8
     exx 
-    ex af,af'
+    push af
     ld bc,(rocks_killerrock)    ; get the coords of the rock that killed us
     ld hl,sprites+72
     call sprites_drawsprite     ; draw a rock over current 
-    ex af,af'
+    pop af
     exx
     jp player_drawplayer6       ; continue drawing player
 player_drawplayer8:
@@ -266,7 +266,7 @@ player_drawplayer2:
 player_drawplayer7:
     ld bc,(player)              ; load bc with the start coords
     call sprites_drawsprite     ; call the routine to draw the sprite
-    call player_storeupdatedlines ; log updated rows
+    ;call player_storeupdatedlines ; log updated rows
     ret
 
 
@@ -299,30 +299,6 @@ player_justmoved1:
     ld (player+4),a
 player_justmoved3:
     exx;
-    ret
-
-;
-; Stores the updated rows associated with the player
-;
-player_storeupdatedlines:
-    ld bc,(player)          ; get the screen coords into bc 
-    ld a,c                  ; get the player block coords of current block
-    and 248                 ; find closest multiple of eight
-    rrca
-    rrca
-    rrca                    ; divide by 8
-    ld de,(screen_offset)          ; load the screen offset, this is in rows
-    sub e
-    push af
-    call buffer_marklineforupdate  ; store current row in updated lines 
-    pop af
-    dec a 
-    push af
-    call buffer_marklineforupdate  ; store line above 
-    pop af
-    inc a 
-    inc a 
-    call buffer_marklineforupdate  ; store line beneath   
     ret
 
 ;

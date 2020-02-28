@@ -84,21 +84,5 @@ monster_process2:
 monster_draw:
     ld bc,(monster_currentcoords)
     ld hl,monster_sprite                    ; load the first frame
-    call sprites_draw2by2sprite
-    ld bc,(monster_currentcoords)
-    ld a,c 
-    and 248                                 ; work out the lines to update
-    rrca
-    rrca
-    rrca
-    ld bc,(screen_offset)
-    sub c
-    ld c,a
-    call buffer_marklineforupdate
-    inc c
-    ld a,c
-    call buffer_marklineforupdate
-    inc c
-    ld a,c
-    call buffer_marklineforupdate 
+    call sprites_draw2by2sprite 
     ret

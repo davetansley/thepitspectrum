@@ -102,7 +102,6 @@ rocks_processrocks2:
     push bc
     call rocks_fall
     pop bc
-    call rocks_storeupdatedlines 
     inc ix
     inc ix              ; inc ix to get to next
     jp rocks_processrocks1 
@@ -112,26 +111,6 @@ rocks_processrocks3:
 rocks_processrocks1: 
     pop bc              ; get loop count back         
     djnz rocks_processrocks0
-    ret
-
-;
-; Stores the updated rows associated with the rock
-; Inputs:
-; bc - coords
-;
-rocks_storeupdatedlines:
-    ld a,c                  ; get the rock block coords of current block
-    and 248                 ; find closest multiple of eight
-    rrca
-    rrca
-    rrca                    ; divide by 8
-    ld de,(screen_offset)          ; load the screen offset, this is in rows
-    sub e
-    push af
-    call buffer_marklineforupdate  ; store current row in updated lines 
-    pop af 
-    inc a 
-    call buffer_marklineforupdate  ; store line beneath   
     ret
 
 ;

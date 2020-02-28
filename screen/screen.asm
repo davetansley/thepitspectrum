@@ -328,6 +328,7 @@ screen_getbufferaddress:
 ; bc: coords
 ;
 screen_showchar: 
+    ld (origcoords),bc   ; store char coords
     ld a,0
     push hl
     call screen_getbufferaddress ; get the current screen buffer pointer
@@ -346,6 +347,9 @@ screen_showchar0:
     pop hl              ; restore hl
     
     djnz screen_showchar0 ; repeat
+    ld l,1
+    call sprites_marklinesforupdatechar
+    
     ret
 
 
@@ -379,7 +383,9 @@ screen_setattr:
     call screen_getcellattroffset   ; get offset into de
     ld hl,buffer_attr_buffer
     add hl,de                       ; get the memory location    
+    ex af, af'                      ; get attr back
     ld (hl),a                         ; set the attr 
+    ex af, af'                      ; get attr back
     ld de,(screen_offset)           ; get the offset
     ld a,b                          ; get the vertical
     sub e                           ; subtract the offset

@@ -94,9 +94,6 @@ missiles_process1:                          ; activate a missile
     ld a,b
     ld de,(screen_offset)          ; load the screen offset, this is in rows
     sub e
-    push bc
-    call buffer_marklineforupdate
-    pop bc
     call screen_getscreencoordsfromcharcoords ; get screen coords into bc
     push bc
     ld a,12                                 ; inactive missile sprite
@@ -138,8 +135,6 @@ missiles_fall3:
     call screen_getblock 
     call sprites_drawsprite                 ; draw the sprite over the old one
     ld bc,(ix)          ; load coords into bc
-    call missiles_storeupdatedlines
-    ld bc,(ix)          ; load coords into bc
     inc c               ; move down one pixel
     ld (ix),bc          ; store the new coords
     ld a,20                                 ; active missile sprite
@@ -176,26 +171,6 @@ missiles_fall4:
     dec a               ; decrease the countdown
     ld (ix+2),a         ; store back
     jp missiles_fall1   ; do next missile
-
-;
-; Stores the updated rows associated with the missiles
-; Inputs:
-; bc - coords
-;
-missiles_storeupdatedlines:
-    ld a,c                  ; get the missile block coords of current block
-    and 248                 ; find closest multiple of eight
-    rrca
-    rrca
-    rrca                    ; divide by 8
-    ld de,(screen_offset)          ; load the screen offset, this is in rows
-    sub e
-    push af
-    call buffer_marklineforupdate  ; store current row in updated lines 
-    pop af 
-    inc a 
-    call buffer_marklineforupdate  ; store line beneath   
-    ret
 
 ;
 ; Adds the missile to the structure that tracks falling missile 

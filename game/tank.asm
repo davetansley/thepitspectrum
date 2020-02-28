@@ -270,10 +270,6 @@ tank_draw_full:
     ld c,a                       
     ld (tank_current_coords),bc  ; put into memory
     call tank_draw   
-    ld a,2
-    call buffer_marklineforupdate  
-    ld a,3
-    call buffer_marklineforupdate   ; mark the first two rows for update 
     ret
 
 ;
