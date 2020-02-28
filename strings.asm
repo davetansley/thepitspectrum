@@ -47,7 +47,7 @@ string_lifescreen_lastman:
 string_gameoverscreen_gameover:
     defb 12,6,'GAME OVER',255
 string_gameoverscreen_copyright:
-    defb 5,18,127,' 1982 AW ZILEC ELC LTD',255
+    defb 7,18,127,'1982 CENTURI INC',255
 string_gameoverscreen_bestscores:
     defb 7,22,'BEST SCORES TODAY',255
 string_gameover_credits:

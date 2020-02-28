@@ -9,7 +9,7 @@ monster_currentcoords:
 ; The start coords of the monster
 ;
 monster_initcoords:
-    defb 112,32
+    defb 112,27
 
 ;
 ; Store the memory location of the current jump position
@@ -28,7 +28,24 @@ monster_jumptable:
 ;
 monster_jumpdirectionvert:
     defb 0
-    
+
+;
+; The horiz direction: 0 right, 1 left
+;
+monster_jumpdirectionhoriz:
+    defb 0
+
+;
+; Frame offset, 0 or 32
+;
+monster_frameoffset:
+    defb 0
+
+;
+; Monster tick
+;
+monster_tick:
+    defb 0
 
 ;
 ; Initialises the pit monster
@@ -40,6 +57,8 @@ monster_init:
     ld (monster_jumppos),hl                 ; store the initial position in the jump table
     ld a,0
     ld (monster_jumpdirectionvert),a        ; going up
+    ld (monster_frameoffset),a
+    ld (monster_tick),a
     call monster_draw                       ; the monster
     ret
 
@@ -47,7 +66,19 @@ monster_init:
 ; Animate the monster
 ;
 monster_process:
+    ld a,(monster_tick)                     ; check if we should draw this frame
+    cp 1
+    jp z,monster_process6
+    inc a
+    ld (monster_tick),a                     ; increase the tick and continue
+    ret
+monster_process6:
+    ld a,0
+    ld (monster_tick),a                     ; zero the tick
     call monster_draw                       ; overwrite the old sprite
+    ld a,(monster_frameoffset)              ; get the anim frame offset
+    xor 32                                  ; flip between 0 and 32
+    ld (monster_frameoffset),a              ; store
     ld bc,(monster_currentcoords)           ; get the current coords
     ld hl,(monster_jumppos)                 ; get the position in the jump table
     ld d,(hl)                               ; get the jump modifier
@@ -64,7 +95,6 @@ monster_process0:
     dec hl                                  ; move back a jump pos
 monster_process1:
     ld c,a                                  ; get the vertical coord back
-    ld (monster_currentcoords),bc           ; store the new vertical coords
     ld a,(hl)                               ; check the next jump pos
     cp 255                                  ; if 255 reverse
     jp z,monster_process3
@@ -75,6 +105,27 @@ monster_process3:
     xor 1                                   ; flip it
     ld (monster_jumpdirectionvert),a        ; store it
 monster_process2:
+    ld a,(monster_jumpdirectionhoriz)       ; get the horiz direction
+    cp 0                                    ; is it right?
+    jp nz,monster_process4
+    inc b                                   ; 1 pixel right
+    ld a,b
+    cp 56                                   ; reached the edge of the pit?
+    jp nz,monster_process5
+    ld a,(monster_jumpdirectionhoriz)
+    xor 1
+    ld (monster_jumpdirectionhoriz),a       ; flip direction
+    jp monster_process5
+monster_process4:
+    dec b                                   ; 1 pixel left
+    ld a,b
+    cp 24                                   ; reached the edge of the pit?
+    jp nz,monster_process5
+    ld a,(monster_jumpdirectionhoriz)
+    xor 1
+    ld (monster_jumpdirectionhoriz),a       ; flip direction
+monster_process5:
+    ld (monster_currentcoords),bc           ; store the new vertical coords
     call monster_draw                       ; finally, draw the monster
     ret
 
@@ -83,6 +134,10 @@ monster_process2:
 ;
 monster_draw:
     ld bc,(monster_currentcoords)
+    ld a,(monster_frameoffset)
+    ld de,0
+    ld e,a
     ld hl,monster_sprite                    ; load the first frame
+    add hl,de
     call sprites_draw2by2sprite 
     ret
