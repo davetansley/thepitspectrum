@@ -379,8 +379,19 @@ screen_setattr:
     call screen_getcellattroffset   ; get offset into de
     ld hl,buffer_attr_buffer
     add hl,de                       ; get the memory location    
-    ex af, af'                      ; get attr back
     ld (hl),a                         ; set the attr 
+    ld de,(screen_offset)           ; get the offset
+    ld a,b                          ; get the vertical
+    sub e                           ; subtract the offset
+    jp c,screen_setattr0            ; if less than zero, don't update the attr on screen
+    cp 21
+    jp nc,screen_setattr0           ; if more than 21, don't update the attr on screen
+    ld b,a                          ; put the coord back in b
+    call screen_getscreenattradress ; screen attr address in de
+    ld hl,64                        ; attr memory + two rows for scores
+    add hl,de
+    ex af, af'                      ; get attr back
+    ld (hl),a
     pop bc
     pop ix
     ret

@@ -170,7 +170,7 @@ buffer_buffertoscreen0:
     inc iy
     djnz buffer_buffertoscreen0
 buffer_buffertoscreen1:
-    call buffer_buffertoattrsfast
+    ;call buffer_buffertoattrsfast
     ret
 
 ;
