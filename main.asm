@@ -45,6 +45,7 @@
     include "game\missiles.asm"
     include "game\thepit.asm"
     include "game\monster.asm"
+    include "game\robots.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -74,6 +75,7 @@ main_lifestart:
     call diamonds_init  
     call thepit_init
     call monster_init
+    call robots_init
 
 mloop:    
     halt 
@@ -122,6 +124,7 @@ main_loop_processing:
     call thepit_process         ; process the pit trap
     call missiles_process       ; process missiles
     call monster_process        ; process monster
+    call robots_process         ; process robots
     call diamonds_twinkle       ; make the diamonds twinkle
     call scores_printscore      ; update the score on screen
     call game_incrementframe    ; increment the game frame

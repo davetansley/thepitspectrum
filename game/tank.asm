@@ -187,6 +187,8 @@ tank_fire3:                      ; dealing with slopes
     sub b                        ; special case for slopes
     ld (tank_currentdamage),a    ; decrease the damage countdown by 8, so that next time, we get rid of this block without eroding it 
 tank_fire4:                     ; TIDY UP
+    ld bc,(tank_currentdamagecoord)
+    ld (origcoords),bc
     call buffer_marklineforupdate 
     ld a,1
     call buffer_marklineforupdate 

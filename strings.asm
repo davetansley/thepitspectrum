@@ -45,7 +45,7 @@ string_lifescreen_lastman:
     defb 12,3,'LAST MAN',255
 
 string_gameoverscreen_gameover:
-    defb 12,6,'GAME OVER',255
+    defb 11,6,'GAME OVER',255
 string_gameoverscreen_copyright:
     defb 7,18,127,'1982 CENTURI INC',255
 string_gameoverscreen_bestscores:
