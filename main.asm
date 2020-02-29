@@ -78,7 +78,7 @@ main_lifestart:
     call robots_init
 
 mloop:    
-    halt 
+    ;halt 
     call main_loop_processing
 
     ;

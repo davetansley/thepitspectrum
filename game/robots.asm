@@ -17,6 +17,12 @@ robots_spawntimer:
     defb 250
 
 ;
+; When this reaches max, change the anim frame
+;
+robots_animtimer:
+    defb 0
+
+;
 ; The number of robots active
 ;
 robots_numberactive:
@@ -108,6 +114,13 @@ robots_process3:
     ld de,5
     add ix,de
     djnz robots_process2
+    ld a,(robots_animtimer)
+    inc a
+    cp 8
+    jp nz,robots_process4
+    ld a,0                                  ; reset if we reached max
+robots_process4:
+    ld (robots_animtimer),a
     ret
 
 ;
@@ -115,9 +128,8 @@ robots_process3:
 ; Inputs:
 ; ix - points to first byte of robot in array
 robots_move:
-    call game_getcurrentframe               ; get the current frame
-    and 8                                   ; and with 1
-    cp 8
+    ld a,(robots_animtimer)                 ; get the anim timer
+    cp 7                                    ; compare with 8
     jp nz,robots_move1                       ; if even, don't increment frame
     ld a,(ix+4)                             ; get the anim frame
     ld b,8

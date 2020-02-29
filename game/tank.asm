@@ -116,6 +116,10 @@ tank_fire0:                      ; DEALING WITH A NEW BLOCK
     ld a,0                       ; reset the flag
     ld (tank_missile_displayed),a
     ld a,2
+    ld bc,(tank_currentdamagecoord)
+    inc c 
+    inc c
+    ld (origcoords),bc
     call buffer_marklineforupdate 
     ret                        ; only shoot if we're on 0
 tank_fire7:
