@@ -16,6 +16,13 @@ rocks_tmp2:
     defb 0,0
 
 ;
+; The number of frames to wobble for
+; Must always be 10 more than the number of frames a player digs
+;
+rocks_numberofframestowobble:
+    defb 20
+
+;
 ; Coords of the rock that killed us
 ;
 rocks_killerrock:
@@ -53,7 +60,7 @@ rocks_addrocktofalling0:
     cp 0                ; check if this is not falling
     jp nz,rocks_addrocktofalling1 ; continue the loop if not 0
     inc de              ; move to frame
-    ld a,16             ; load the number of frames to wobble
+    ld a,(rocks_numberofframestowobble) ; load the number of frames to wobble
     ld (de),a
     dec de              ; move de back to state
     ld a,2
@@ -224,19 +231,15 @@ rocks_wobble:
     push bc
     call screen_getblock     ; get the memory into hl
     call sprites_drawsprite  ; draw the sprite - over the top of the current one
-    
     ld a,(ix)           ; get the frame toggle again
     dec a               ; decrease
     ld (ix),a           ; store
-    
     and 1
     ld e,9              ; this is the rock frame
     add a,e             ; add the frame toggle
     call screen_getblock     ; get the memory into hl
-    
     pop bc
     call sprites_drawsprite  ; draw the sprite again with the new frame - next time it will do the opposite
-    
     ld a,(ix)           ; get the wobble count back
     cp 0
     ret nz              ; if we're not at zero, return

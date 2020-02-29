@@ -102,7 +102,7 @@ tank_process0:
 tank_fire:
     ld a,(tank_count)            ; if not, don't do anything
     inc a                        ; increment
-    cp 25                        ; have we reached fifty
+    cp 50                        ; have we reached fifty
     jp nz,tank_fire0             
     ld a,0                       ; reset if reached fifty
 tank_fire0:                      ; DEALING WITH A NEW BLOCK

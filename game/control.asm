@@ -3,6 +3,9 @@
 ;
 control_keyboard:
     ld a,(player+11)    ; first, check if player is dying
+    cp 4                ; is the player falling
+    call z, control_fall
+    ld a,(player+11)    ; first, check if player is dying
     cp 0
     ret nz               ; if so, can't move
     ld a,(player+5)      ; next, check if the player has pixels left to move
@@ -46,6 +49,24 @@ control_keyboard3:
     ret
 control_keyboard4:
     call control_pl_moveleft       ; player right.
+    ret
+
+;
+; Falls the player
+;
+control_fall:
+    ld bc,(player)              ; get coords
+    inc c
+    ld (player),bc
+    ld a,(player+3)             ; load the frame
+    cp 3                       ; flip between 3 and 0
+    jp nz, control_fall0
+    ld a,0
+    jp control_fall1
+control_fall0:
+    ld a,3
+control_fall1:
+    ld (player+3),a           ; save back
     ret
 
 ;

@@ -33,6 +33,14 @@ thepit_process:
     ld a,(player_location)
     cp 2                            ; if two, the player is in the pit, so process the trap
     jp nz,thepit_process0
+    ld bc,(player)                  ; get the player's coords to check if about to fall
+    ld a,8
+    add a,c
+    ld c,a                          ; look at the square underneath
+    call screen_getcharcoordsfromscreencoords ; get the cell coords
+    call screen_ischarempty
+    cp 1                            ; check if this is 1=empty
+    jp z,thepit_process2
     ld a,(thepit_timer)             ; get the timer
     inc a
     ld (thepit_timer),a             ; store
@@ -67,5 +75,8 @@ thepit_process1:                    ; draw the trapdoor in current position
     call screen_showchar            ; show the char
 
 thepit_process0:
+    ret
+thepit_process2:
+    call player_pitkillplayer
     ret
 

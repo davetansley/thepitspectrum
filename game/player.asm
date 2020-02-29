@@ -8,7 +8,7 @@ player:
     defb    0,0,0               ; is digging (0 no), digging count, pixels to di (+6,+7,+8)
     defb    0                   ; lives remaining (+9)
     defb    0                   ; died this life (+10)
-    defb    0,0                 ; crushed (+11), frames (+12)
+    defb    0,0                 ; dying (+11), frames (+12)
     defb    0                   ; can finish level, whether can finish level or not (+13)
 
 player_location:
@@ -26,8 +26,8 @@ player_getlocation:
     cp 9                        ; if not on this row, not in the pit
     jp nz,player_getlocation0
     ld a,c                      ; check horizontal
-    cp 8
-    jp nc, player_getlocation0  ; if more than 8, not in the pit
+    cp 9
+    jp nc, player_getlocation0  ; if more than 9, not in the pit
     ld hl,player_location
     ld (hl),2                   ; load location with 2, the pit
     ret                         ; done
@@ -194,6 +194,11 @@ player_zonkplayer
     ld (hl),3
     ret
 
+player_pitkillplayer
+    ld hl,player+11             ; mark as pit killed
+    ld (hl),4
+    ret
+
 ;
 ; Draws the player at the current position or deletes them
 ;
@@ -202,18 +207,43 @@ player_drawplayer:
     cp 3
     jp nz,player_drawplayer0
     ld a,0                      ; if 3, then down, so set the direction to 0 since the sprite is the same as up
-player_drawplayer0:
+player_drawplayer0:             ; DYING CHECKS
     ld e,a                      ; store in e
     ld a,(player+11)             ; get the dying flag
     cp 1
     jp z,player_drawplayer3     ; if it's one, we're being crushed
-player_drawplayer4:
+    cp 4
+    jp z,player_drawplayer9     ; player is falling into the pit
+player_drawplayer4:             ; CHECK FOR DIGGING
     ld a,(player+6)             ; get the dig flag
     cp 1
     jp z,player_drawplayer1    ; get dig frame
     ld a,(player+3)             ; this is normal movement so get the current frame
     add a,e
     jp player_drawplayer2
+player_drawplayer6:             ; GETTING THE DIG FRAM
+    and 1                       ; check for odd
+    add 10                      ; add 10, to get either 10 or 11
+    jp player_drawplayer2
+player_drawplayer1:             ; GET THE NORMAL FRAME
+    ld a,(player+2)             ; digging, get the current direction again, because want all four
+    add a,6                     ; add direction to 6 to get frame    
+player_drawplayer2:             ; WORK OUT THE FRAME
+    rlca
+    rlca
+    rlca                        ; multiply by eight
+    ld l,a
+    ld h,0  
+    ld de,player_sprite
+    add hl,de                   ; load hl with the location of the player sprite data
+player_drawplayer7:             ; DRAW THE PlAYER
+    ld bc,(player)              ; load bc with the start coords
+    call sprites_drawsprite     ; call the routine to draw the sprite
+    ;call player_storeupdatedlines ; log updated rows
+    ret
+;
+; CRUSHING
+;
 player_drawplayer3:
     ld hl,player+12
     ld a,(hl)                  ; crushing, so get the current anim flag
@@ -248,27 +278,25 @@ player_drawplayer8:
     call screen_setattr
     ld hl,sprites+72            ; otherwise, player is rock
     jp player_drawplayer7
-player_drawplayer6:
-    and 1                       ; check for odd
-    add 10                      ; add 10, to get either 10 or 11
+;
+; FALLING
+;
+player_drawplayer9:             ; player is falling into the pit
+    ld hl,player+12
+    ld a,(hl)                   ; get the frames
+    cp 0
+    jp nz,player_drawplayer10    ; if this isn't zero, then this isn't the first time round, so do the crush anim
+    ld a,80
+    ld (hl),a                   ; otherwise, load up the anim frames 
+    jp player_drawplayer4       ; and return to the main loop to remove the current frame
+player_drawplayer10:
+    dec a 
+    ld (hl),a
+    cp 0
+    call z,player_killplayer     ; final frame, so kill the player
+player_drawplayer11:
+    ld a,(player+3)
     jp player_drawplayer2
-player_drawplayer1:
-    ld a,(player+2)             ; digging, get the current direction again, because want all four
-    add a,6                     ; add direction to 6 to get frame    
-player_drawplayer2:
-    rlca
-    rlca
-    rlca                        ; multiply by eight
-    ld l,a
-    ld h,0  
-    ld de,player_sprite
-    add hl,de                   ; load hl with the location of the player sprite data
-player_drawplayer7:
-    ld bc,(player)              ; load bc with the start coords
-    call sprites_drawsprite     ; call the routine to draw the sprite
-    ;call player_storeupdatedlines ; log updated rows
-    ret
-
 
 ;
 ; Runs after the player just moved. Changes animation frame if required

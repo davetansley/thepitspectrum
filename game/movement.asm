@@ -1,4 +1,10 @@
 ;
+; The number of frames to dig for
+;
+movement_numberdigframes:
+    defb 10
+
+;
 ; Checks the contents of a cell are empty - ie, all pixel rows are zero
 ; Inputs: 
 ; hl - memory location of top pixel row
@@ -182,7 +188,8 @@ movement_spaceisdiggable2:
     ld hl,player+6                  
     ld (hl),1                       ; set the player into digging mode
     inc hl
-    ld (hl),5                      ; set the number of frame to dig for
+    ld a,(movement_numberdigframes)
+    ld (hl),a                       ; set the number of frame to dig for
     inc hl
     ld (hl),8                       ; set the number of pixels to dig
     ret
@@ -234,7 +241,8 @@ movement_spacebelowisdiggable5:
     ld hl,player+6                  
     ld (hl),1                       ; set the player into digging mode
     inc hl
-    ld (hl),3                      ; set the number of frame to dig for
+    ld a,(movement_numberdigframes)
+    ld (hl),a                       ; set the number of frame to dig for
     inc hl
     ld (hl),e                       ; set the number of pixels to dig
     ret
@@ -286,7 +294,8 @@ movement_spaceaboveisdiggable5:
     ld hl,player+6                  
     ld (hl),1                       ; set the player into digging mode
     inc hl
-    ld (hl),5                       ; set the number of frame to dig for
+    ld a,(movement_numberdigframes)
+    ld (hl),a                       ; set the number of frame to dig for
     inc hl
     ld (hl),e                       ; set the number of pixels to dig
     ret
