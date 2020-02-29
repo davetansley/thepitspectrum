@@ -115,6 +115,19 @@ robots_process3:
 ; Inputs:
 ; ix - points to first byte of robot in array
 robots_move:
+    call game_getcurrentframe               ; get the current frame
+    and 8                                   ; and with 1
+    cp 8
+    jp nz,robots_move1                       ; if even, don't increment frame
+    ld a,(ix+4)                             ; get the anim frame
+    ld b,8
+    add a,b                                 ; add to anim frame
+    cp 32
+    jp nz,robots_move0                      ; if not 32, then just store
+    ld a,0                                  ; otherwise, reset
+robots_move0:
+    ld (ix+4),a                             ; store
+robots_move1:
     ret
 
 ;
@@ -130,5 +143,9 @@ robots_draw:
     ld de,32
     add hl,de                               ; add four frames to sprite
 robots_draw0:
+    ld a,(ix+4)                             ; get the anim frame
+    ld de,0
+    ld e,a
+    add hl,de                               ; add to base
     call sprites_drawsprite
     ret

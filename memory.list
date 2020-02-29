@@ -5889,7 +5889,7 @@
  56+  C6B7 3A 81 C6         ld a,(robots_numberactive)
  57+  C6BA 3C               inc a
  58+  C6BB 32 81 C6         ld (robots_numberactive),a  ; increase the number active
- 59+  C6BE CD 17 C7         call robots_draw            ; draw initial frame
+ 59+  C6BE CD 31 C7         call robots_draw            ; draw initial frame
  60+  C6C1 C9               ret
  61+  C6C2              robots_spawn1:
  62+  C6C2 11 05 00         ld de,5
@@ -5933,9 +5933,9 @@
 100+  C6FC DD 7E 02         ld a,(ix+2)                             ; check the state
 101+  C6FF FE 00            cp 0
 102+  C701 CA 0D C7         jp z,robots_process3                    ; if not active, move on
-103+  C704 CD 17 C7         call robots_draw                        ; draw over existing
+103+  C704 CD 31 C7         call robots_draw                        ; draw over existing
 104+  C707 CD 16 C7         call robots_move                        ; move the robot
-105+  C70A CD 17 C7         call robots_draw                        ; draw the new robot
+105+  C70A CD 31 C7         call robots_draw                        ; draw the new robot
 106+  C70D              robots_process3:
 107+  C70D C1               pop bc
 108+  C70E 11 05 00         ld de,5
@@ -5948,132 +5948,149 @@
 115+  C716              ; Inputs:
 116+  C716              ; ix - points to first byte of robot in array
 117+  C716              robots_move:
-118+  C716 C9               ret
-119+  C717
-120+  C717              ;
-121+  C717              ; Draws a robot
-122+  C717              ; Inputs:
-123+  C717              ; ix - points to first byte of robot in array
-124+  C717              robots_draw:
-125+  C717 DD 4E 00 DD      ld bc,(ix)
-125+  C71B 46 01
-126+  C71D 21 84 B6         ld hl,robot_sprite                      ; set to the robot sprite
-127+  C720 DD 7E 03         ld a,(ix+3)                             ; get the direction
-128+  C723 FE 00            cp 0
-129+  C725 CA 2C C7         jp z,robots_draw0                       ; if left, nothing to do
-130+  C728 11 20 00         ld de,32
-131+  C72B 19               add hl,de                               ; add four frames to sprite
-132+  C72C              robots_draw0:
-133+  C72C CD 94 A9         call sprites_drawsprite
-134+  C72F C9               ret
+118+  C716 CD 3D BB         call game_getcurrentframe               ; get the current frame
+119+  C719 E6 08            and 8                                   ; and with 1
+120+  C71B FE 08            cp 8
+121+  C71D C2 30 C7         jp nz,robots_move1                       ; if even, don't increment frame
+122+  C720 DD 7E 04         ld a,(ix+4)                             ; get the anim frame
+123+  C723 06 08            ld b,8
+124+  C725 80               add a,b                                 ; add to anim frame
+125+  C726 FE 20            cp 32
+126+  C728 C2 2D C7         jp nz,robots_move0                      ; if not 32, then just store
+127+  C72B 3E 00            ld a,0                                  ; otherwise, reset
+128+  C72D              robots_move0:
+129+  C72D DD 77 04         ld (ix+4),a                             ; store
+130+  C730              robots_move1:
+131+  C730 C9               ret
+132+  C731
+133+  C731              ;
+134+  C731              ; Draws a robot
+135+  C731              ; Inputs:
+136+  C731              ; ix - points to first byte of robot in array
+137+  C731              robots_draw:
+138+  C731 DD 4E 00 DD      ld bc,(ix)
+138+  C735 46 01
+139+  C737 21 84 B6         ld hl,robot_sprite                      ; set to the robot sprite
+140+  C73A DD 7E 03         ld a,(ix+3)                             ; get the direction
+141+  C73D FE 00            cp 0
+142+  C73F CA 46 C7         jp z,robots_draw0                       ; if left, nothing to do
+143+  C742 11 20 00         ld de,32
+144+  C745 19               add hl,de                               ; add four frames to sprite
+145+  C746              robots_draw0:
+146+  C746 DD 7E 04         ld a,(ix+4)                             ; get the anim frame
+147+  C749 11 00 00         ld de,0
+148+  C74C 5F               ld e,a
+149+  C74D 19               add hl,de                               ; add to base
+150+  C74E CD 94 A9         call sprites_drawsprite
+151+  C751 C9               ret
 # file closed: game/robots.asm
- 49   C730
- 50   C730              ;===========================================================================
- 51   C730              ; main routine - the code execution starts here.
- 52   C730              ; Sets up the new interrupt routine, the memory
- 53   C730              ; banks and jumps to the start loop.
- 54   C730              ;===========================================================================
- 55   C730              main:
- 56   C730
- 57   C730                  ; Draw the title screen
- 58   C730              main_titlescreen:
- 59   C730 CD B3 AA         call titlescreen_show
- 60   C733 CD 8C BB         call player_init_gamestart
- 61   C736
- 62   C736              main_lifestart:
- 63   C736
- 64   C736 CD AA BB         call player_init_lifestart
- 65   C739
- 66   C739 CD 19 AC         call lifescreen_draw        ; show the lives remaining screen
- 67   C73C
- 68   C73C CD 00 80         call init_start
- 69   C73F CD 8B A7         call screen_draw
- 70   C742 CD DA A6         call buffer_allbuffertoscreen
- 71   C745
- 72   C745 CD 9D C3         call missiles_init
- 73   C748 CD 31 BD         call ship_land              ; land the ship
- 74   C74B CD 44 BE         call tank_init
- 75   C74E CD 65 C3         call diamonds_init
- 76   C751 CD 4E C5         call thepit_init
- 77   C754 CD C3 C5         call monster_init
- 78   C757 CD 82 C6         call robots_init
- 79   C75A
- 80   C75A              mloop:
- 81   C75A 76               halt
- 82   C75B CD 8F C7         call main_loop_processing
- 83   C75E
- 84   C75E                  ;
- 85   C75E                  ; Check if the player died
- 86   C75E                  ;
- 87   C75E 21 51 BB         ld hl,player+10
- 88   C761 7E               ld a,(hl)                   ; check if the player died this frame
- 89   C762 FE 01            cp 1
- 90   C764 C2 7B C7         jp nz,mloop0
- 91   C767 CD 11 BC         call player_died        ; do end of life housekeeping
- 92   C76A 06 28            ld b,40
- 93   C76C CD 82 80         call utilities_pauseforframes
- 94   C76F 21 50 BB         ld hl,player+9        ; check lives remaining
- 95   C772 7E               ld a,(hl)
- 96   C773 FE 00            cp 0
- 97   C775 CA C0 C7         jp z,main_gameover   ; leave the loop if we're done
- 98   C778 C3 36 C7         jp main_lifestart    ; otherwise, start a new life
- 99   C77B              mloop0:
-100   C77B                  ;
-101   C77B                  ; Check if the player completed the level
-102   C77B                  ;
-103   C77B 21 54 BB         ld hl,player+13
-104   C77E 7E               ld a,(hl)
-105   C77F FE 01            cp 1
-106   C781 C2 5A C7         jp nz,mloop
-107   C784 CD FB BC         call player_checkforexit
-108   C787 FE 01            cp 1                        ; look at return, if 1, level has been completed
-109   C789 CA C6 C7         jp z,main_endlevel          ; jump to level transition screen
-110   C78C C3 5A C7         jp mloop                ; start the loop again
-111   C78F
-112   C78F
-113   C78F              main_loop_processing:
-114   C78F
-115   C78F CD 99 A6         call buffer_buffertoscreen  ; copy buffer to screen
-116   C792 CD FE A5         call buffer_clearlist       ; zero the updated lines list
-117   C795 CD 56 BB         call player_getlocation     ; figure out where the player is
-118   C798 CD 47 BC         call player_drawplayer      ; delete player
-119   C79B CD C4 B6         call control_keyboard       ; check keyboard
-120   C79E CD 47 BC         call player_drawplayer      ; draw player
-121   C7A1 CD 73 BE         call tank_process           ; prcoess the tank
-122   C7A4 CD 1C BD         call ship_process           ; proces the ship
-123   C7A7 CD 6B C0         call rocks_processrocks     ; process falling rocks
-124   C7AA CD 59 C5         call thepit_process         ; process the pit trap
-125   C7AD CD C5 C3         call missiles_process       ; process missiles
-126   C7B0 CD E0 C5         call monster_process        ; process monster
-127   C7B3 CD D6 C6         call robots_process         ; process robots
-128   C7B6 CD 44 C3         call diamonds_twinkle       ; make the diamonds twinkle
-129   C7B9 CD CE C1         call scores_printscore      ; update the score on screen
-130   C7BC CD 2E BB         call game_incrementframe    ; increment the game frame
-131   C7BF
-132   C7BF C9               ret
-133   C7C0
-134   C7C0              main_gameover:
-135   C7C0 CD 6C AC         call gameover_draw          ; show the game over screen
-136   C7C3 C3 30 C7         jp main_titlescreen         ; go back to title
-137   C7C6
-138   C7C6              main_endlevel:
-139   C7C6 CD F7 BB         call player_recordcurrentscore
-140   C7C9 CD 5A AD         call endlevel_draw          ; show the end level screen
-141   C7CC C3 36 C7         jp main_lifestart           ; start a new life
-142   C7CF
-143   C7CF              ;===========================================================================
-144   C7CF              ; Stack.
-145   C7CF              ;===========================================================================
-146   C7CF
-147   C7CF              ; Stack: this area is reserved for the stack
-148   C7CF              STACK_SIZE: equ 100    ; in words
-149   C7CF
-150   C7CF              ; Reserve stack space
-151   C7CF 00 00            defw 0  ; WPMEM, 2
-152   C7D1              stack_bottom:
-153   C7D1 00 00 00...      defs    STACK_SIZE*2, 0
-154   C899              stack_top:
-155   C899 00 00            defw 0  ; WPMEM, 2
-156   C89B
-157   C89B                     SAVESNA "ThePit.sna", main
+ 49   C752
+ 50   C752              ;===========================================================================
+ 51   C752              ; main routine - the code execution starts here.
+ 52   C752              ; Sets up the new interrupt routine, the memory
+ 53   C752              ; banks and jumps to the start loop.
+ 54   C752              ;===========================================================================
+ 55   C752              main:
+ 56   C752
+ 57   C752                  ; Draw the title screen
+ 58   C752              main_titlescreen:
+ 59   C752 CD B3 AA         call titlescreen_show
+ 60   C755 CD 8C BB         call player_init_gamestart
+ 61   C758
+ 62   C758              main_lifestart:
+ 63   C758
+ 64   C758 CD AA BB         call player_init_lifestart
+ 65   C75B
+ 66   C75B CD 19 AC         call lifescreen_draw        ; show the lives remaining screen
+ 67   C75E
+ 68   C75E CD 00 80         call init_start
+ 69   C761 CD 8B A7         call screen_draw
+ 70   C764 CD DA A6         call buffer_allbuffertoscreen
+ 71   C767
+ 72   C767 CD 9D C3         call missiles_init
+ 73   C76A CD 31 BD         call ship_land              ; land the ship
+ 74   C76D CD 44 BE         call tank_init
+ 75   C770 CD 65 C3         call diamonds_init
+ 76   C773 CD 4E C5         call thepit_init
+ 77   C776 CD C3 C5         call monster_init
+ 78   C779 CD 82 C6         call robots_init
+ 79   C77C
+ 80   C77C              mloop:
+ 81   C77C 76               halt
+ 82   C77D CD B1 C7         call main_loop_processing
+ 83   C780
+ 84   C780                  ;
+ 85   C780                  ; Check if the player died
+ 86   C780                  ;
+ 87   C780 21 51 BB         ld hl,player+10
+ 88   C783 7E               ld a,(hl)                   ; check if the player died this frame
+ 89   C784 FE 01            cp 1
+ 90   C786 C2 9D C7         jp nz,mloop0
+ 91   C789 CD 11 BC         call player_died        ; do end of life housekeeping
+ 92   C78C 06 28            ld b,40
+ 93   C78E CD 82 80         call utilities_pauseforframes
+ 94   C791 21 50 BB         ld hl,player+9        ; check lives remaining
+ 95   C794 7E               ld a,(hl)
+ 96   C795 FE 00            cp 0
+ 97   C797 CA E2 C7         jp z,main_gameover   ; leave the loop if we're done
+ 98   C79A C3 58 C7         jp main_lifestart    ; otherwise, start a new life
+ 99   C79D              mloop0:
+100   C79D                  ;
+101   C79D                  ; Check if the player completed the level
+102   C79D                  ;
+103   C79D 21 54 BB         ld hl,player+13
+104   C7A0 7E               ld a,(hl)
+105   C7A1 FE 01            cp 1
+106   C7A3 C2 7C C7         jp nz,mloop
+107   C7A6 CD FB BC         call player_checkforexit
+108   C7A9 FE 01            cp 1                        ; look at return, if 1, level has been completed
+109   C7AB CA E8 C7         jp z,main_endlevel          ; jump to level transition screen
+110   C7AE C3 7C C7         jp mloop                ; start the loop again
+111   C7B1
+112   C7B1
+113   C7B1              main_loop_processing:
+114   C7B1
+115   C7B1 CD 99 A6         call buffer_buffertoscreen  ; copy buffer to screen
+116   C7B4 CD FE A5         call buffer_clearlist       ; zero the updated lines list
+117   C7B7 CD 56 BB         call player_getlocation     ; figure out where the player is
+118   C7BA CD 47 BC         call player_drawplayer      ; delete player
+119   C7BD CD C4 B6         call control_keyboard       ; check keyboard
+120   C7C0 CD 47 BC         call player_drawplayer      ; draw player
+121   C7C3 CD 73 BE         call tank_process           ; prcoess the tank
+122   C7C6 CD 1C BD         call ship_process           ; proces the ship
+123   C7C9 CD 6B C0         call rocks_processrocks     ; process falling rocks
+124   C7CC CD 59 C5         call thepit_process         ; process the pit trap
+125   C7CF CD C5 C3         call missiles_process       ; process missiles
+126   C7D2 CD E0 C5         call monster_process        ; process monster
+127   C7D5 CD D6 C6         call robots_process         ; process robots
+128   C7D8 CD 44 C3         call diamonds_twinkle       ; make the diamonds twinkle
+129   C7DB CD CE C1         call scores_printscore      ; update the score on screen
+130   C7DE CD 2E BB         call game_incrementframe    ; increment the game frame
+131   C7E1
+132   C7E1 C9               ret
+133   C7E2
+134   C7E2              main_gameover:
+135   C7E2 CD 6C AC         call gameover_draw          ; show the game over screen
+136   C7E5 C3 52 C7         jp main_titlescreen         ; go back to title
+137   C7E8
+138   C7E8              main_endlevel:
+139   C7E8 CD F7 BB         call player_recordcurrentscore
+140   C7EB CD 5A AD         call endlevel_draw          ; show the end level screen
+141   C7EE C3 58 C7         jp main_lifestart           ; start a new life
+142   C7F1
+143   C7F1              ;===========================================================================
+144   C7F1              ; Stack.
+145   C7F1              ;===========================================================================
+146   C7F1
+147   C7F1              ; Stack: this area is reserved for the stack
+148   C7F1              STACK_SIZE: equ 100    ; in words
+149   C7F1
+150   C7F1              ; Reserve stack space
+151   C7F1 00 00            defw 0  ; WPMEM, 2
+152   C7F3              stack_bottom:
+153   C7F3 00 00 00...      defs    STACK_SIZE*2, 0
+154   C8BB              stack_top:
+155   C8BB 00 00            defw 0  ; WPMEM, 2
+156   C8BD
+157   C8BD                     SAVESNA "ThePit.sna", main
 # file closed: main.asm
