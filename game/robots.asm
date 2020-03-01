@@ -256,9 +256,11 @@ robots_automove1:
     jp robots_automove2
 robots_automove3:
     dec c
+    dec c
     jp robots_automove2
 robots_automove4:
-    inc c      
+    inc c 
+    inc c     
     jp robots_automove2                     
 robots_automove2:
     ld (ix),bc
@@ -433,7 +435,7 @@ robots_checkupandmove:
     ; check above
     ld bc,(ix)                  ; load current coords into bc
     ld a,c
-    cp 32
+    cp 40
     ret c
     call sprites_scadd              ; get the memory location of cell into de
     ld hl,de                        ; look at cell directly above (subtract 32)
@@ -444,9 +446,10 @@ robots_checkupandmove:
     jp nz,robots_checkupandmove0    ; can't move here so return
     ld bc,(ix)                  ; load current coords into bc
     dec c                       ; move up
+    dec c
     ld (ix),bc
     ld (ix+6),2
-    ld (ix+5),7                 ; set the auto move frames
+    ld (ix+5),3                 ; set the auto move frames
     ld a,1
     ret
 robots_checkupandmove0:
@@ -468,9 +471,10 @@ robots_checkdownandmove:
     jp nz,robots_checkdownandmove0    ; can't move here so return
     ld bc,(ix)                  ; load current coords into bc
     inc c                       ; move up
+    inc c
     ld (ix),bc
     ld (ix+6),3
-    ld (ix+5),7                 ; set the auto move frames
+    ld (ix+5),3                 ; set the auto move frames
     ld a,1
     ret
 robots_checkdownandmove0:

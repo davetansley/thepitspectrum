@@ -88,7 +88,7 @@ string_endlevel_anothergo:
     defb 8,18,'HAVE ANOTHER GO',255
 
 string_zonk:
-    defb 0,0,'ZONK!',255
+    defb 0,0,'ZONK!!',255
 
 
 string_options_title:
