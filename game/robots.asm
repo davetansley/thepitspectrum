@@ -88,7 +88,7 @@ robots_init0:
 ; ix - pointer to start of robot array entry
 ;
 robots_spawn:
-    ld b,3
+    ld b,3                      ;(SELF WRITING CODE)
     ld ix,robots_robots
 robots_spawn0: 
     ld a,(ix+2)                 ; get the state
@@ -97,6 +97,10 @@ robots_spawn0:
     ld bc,(robots_initcoords)
     ld (ix),bc
     ld (ix+2),1
+    ld (ix+3),0
+    ld (ix+4),0
+    ld (ix+5),0
+    ld (ix+6),0
     ld a,(robots_numberactive)
     inc a
     ld (robots_numberactive),a  ; increase the number active
@@ -117,6 +121,12 @@ robots_kill:
     dec a
     ld (robots_numberactive),a
     ld (ix+2),0                     ; set to inactive
+    push bc
+    push hl
+    ld b,1
+    call scores_addhundreds
+    pop hl
+    pop bc
     ret
 
 ;
@@ -138,7 +148,7 @@ robots_process1:
     dec a
     ld (robots_spawntimer),a                ; decrease the spawn timer and store
 robots_process0:
-    ld b,3                                  ; max number of robots
+    ld b,3                                  ; max number of robots (SELF WRITING CODE)
     ld ix, robots_robots                    ; point ix at the robot array
 robots_process2:
     push bc
@@ -150,7 +160,10 @@ robots_process7:                            ; self writing code - the number in 
     cp 4
     jp nz,robots_process3                   ; can we move this frame
     call robots_draw                        ; draw over existing
-    call robots_move                        ; move the robot
+    call robots_move                        ; move the 
+    ld a,(ix+2)                             ; get the state again
+    cp 0
+    jp z,robots_process3                    ; move to next if this robot has become inactive
     call robots_draw                        ; draw the new robot
 robots_process3:
     pop bc
@@ -175,11 +188,15 @@ robots_process5:
     
     ret
 
+
 ;
 ; Moves a robot
 ; Inputs:
 ; ix - points to first byte of robot in array
 robots_move:
+    ld a,(ix+2)                             ; get the state
+    cp 2
+    jp z,robots_move4                       ; don't move if shot, just change the anim
     ld a,(robots_animtimer)                 ; get the anim timer
     cp 7                                    ; compare with 8
     jp nz,robots_move1                       ; if even, don't increment frame
@@ -203,6 +220,18 @@ robots_move2:
 robots_move3:
     call robots_checkforplayer              ; check to see if we collided with a player
     ret
+robots_move4:
+    ld a,(ix+4)
+    cp 72
+    jp nz,robots_move5
+    ld a,64
+    ld (ix+4),a
+    ret
+robots_move5:
+    ld a,72
+    ld (ix+4),a
+    ret
+
 
 ;
 ; Processes automove
@@ -517,6 +546,10 @@ robots_checkrightandmove0:
 robots_draw:
     ld bc,(ix)
     ld hl,robot_sprite                      ; set to the robot sprite
+    ld a,(ix+2)                             ; get the state
+    cp 2                                    ; is this dying
+    jp z,robots_draw1
+robots_draw3:
     ld a,(ix+3)                             ; get the direction
     cp 0
     jp z,robots_draw0                       ; if left, nothing to do
@@ -529,12 +562,34 @@ robots_draw0:
     add hl,de                               ; add to base
     call sprites_drawsprite
     ret
+;
+; Dying
+;
+robots_draw1:
+    ld a,(ix+5)                             ; get anim frames
+    cp 0                                    ; if zero this is the first time around
+    jp nz,robots_draw2
+    ld a,24
+    ld (ix+5),a                             ; load up the anim frames
+    jp robots_draw3                         ; return to main loop to draw as normal
+robots_draw2:
+    dec a 
+    ld (ix+5),a
+    cp 0                                    ; have we reached the end yet
+    jp nz, robots_draw4
+    call robots_kill
+robots_draw4:
+    jp robots_draw0
+    ret
 
 ;
 ; Checks to see if the robot is hitting a player
 ; Inputs:
 ; ix - memory location of robot we're checking
 robots_checkforplayer:
+    ld a,(player+11)     ; get player state
+    cp 0
+    ret nz               ; if already dying, don't kill again
     ld bc,(ix)           ; get coords
     ld de,(player)       ; get the player coords
     ld a,e               ; get the vert coord first 
@@ -548,6 +603,5 @@ robots_checkforplayer:
     cp 17                ; compare to max*2+1? if carry flag set, they've hit
     ret nc
     ld (ix+2),0          ; mark as inactive
-    call robots_draw     ; delete the frame
     call player_robotkillplayer ; mark the player as killed
     ret

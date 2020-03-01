@@ -36,6 +36,9 @@ lifescreen_draw1:
     ld b,10
     call screen_setcolours
 
+    ld b,50
+    call utilities_pauseforframes         ; pause for a second
+
     ld a,100                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
 

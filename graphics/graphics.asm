@@ -27,6 +27,7 @@ sprites:
 	defb	192,192,  0,  0,  0,  0,  0,  0	  ; 24, the pit 4
 	defb	0,0,  0,  0,  0,  0,  0,  0	  	  ; 25, the pit 5
     defb    255,255,255,255,255,255,255,255   ; 26, slime block, green on green
+	defb    0,  0,  0,102,  0,  0,  0,  0     ; 27, bullet
 
     
 sprite_attrs:
@@ -57,6 +58,7 @@ sprite_attrs:
 	defb	066	; 24, the pit 4
 	defb	066	; 25, the pit 5
 	defb    100 ; 26, slime, green on green
+	defb 	070 ; 27, bullet
     
 
 player_sprite:
@@ -125,3 +127,5 @@ robot_sprite:
 	defb	112, 80,114,127,114, 72, 36, 54		; 2
 	defb	112, 80,114,127,114, 76,198,192		; 3
 	defb	112, 80,115,124,115, 80,144,216		; 4
+	defb     56,169,186,124, 56, 42, 38, 96     ; dead 1
+	defb	 28,149, 93, 62, 28, 84,100,  6		; dead 2

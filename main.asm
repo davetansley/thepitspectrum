@@ -27,6 +27,7 @@
     include "screen\lifescreen.asm"
     include "screen\gameover.asm"
     include "screen\endlevel.asm"
+    include "screen\options.asm"
 
     include "sound\sound.asm"
 
@@ -46,6 +47,7 @@
     include "game\thepit.asm"
     include "game\monster.asm"
     include "game\robots.asm"
+    include "game\bullet.asm"
 
 ;===========================================================================
 ; main routine - the code execution starts here.
@@ -53,6 +55,7 @@
 ; banks and jumps to the start loop.
 ;===========================================================================
 main:
+    call options_show
 
     ; Draw the title screen
 main_titlescreen:
@@ -76,6 +79,7 @@ main_lifestart:
     call thepit_init
     call monster_init
     call robots_init
+    call bullet_init
 
 mloop:    
     ;halt 
@@ -116,7 +120,7 @@ main_loop_processing:
     call buffer_clearlist       ; zero the updated lines list
     call player_getlocation     ; figure out where the player is
     call player_drawplayer      ; delete player
-    call control_keyboard       ; check keyboard
+    call control_input          ; check input
     call player_drawplayer      ; draw player
     call tank_process           ; prcoess the tank
     call ship_process           ; proces the ship
@@ -125,6 +129,7 @@ main_loop_processing:
     call missiles_process       ; process missiles
     call monster_process        ; process monster
     call robots_process         ; process robots
+    call bullet_process         ; process the bullet
     call diamonds_twinkle       ; make the diamonds twinkle
     call scores_printscore      ; update the score on screen
     call game_incrementframe    ; increment the game frame
@@ -136,7 +141,7 @@ main_gameover:
     jp main_titlescreen         ; go back to title
 
 main_endlevel:
-    call player_recordcurrentscore
+    call player_recordcurrentstate
     call endlevel_draw          ; show the end level screen
     jp main_lifestart           ; start a new life
 

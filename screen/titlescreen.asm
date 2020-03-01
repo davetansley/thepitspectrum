@@ -4,6 +4,9 @@
 titlescreen_show:
     call titlescreen_init
     call titlescreen_drawtitle
+    ld b,50
+    call utilities_pauseforframes         ; pause for a second
+
     ld a,250                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
     ld a,e
@@ -12,6 +15,9 @@ titlescreen_show:
 
     call titlescreen_alt_init             ; otherwise, draw alt screen
     call titlescreen_alt_drawtitle
+    ld b,50
+    call utilities_pauseforframes         ; pause for a second
+
     ld a,250                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
     ld a,e

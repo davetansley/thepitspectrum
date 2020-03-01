@@ -60,13 +60,12 @@ endlevel_init2:
     push bc
     ld b,1
     call scores_addthousands
-    call player_recordcurrentscore
     call scores_printscores     ; print the current scores
     ld b,10
     call utilities_pauseforframes
     pop bc
     djnz endlevel_init2
-
+    call game_increasedifficulty ; move the difficulty up a level
     call utilities_waitforkey   ; wait for keypress
 
     ret

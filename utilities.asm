@@ -48,7 +48,12 @@ utilities_waitforkey:
 utilities_waitforkey0: 
     ld a,(hl)           ; new value of LAST K.
     cp 0                ; is it still zero?
-    jr z,utilities_waitforkey0           ; yes, so no key pressed.
+    jr nz,utilities_waitforkey1           ; yes, so no key pressed.
+    ld bc,31                        ; Kempston joystick port.
+    in a,(c)                        ; read input.
+    and 16
+    jp z,utilities_waitforkey0
+utilities_waitforkey1:
     ret                 ; key was pressed.
 
 ;
@@ -68,6 +73,13 @@ utilities_waitforkey_forframes0:
     ld e,1              ; set the pressed flag
     ret                 ; key was pressed.
 utilities_waitforkey_forframes1:
+    ld bc,31                        ; Kempston joystick port.
+    in a,(c)                        ; read input.
+    and 16
+    jp z,utilities_waitforkey_forframes2
+    ld e,1              ; set the pressed flag
+    ret                 ; key was pressed.
+utilities_waitforkey_forframes2:
     halt                ; wait for frame
     halt                ; wait for frame
     djnz utilities_waitforkey_forframes0 ; loop again

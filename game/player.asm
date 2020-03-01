@@ -10,6 +10,7 @@ player:
     defb    0                   ; died this life (+10)
     defb    0,0                 ; dying (+11), frames (+12)
     defb    0                   ; can finish level, whether can finish level or not (+13)
+    defb    0                   ; difficulty (+14)
 
 player_location:
     defb 0                      ; 0 normal, 1 diamond cavern, 2 the pit
@@ -70,6 +71,9 @@ player_init_gamestart1:
     ld (hl),48
     inc hl
     djnz player_init_gamestart1                 ; zero out player 2 score
+    ld a,0
+    ld (player1_difficulty),a
+    ld (player2_difficulty),a                   ; set player difficulties to zero
     ret
 
 ;
@@ -104,10 +108,14 @@ player_init_lifestart2:
     ld a,(game_currentplayer)
     cp 1
     jp nz,player_init_lifestart0
-    ld hl,player1_score+2
+    ld a,(player1_difficulty)       ; initialise player 1 difficulty
+    ld (game_difficulty),a 
+    ld hl,player1_score+2           ; itialise player 1 scores
     jp player_init_lifestart1
 player_init_lifestart0:
-    ld hl,player2_score+2
+    ld a,(player2_difficulty)       ; initialise player 2 difficulty
+    ld (game_difficulty),a 
+    ld hl,player2_score+2           ; initialise player 2 scores
 player_init_lifestart1:
     ldir
     ret
@@ -121,23 +129,27 @@ player_lifeend:
     ld a,(bc)
     ld bc,player1_lives
     ld (bc),a
-    call player_recordcurrentscore
+    call player_recordcurrentstate
     ret
 
 ;
-; Copies the current score in the current
+; Copies the current score and difficulty in the current player
 ;
-player_recordcurrentscore:
+player_recordcurrentstate:
     ld bc,6                  ; copy current score back to correct player
     ld hl,scores_current+2
     ld a,(game_currentplayer)
     cp 1
-    jp nz,player_lifeend0
+    jp nz,player_recordcurrentstate0
+    ld a,(game_difficulty)
+    ld (player1_difficulty),a       ; store difficulty
     ld de,player1_score+2
-    jp player_lifeend1
-player_lifeend0:
+    jp player_recordcurrentstate1
+player_recordcurrentstate0:         ; do player 2
+    ld a,(game_difficulty)
+    ld (player2_difficulty),a       ; store difficulty
     ld de,player2_score+2
-player_lifeend1:
+player_recordcurrentstate1:
     ldir
     ret
 
@@ -167,6 +179,14 @@ player1_score:
     defb 4,1,'000000',255
 player2_score:
     defb 22,1,'000000',255
+
+;
+; Player difficulties
+;
+player1_difficulty:
+    defb 0
+player2_difficulty:
+    defb 0
 
 ;
 ; Kills a player this life

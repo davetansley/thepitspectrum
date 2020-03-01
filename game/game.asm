@@ -23,6 +23,18 @@ game_numberlives:
     defb 4
 
 ;
+; The current difficulty
+;
+game_difficulty:
+    defb 0
+
+;
+; Control method: 0 for keyboard, 1 for kempston
+;
+game_control:
+    defb 0
+
+;
 ; Moves to the next player
 ;
 game_changeplayer:
@@ -73,3 +85,11 @@ game_resetcurrentframe:
     ld hl,game_framenumber
     ld (hl),0
     ret
+
+;
+; Increases the current difficulty
+;
+game_increasedifficulty:
+    ld a,(game_difficulty)
+    inc a
+    ld (game_difficulty),a

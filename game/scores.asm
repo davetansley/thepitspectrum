@@ -26,6 +26,16 @@ scores_addthousands:
     ret
 
 ;
+; Add hundreds to the score
+; Inputs:
+; b - number to add
+;
+scores_addhundreds:
+    ld hl,scores_current+5  
+    call scores_update
+    ret
+
+;
 ; Prints the score to screen
 ;
 scores_printscore:

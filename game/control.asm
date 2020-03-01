@@ -1,7 +1,7 @@
 ;
-; Check the keyboard then move
+; Check the preferred input method then move
 ;
-control_keyboard:
+control_input:
     ld a,(player+11)    ; first, check if player is dying
     cp 4                ; is the player falling
     call z, control_fall
@@ -12,16 +12,30 @@ control_keyboard:
     ret nz               ; if so, can't move
     ld a,(player+5)      ; next, check if the player has pixels left to move
     cp 0
-    jp z, control_keyboard5
+    jp z, control_input0
     call control_automove
     ret
-control_keyboard5:
+control_input0:
     ld a,(player+6)      ; next, check if the player is digging
     cp 0
-    jp z, control_keyboard0
+    jp z, control_input1
     call control_dig
     ret
-control_keyboard0:
+control_input1:
+    ld a,(game_control)
+    cp 0                ; is this keyboard
+    jp nz,control_input2
+    call control_keyboard
+    ret
+control_input2:
+    ; do joystick
+    call control_joystick
+    ret
+
+;
+; Check the keyboard
+;
+control_keyboard:
     ld bc,64510         ; port for keyboard row q-t.
     in a,(c)            ; read keyboard.
     ld b,a              ; store result in b register.
@@ -39,6 +53,11 @@ control_keyboard0:
     jp nc,control_keyboard3   
     rr b                ; check next key.
     jp nc,control_keyboard4
+    ld bc,32766         ; port for keyboard row b-space.
+    in a,(c)            ; read keyboard.
+    ld b,a              ; store result in b register.
+    rr b                ; check outermost key (space).
+    jp nc,control_keyboard5 
     ret
 control_keyboard1:
     call control_pl_moveup         ; player up.
@@ -52,7 +71,46 @@ control_keyboard3:
 control_keyboard4:
     call control_pl_moveleft       ; player right.
     ret
+control_keyboard5:
+    call control_pl_fire       ; player fire.
+    ret
 
+;
+; Check the joystick
+;
+control_joystick:
+    ld bc,31                        ; Kempston joystick port.
+    in a,(c)                        ; read input.
+    and 2                           ; check "left" bit.
+    jp nz,control_joystick3       ; move left.
+    in a,(c)                        ; read input.
+    and 1                           ; test "right" bit.
+    jp nz,control_joystick4       ; move right.
+    in a,(c)                        ; read input.
+    and 8                           ; check "up" bit.
+    jp nz,control_joystick1       ; move up.
+    in a,(c)                        ; read input.
+    and 4                           ; check "down" bit.
+    jp nz,control_joystick2       ; move down.
+    in a,(c)                        ; read input.
+    and 16                          ; try the fire bit.
+    jp nz,control_joystick5       ; fire pressed.
+    ret
+control_joystick1:
+    call control_pl_moveup         ; player up.
+    ret
+control_joystick2:
+    call control_pl_movedown       ; player down.
+    ret
+control_joystick3:
+    call control_pl_moveleft       ; player left.
+    ret
+control_joystick4:
+    call control_pl_moveright       ; player right.
+    ret
+control_joystick5:
+    call control_pl_fire
+    ret
 
 ;
 ; Fights the player - just flips the players anim frame
@@ -380,6 +438,22 @@ control_pl_moveright0:
     ld a,2
     ld (player+2),a        ; set direction to right
     pop bc
+    ret
+
+;
+; Player fires
+;
+control_pl_fire:
+    ld a,(player+2)         ; get player direction
+    cp 0
+    ret z
+    cp 3
+    ret z                   ; if up or down, don't fire
+    ld a,(bullet_state+3)       ; get the state
+    cp 1
+    ret z                   ; if currently firing, don't fire
+    call bullet_init        ; initialise the bullet
+    call bullet_shoot       ; shoot the bullet
     ret
 
 ;
