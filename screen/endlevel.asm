@@ -32,22 +32,22 @@ endlevel_init1:
     call string_print
 
     ld b,32
-    ld a,99
+    ld a,35
     ld de,22528+352                         ; attrs here 
     call screen_setcolours
 
     ld b,32
-    ld a,101
+    ld a,37
     ld de,22528+416                         ; attrs here 
     call screen_setcolours
 
     ld b,32
-    ld a,99
+    ld a,35
     ld de,22528+480                         ; attrs here 
     call screen_setcolours
 
     ld b,32
-    ld a,98
+    ld a,34
     ld de,22528+576                         ; attrs here 
     call screen_setcolours
 
@@ -165,7 +165,7 @@ endlevel_commontext:
 ;
 endlevel_init:
 ; We want a green screen.
-    ld a,97             ; white ink (7) on black paper (0),
+    ld a,33             ; white ink (7) on black paper (0),
                         ; bright (64).
     call utilities_clearscreen
     ld (23693),a        ; set our screen colours.

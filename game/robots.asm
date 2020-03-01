@@ -196,9 +196,12 @@ robots_move1:
     cp 0                                    ; are we automoving
     jp z,robots_move2                       ; if not, keep directions
     call robots_automove
-    ret
+    jp robots_move3         
 robots_move2:
     call robots_checkdirectionsandmove
+    ret
+robots_move3:
+    call robots_checkforplayer              ; check to see if we collided with a player
     ret
 
 ;
@@ -212,11 +215,22 @@ robots_automove:
     ld bc,(ix)                          ; get coords
     ld a,(ix+6)                         ; get the direction
     cp 0                                ; left
-    jp nz,robots_automove1
-    dec b
+    jp z,robots_automove1
+    cp 2                                ; up
+    jp z,robots_automove3
+    cp 3                                ; down
+    jp z,robots_automove4
+    inc b                               ; right
     jp robots_automove2                             
 robots_automove1:
-    inc b                             
+    dec b  
+    jp robots_automove2
+robots_automove3:
+    dec c
+    jp robots_automove2
+robots_automove4:
+    inc c      
+    jp robots_automove2                     
 robots_automove2:
     ld (ix),bc
     ret
@@ -403,6 +417,7 @@ robots_checkupandmove:
     dec c                       ; move up
     ld (ix),bc
     ld (ix+6),2
+    ld (ix+5),7                 ; set the auto move frames
     ld a,1
     ret
 robots_checkupandmove0:
@@ -426,6 +441,7 @@ robots_checkdownandmove:
     inc c                       ; move up
     ld (ix),bc
     ld (ix+6),3
+    ld (ix+5),7                 ; set the auto move frames
     ld a,1
     ret
 robots_checkdownandmove0:
@@ -512,4 +528,26 @@ robots_draw0:
     ld e,a
     add hl,de                               ; add to base
     call sprites_drawsprite
+    ret
+
+;
+; Checks to see if the robot is hitting a player
+; Inputs:
+; ix - memory location of robot we're checking
+robots_checkforplayer:
+    ld bc,(ix)           ; get coords
+    ld de,(player)       ; get the player coords
+    ld a,e               ; get the vert coord first 
+    sub c                ; subtract the diamond vertical coord from players 
+    add 8                ; add the max distance
+    cp 17                ; compare to max*2+1? if carry flag set, they've hit
+    ret nc               ; if not, hasn't hit
+    ld a,d               ; get the player horiz coord 
+    sub b                ; subtract rock coord 
+    add 8                ; add max distance
+    cp 17                ; compare to max*2+1? if carry flag set, they've hit
+    ret nc
+    ld (ix+2),0          ; mark as inactive
+    call robots_draw     ; delete the frame
+    call player_robotkillplayer ; mark the player as killed
     ret

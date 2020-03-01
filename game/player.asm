@@ -199,6 +199,11 @@ player_pitkillplayer
     ld (hl),4
     ret
 
+player_robotkillplayer
+    ld hl,player+11             ; mark as robot killed
+    ld (hl),5
+    ret
+
 ;
 ; Draws the player at the current position or deletes them
 ;
@@ -214,6 +219,8 @@ player_drawplayer0:             ; DYING CHECKS
     jp z,player_drawplayer3     ; if it's one, we're being crushed
     cp 4
     jp z,player_drawplayer9     ; player is falling into the pit
+    cp 5
+    jp z,player_drawplayer12    ; player has been killed by a robot
 player_drawplayer4:             ; CHECK FOR DIGGING
     ld a,(player+6)             ; get the dig flag
     cp 1
@@ -294,7 +301,24 @@ player_drawplayer10:
     ld (hl),a
     cp 0
     call z,player_killplayer     ; final frame, so kill the player
-player_drawplayer11:
+    ld a,(player+3)
+    jp player_drawplayer2
+;
+; ROBOT KILLED
+;
+player_drawplayer12:
+    ld hl,player+12
+    ld a,(hl)                   ; get the frames
+    cp 0
+    jp nz,player_drawplayer13    ; if this isn't zero, then this isn't the first time round, so do the crush anim
+    ld a,200
+    ld (hl),a                   ; otherwise, load up the anim frames 
+    jp player_drawplayer4       ; and return to the main loop to remove the current frame
+player_drawplayer13:
+    dec a 
+    ld (hl),a
+    cp 0
+    call z,player_killplayer     ; final frame, so kill the player
     ld a,(player+3)
     jp player_drawplayer2
 

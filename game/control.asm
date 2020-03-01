@@ -5,6 +5,8 @@ control_keyboard:
     ld a,(player+11)    ; first, check if player is dying
     cp 4                ; is the player falling
     call z, control_fall
+    cp 5                ; is the player fighting
+    call z, control_fight
     ld a,(player+11)    ; first, check if player is dying
     cp 0
     ret nz               ; if so, can't move
@@ -49,6 +51,22 @@ control_keyboard3:
     ret
 control_keyboard4:
     call control_pl_moveleft       ; player right.
+    ret
+
+
+;
+; Fights the player - just flips the players anim frame
+;
+control_fight:
+    ld a,(player+3)             ; load the frame
+    cp 12                       ; flip between 12 and 13
+    jp z,control_fight0
+    ld a,12
+    jp control_fight1
+control_fight0:
+    ld a,13
+control_fight1:
+    ld (player+3),a           ; save back
     ret
 
 ;

@@ -72,6 +72,8 @@ player_sprite:
 	defb	 250,191, 58,120, 72,  8, 20, 42 ; 9 shoot down
 	defb 	 146,186,148,120, 56,120, 68,195 ; 10 crushed 1
 	defb	  73, 93, 41, 30, 28, 30, 34,195 ; 11 crushed 2
+	defb	114, 87,114,103,111, 69,225,155  ; 12 fight 1
+	defb	 78,234, 78,230,246,162,135,217  ; 13 fight 2
 
 ;
 ; First 4 top half, next 4 bottom 1, next 4 bottom 2
