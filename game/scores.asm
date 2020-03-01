@@ -36,9 +36,15 @@ scores_addhundreds:
     ret
 
 ;
+; Temporary area for printing scores
+;
+scores_printscore_tmp:
+    defb 0,0,0,0,0,0,0,0,255
+
+;
 ; Prints the score to screen
 ;
-scores_printscore:
+scores_printscore:    
     ld a,(game_currentplayer)   ; get current player
     ld hl,scores_current
     cp 1
@@ -48,7 +54,28 @@ scores_printscore:
 score_printscore0:
     ld (hl),22       ; set position for player 2
 score_printscore1:
-    ld hl,scores_current
+    call score_printscoreformatted
+    ret
+
+;
+; Formats a score and prints to the top screen
+; Inputs:
+; hl - where is the score
+score_printscoreformatted:
+    ld bc,8
+    ld de,scores_printscore_tmp
+    ldir                        ; copy to temp
+    ld hl,scores_printscore_tmp
+    ld ix,hl
+    ld a,(ix+2)
+    cp 48                   ; is it a leading zero?
+    jp nz,score_printscore2
+    ld (ix+2),32              ; load it with a space
+    ld a,(ix+3)
+    cp 48                   ; is it a leading zero?
+    jp nz,score_printscore2
+    ld (ix+3),32              ; load it with a space
+score_printscore2:
     call string_print
     ret
 
@@ -57,9 +84,9 @@ score_printscore1:
 ;
 scores_printscores:
     ld hl,player1_score
-    call string_print
+    call score_printscoreformatted
     ld hl,player2_score
-    call string_print
+    call score_printscoreformatted
     ret
 
 ;
@@ -88,15 +115,47 @@ scores_update0:
 
 
 ;
+; Temporary area to store score
+;
+scores_showtable_tmp:
+    defb 0,0,0,0,0,0,0,0,0,0,0,255
+
+;
+; Processes a score 
+; Inputs:
+; hl - location on table
+;
+scores_showtable_process:
+    ld bc,11                     ; copy this many
+    ld de,scores_showtable_tmp
+    ldir
+    ld ix,scores_showtable_tmp   ; decide whether to show five or six numbers
+    ld a,(ix+5)
+    cp 48                        ; is this a zero? 
+    jp nz,scores_showtable_process0 ; if not, show the whole thing
+    ld bc,5                      ; copy this many
+    ld hl,ix
+    ld de,6
+    add hl,de                    ; move to second digit
+    ld de,hl
+    dec de
+    ldir
+    ld (ix+10),32                ; stick a space at the end
+scores_showtable_process0:
+    ld hl,scores_showtable_tmp
+    call string_print
+    ret
+
+;
 ; Displays the high score table at the bottom of the screen
 ;
 scores_showtable:
     ld hl, scores_table
-    call string_print
+    call scores_showtable_process
     ld hl, scores_table+12
-    call string_print
+    call scores_showtable_process
     ld hl, scores_table+24
-    call string_print
+    call scores_showtable_process
     ret
 
 ;

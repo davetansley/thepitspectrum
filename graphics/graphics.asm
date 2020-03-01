@@ -6,7 +6,7 @@ sprites:
     defb    128,192,224,240,248,252,254,255   ; 3, slope right
     defb    85,170, 85,170, 85,170, 85,170    ; 4, dirt
     defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 5, sky block
-    defb    255,255,255,255,255,255,255,255   ; 6, slime block
+    defb    0  ,  0,  0,  0,  0,  0,  0,  0   ; 6, slime block
     defb    0  ,0  ,  0,  0,  0,  0,  0,  0   ; 7, for reuse
     defb    24, 44, 78,143,241,114, 52,  24    ; 8, diamond
     defb    60,126,255,127,254,254,255,126    ; 9, rock	
@@ -37,7 +37,7 @@ sprite_attrs:
     defb    077 ; 3, slope right
     defb    070 ; 4, dirt
     defb    078 ; 5, sky
-    defb    076 ; 6, slime
+    defb    102 ; 6, slime
     defb    066 ; 7, trapdoor
     defb    070 ; 8, diamond
     defb    066 ; 9, rock

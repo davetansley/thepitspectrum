@@ -339,7 +339,7 @@ control_pl_moveup:
     jp z,control_pl_moveup1 ; don't move if we can't
     pop af
     sub 1                   ; subtract 1
-    sub 1                   ; subtract 1
+    ;sub 1                   ; subtract 1
     ld c,a                  ; load back to c
     ld (player),bc          ; load back to player
     jp control_pl_moveup0
@@ -368,7 +368,7 @@ control_pl_movedown:
     jp z,control_pl_movedown1 ; don't move if we can't
     pop af
     inc a                   ; add 1
-    inc a                   ; add 1
+    ;inc a                   ; add 1
     ld c,a                  ; load back to c
     ld (player),bc          ; load back to player
     jp control_pl_movedown0

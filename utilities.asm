@@ -73,8 +73,10 @@ utilities_waitforkey_forframes0:
     ld e,1              ; set the pressed flag
     ret                 ; key was pressed.
 utilities_waitforkey_forframes1:
+    push bc
     ld bc,31                        ; Kempston joystick port.
     in a,(c)                        ; read input.
+    pop bc
     and 16
     jp z,utilities_waitforkey_forframes2
     ld e,1              ; set the pressed flag
