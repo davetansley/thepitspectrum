@@ -124,7 +124,13 @@ bullets_checkforrobot0:
     ld a,d               ; get the player horiz coord 
     sub b                ; subtract robot coord 
     cp 0                ; should be the same
+    jp nz,bullets_checkforrobot2 ; if not, might have hit, so check the next char along... if matched, check vert
+    ld a,8
+    add a,d
+    sub b                ; check again for the next char along
+    cp 0
     jp nz,bullets_checkforrobot1 ; if not, haven't hit
+bullets_checkforrobot2:
     ld a,e               ; get the vert coord  
     sub c                ; subtract the bullet vertical coord from robots
     add 4                ; add the max distance

@@ -4,9 +4,12 @@
 titlescreen_show:
     call titlescreen_init
     call titlescreen_drawtitle
+    ld a,(game_control)
+    cp 0
+    jp z,titlescreen_show1
     ld b,50
     call utilities_pauseforframes         ; pause for a second
-
+titlescreen_show1:
     ld a,250                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
     ld a,e
@@ -15,9 +18,12 @@ titlescreen_show:
 
     call titlescreen_alt_init             ; otherwise, draw alt screen
     call titlescreen_alt_drawtitle
+    ld a,(game_control)
+    cp 0
+    jp z,titlescreen_show0
     ld b,50
-    call utilities_pauseforframes         ; pause for a second
-
+    call utilities_pauseforframes         ; pause for a second if joystick
+titlescreen_show0:
     ld a,250                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
     ld a,e

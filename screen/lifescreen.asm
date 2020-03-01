@@ -35,10 +35,12 @@ lifescreen_draw1:
     ld de, 22528+11     ; get the colour for the top text
     ld b,10
     call screen_setcolours
-
+    ld a,(game_control)
+    cp 0
+    jp z,lifescreen_draw2
     ld b,50
-    call utilities_pauseforframes         ; pause for a second
-
+    call utilities_pauseforframes         ; pause for a second if joystick
+lifescreen_draw2:
     ld a,100                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
 
