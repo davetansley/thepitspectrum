@@ -38,9 +38,10 @@ game_control:
 ; Moves to the next player
 ;
 game_changeplayer:
-    ld a,(game_currentplayer)
+    ld a,(game_numberplayers)
     cp 1
     ret z                       ; if just one player, no need to change
+    ld a,(game_currentplayer)   ; get current player
     dec a                       ; otherwise decrease by one 
     xor 1                       ; xor with one to flip 
     inc a                       ; increment 
@@ -55,6 +56,15 @@ game_changeplayer:
 game_setnumberofplayers:
     ld hl,game_numberplayers
     ld (hl),a
+
+;
+; Starts a game
+;
+game_init:
+    ld a,1
+    ld (game_currentplayer),a
+    ret
+    
 
 ;
 ; Increment frame number by 1

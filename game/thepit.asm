@@ -58,6 +58,11 @@ thepit_process:
     ld a,(thepit_trapcoord)         ; get the trap horiz coord
     cp 2
     jp z,thepit_process0
+    ld c,a
+    ld b,10
+    ld a,70
+    call screen_setattr             ; set the attr of the empty square to yellow on black
+    ld a,(thepit_trapcoord)         ; get the trap horiz coord
     dec a
     ld (thepit_trapcoord),a         ; store the reduced coord
 

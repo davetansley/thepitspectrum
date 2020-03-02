@@ -15,41 +15,6 @@
 
 
 ;===========================================================================
-; Include modules
-;===========================================================================
-    include "init.asm"
-    include "utilities.asm"
-    include "strings.asm"
-    include "screen\buffer.asm"
-    include "screen\screen.asm"
-    include "screen\sprites.asm"
-    include "screen\titlescreen.asm"
-    include "screen\lifescreen.asm"
-    include "screen\gameover.asm"
-    include "screen\endlevel.asm"
-    include "screen\options.asm"
-
-    include "sound\sound.asm"
-
-    include "leveldata\level01.asm"
-    include "graphics\graphics.asm"
-
-    include "game\control.asm"
-    include "game\movement.asm"
-    include "game\game.asm"
-    include "game\player.asm"
-    include "game\ship.asm"
-    include "game\tank.asm"
-    include "game\rocks.asm"
-    include "game\scores.asm"
-    include "game\diamonds.asm"
-    include "game\missiles.asm"
-    include "game\thepit.asm"
-    include "game\monster.asm"
-    include "game\robots.asm"
-    include "game\bullet.asm"
-
-;===========================================================================
 ; main routine - the code execution starts here.
 ; Sets up the new interrupt routine, the memory
 ; banks and jumps to the start loop.
@@ -60,6 +25,7 @@ main:
     ; Draw the title screen
 main_titlescreen:
     call titlescreen_show
+    call game_init
     call player_init_gamestart
 
 main_lifestart:
@@ -95,10 +61,22 @@ mloop:
     call player_died        ; do end of life housekeeping
     ld b,40
     call utilities_pauseforframes
+    
     ld hl,player+9        ; check lives remaining
     ld a,(hl)
     cp 0
-    jp z,main_gameover   ; leave the loop if we're done
+    jp nz,mloop1         ; haven't finished, so keep going
+
+    ld a,(game_numberplayers) ; get the number of players
+    cp 1
+    jp z,main_gameover   ; if just one player, then this is game over
+
+    ld a,(game_currentplayer) ; get the current player
+    cp 2                    ; if we're here, we have no lives, and if the current player is 2, then we're done
+    jp z,main_gameover            ; if it's  two game over
+
+mloop1:
+    call game_changeplayer ; change player if needed
     jp main_lifestart    ; otherwise, start a new life
 mloop0:
     ;
@@ -145,6 +123,42 @@ main_endlevel:
     call endlevel_draw          ; show the end level screen
     jp main_lifestart           ; start a new life
 
+
+;===========================================================================
+; Include modules
+;===========================================================================
+    include "init.asm"
+    include "utilities.asm"
+    include "strings.asm"
+    include "screen\buffer.asm"
+    include "screen\screen.asm"
+    include "screen\sprites.asm"
+    include "screen\titlescreen.asm"
+    include "screen\lifescreen.asm"
+    include "screen\gameover.asm"
+    include "screen\endlevel.asm"
+    include "screen\options.asm"
+
+    include "sound\sound.asm"
+
+    include "leveldata\level01.asm"
+    include "graphics\graphics.asm"
+
+    include "game\control.asm"
+    include "game\movement.asm"
+    include "game\game.asm"
+    include "game\player.asm"
+    include "game\ship.asm"
+    include "game\tank.asm"
+    include "game\rocks.asm"
+    include "game\scores.asm"
+    include "game\diamonds.asm"
+    include "game\missiles.asm"
+    include "game\thepit.asm"
+    include "game\monster.asm"
+    include "game\robots.asm"
+    include "game\bullet.asm"
+
 ;===========================================================================
 ; Stack. 
 ;===========================================================================
@@ -159,4 +173,5 @@ stack_bottom:
 stack_top:  
     defw 0  ; WPMEM, 2
 
-       SAVESNA "ThePit.sna", main
+       SAVESNA "./dist/ThePit.sna", main
+       ;SAVETAP "./dist/ThePit.tap", main

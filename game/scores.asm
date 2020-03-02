@@ -165,6 +165,12 @@ scores_highscoretmp:
     defb 0
 
 ;
+; Place to store the equal indicator
+;
+scores_highscoretmp2:
+    defb 0
+
+;
 ; Updates the highscore table. Start at bottom score. Work way from left. Compare each digit. If current is higher than one we're checking, 
 ; copy checking one down (or erase) then copy current over that one. Then move up one and do the same
 ;
@@ -179,6 +185,8 @@ scores_processhighscores3:
     add hl,de
     ex af,af'                   ; store a for later
     ld de,scores_current+2      ; position of current score column
+    ld a,1
+    ld (scores_highscoretmp2),a ; set the equal indicator to 1 - this will be set to zero if a different number is found
     ld b,6                      ; times to loop
 scores_processhighscores0:
     ld a,(hl)
@@ -186,9 +194,17 @@ scores_processhighscores0:
     ld a,(de)                   ; get first current column
     cp c                        ; compare current with first
     jp c,scores_processhighscores4  ; if c is bigger, then this is not a higher score, so end
+    jp z,scores_processhighscores5  ; if c is equal, then this is not a higher score, so end
+    ld a,0
+    ld (scores_highscoretmp2),a ; zero the equality indicator
+scores_processhighscores5:
     inc hl 
     inc de                      ; move to next column
     djnz scores_processhighscores0 ; loop
+    ld a,(scores_highscoretmp2)   ; get the equality indicator
+    cp 1
+    jp z,scores_processhighscores4 ; if it is equal, not a highscore
+    or a                            ; clear the carry flag
     ex af,af'                     ; still here, so must be bigger
     ld (scores_highscoretmp),a  ; store the position indicator in the tracking byte
     ld c,12

@@ -2,11 +2,19 @@
 ; Draws the game over screen
 ;
 gameover_draw:
-    call scores_processhighscores
-
-gameover_draw0:
+    ld a,1
+    ld (game_currentplayer),a               ; do the first player first    
+    call player_init_lifestart              ; get the player config
     call gameover_enterhighscores
-    
+
+    ld a,(game_numberplayers)               ; check if we need to do player 2
+    cp 2
+    jp nz,gameover_draw0
+    ld a,2
+    ld (game_currentplayer),a               ; do the second player 
+    call player_init_lifestart              ; get the player config
+    call gameover_enterhighscores
+gameover_draw0:
     call gameover_init
     
     ld hl,string_gameoverscreen_gameover
@@ -50,6 +58,8 @@ gameover_commontext:
 ;
 gameover_enterhighscores:
     ; check if we need to enter initial
+    call scores_processhighscores
+    
     ld a,(scores_highscoretmp)
     cp 0
     ret z

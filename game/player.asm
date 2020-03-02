@@ -97,9 +97,19 @@ player_init_lifestart2:
 
     ld bc,(init_coord)
     ld (player),bc
+
+    ld a,(game_currentplayer)
+    cp 1
+    jp nz,player_init_lifestart4
     ld bc,player+9
     ld a,(player1_lives)
     ld (bc),a
+    jp player_init_lifestart3
+player_init_lifestart4:
+    ld bc,player+9
+    ld a,(player2_lives)
+    ld (bc),a
+player_init_lifestart3:
     
     call diamonds_init      ; initialise gems
 
@@ -120,17 +130,6 @@ player_init_lifestart1:
     ldir
     ret
 
-;
-; Finalises a player at end of a life
-; Copy lives, copy score
-;
-player_lifeend:
-    ld bc,player+9
-    ld a,(bc)
-    ld bc,player1_lives
-    ld (bc),a
-    call player_recordcurrentstate
-    ret
 
 ;
 ; Copies the current score and difficulty in the current player
@@ -144,10 +143,14 @@ player_recordcurrentstate:
     ld a,(game_difficulty)
     ld (player1_difficulty),a       ; store difficulty
     ld de,player1_score+2
+    ld a,(player+9)
+    ld (player1_lives),a              ; record lives
     jp player_recordcurrentstate1
 player_recordcurrentstate0:         ; do player 2
     ld a,(game_difficulty)
     ld (player2_difficulty),a       ; store difficulty
+    ld a,(player+9)
+    ld (player2_lives),a              ; record lives
     ld de,player2_score+2
 player_recordcurrentstate1:
     ldir
@@ -161,7 +164,7 @@ player_died:
     ld a,(bc)
     dec a
     ld (bc),a
-    call player_lifeend
+    call player_recordcurrentstate
     ret
 
 ;

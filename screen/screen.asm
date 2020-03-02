@@ -86,7 +86,14 @@ screen_setuptext:
     call string_print
     ld hl, string_scorenumbers2
     call string_print
-    ld hl, string_credits
+    ld a,(game_currentplayer)
+    cp 1
+    jp nz,screen_setuptext0
+    ld hl, string_player1
+    jp screen_setuptext1
+screen_setuptext0:
+    ld hl, string_player2
+screen_setuptext1:
     call string_print
     call screen_setscorecolours
     ret

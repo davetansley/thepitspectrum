@@ -4,8 +4,10 @@ string_scorenumbers1:
     defb 4,1,'000000',255  
 string_company:
     defb 12,0,'CENTURI',255
-string_credits:
+string_player1:
     defb 12,1,'PLAYER 1',255
+string_player2:
+    defb 12,1,'PLAYER 2',255
 string_score2: 
     defb 22,0,'SCORE2',255
 string_scorenumbers2:
