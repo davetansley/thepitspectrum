@@ -1,5 +1,5 @@
-The Pit
-=======
+The Pit (2020)
+==============
 A conversion of the 1982 coin-op The Pit for Sinclair computers.
 
 Platform: Spectrum 48/128/Next
