@@ -2,6 +2,10 @@
 ; Draws the title screen
 ;
 titlescreen_show:
+    call titlescreen_preinit
+    ld b,60
+    call utilities_pauseforframes         ; pause for a second
+titlescreen_show2:
     call titlescreen_init
     call titlescreen_drawtitle
     ld a,(game_control)
@@ -28,7 +32,7 @@ titlescreen_show0:
     call utilities_waitforkey_forframes   ; wait for keypress
     ld a,e
     cp 1                                  ; was anything pressed?
-    jp nz,titlescreen_show                ; start again if not
+    jp nz,titlescreen_show2               ; start again if not
     ret
 
 ;
@@ -94,6 +98,19 @@ titlescreen_init:
     ld hl,string_titlescreen_copyright
     call string_print
     
+    ret
+
+;
+; Initialises the pre-screen
+;
+titlescreen_preinit:
+; We want a red screen.
+    ld a,16             ; magenta ink (7) on blue paper (0),
+                        ; bright (64).
+    call utilities_clearscreen
+    ld (23693),a        ; set our screen colours.
+    ld a,2              ; 2 is the code for red.
+    out (254),a         ; write to port 254.
     ret
 
 ;

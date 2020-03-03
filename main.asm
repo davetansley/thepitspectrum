@@ -33,6 +33,8 @@ main_titlescreen:
 main_lifestart:
 
     call player_init_lifestart
+    call game_setcurrentrocks   ; set the current rocks based on the level
+    call game_setdifficulty     ; set the current difficulty
     
     call lifescreen_draw        ; show the lives remaining screen
     

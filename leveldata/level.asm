@@ -38,7 +38,7 @@ level_layout:
 ; ###############################################################
 ; Object data: horiz, vert, state, memh, meml
 ; ###############################################################   
-level_rocks_alt:
+level_rocks:
     defb 9,4,0,0,0
     defb 12,7,0,0,0
     defb 16,7,0,0,0
@@ -92,7 +92,7 @@ level_rocks_alt:
     defb 4,23,0,0,0
     defb 255
 
-level_rocks:
+level_rocks_alt:
     defb 9,4,0,0,0
     defb 12,7,0,0,0
     defb 11,7,0,0,0

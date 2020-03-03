@@ -50,6 +50,12 @@ tank_missile_displayed:
     defb 0
 
 ;
+; Speed that the tank fires
+;
+tank_speed:
+    defb 0
+
+;
 ; Initialise the tank
 ;
 tank_init:
@@ -102,7 +108,8 @@ tank_process0:
 tank_fire:
     ld a,(tank_count)            ; if not, don't do anything
     inc a                        ; increment
-    cp 50                        ; have we reached fifty
+    ld de,(tank_speed)
+    cp e                        ; have we reached the speed
     jp nz,tank_fire0             
     ld a,0                       ; reset if reached fifty
 tank_fire0:                      ; DEALING WITH A NEW BLOCK

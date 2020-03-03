@@ -22,6 +22,12 @@ missiles_killermissile:
     defb 0,0
 
 ;
+; The speed of the missiles
+;
+missiles_speed:
+    defb 0
+
+;
 ; Zeroes the state of each missile
 ;
 missiles_init:
@@ -67,7 +73,8 @@ missiles_process3:
     ld hl,missiles_count
     ld a,(hl)                   ; get the missiles count
     inc a
-    cp 50                                   ; have we reached the count yet
+    ld de,(missiles_speed)
+    cp e                                   ; have we reached the count yet
     jp z,missiles_process2                 ; if not, don't activate a new one
     ld (hl),a                               ; store the updated count, and continue without activating
     jp missiles_process0
@@ -235,6 +242,8 @@ missiles_zonkplayer:
     inc b
     push bc
     ld a,66
+    call screen_setattr
+    inc c
     call screen_setattr
     inc c
     call screen_setattr

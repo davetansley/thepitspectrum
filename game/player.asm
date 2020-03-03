@@ -71,7 +71,7 @@ player_init_gamestart1:
     ld (hl),48
     inc hl
     djnz player_init_gamestart1                 ; zero out player 2 score
-    ld a,0
+    ld a,1
     ld (player1_difficulty),a
     ld (player2_difficulty),a                   ; set player difficulties to zero
     ret
@@ -110,9 +110,7 @@ player_init_lifestart4:
     ld a,(player2_lives)
     ld (bc),a
 player_init_lifestart3:
-    
     call diamonds_init      ; initialise gems
-
     ld bc,6
     ld de,scores_current+2
     ld a,(game_currentplayer)

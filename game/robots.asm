@@ -53,7 +53,7 @@ robots_robotspeed:
 ; The current max robots
 ;
 robots_robotsmax:
-    defb 2
+    defb 3
 
 ;
 ; Initialises the robots

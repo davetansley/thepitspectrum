@@ -48,6 +48,12 @@ monster_tick:
     defb 0
 
 ;
+; The colour of the monster
+;
+monster_colour:
+    defb 6
+
+;
 ; Initialises the pit monster
 ;
 monster_init:
@@ -104,6 +110,11 @@ monster_process3:
     ld a,(monster_jumpdirectionvert)        ; get the direction
     xor 1                                   ; flip it
     ld (monster_jumpdirectionvert),a        ; store it
+    cp 1
+    jp z,monster_process2
+    exx
+    call monster_colourchange
+    exx
 monster_process2:
     ld a,(monster_jumpdirectionhoriz)       ; get the horiz direction
     cp 0                                    ; is it right?
@@ -140,4 +151,56 @@ monster_draw:
     ld hl,monster_sprite                    ; load the first frame
     add hl,de
     call sprites_draw2by2sprite 
+    ret
+
+;
+; Changes the monster colour whenever it reaches the bottom of its jump
+;
+monster_colourchange:
+    ld a,(monster_colour)
+    inc a
+    cp 7
+    jp nz, monster_colourchange0
+    ld a,1
+monster_colourchange0:
+    ld (monster_colour),a                   ; save the monster colour
+    ld a,(screen_offset)
+    cp 0
+    jp z,monster_colourchange1
+    ld a,(monster_colour)                   ; get the monster colour
+    ld b,6
+    ld c,64
+    add c                                   ; want this with black background, so add 64
+    ld de,22528+163                         ; attrs here 
+    call screen_setcolours
+    ld a,(monster_colour)                   ; get the monster colour
+    ld b,6
+    ld c,64
+    add c                                   ; want this with black background, so add 64
+    ld de,22528+195                         ; attrs here 
+    call screen_setcolours
+    ld a,(monster_colour)                   ; get the monster colour
+    or 96
+    ld b,6    
+    ld de,22528+227                         ; attrs here 
+    call screen_setcolours
+    ret
+monster_colourchange1:
+    ld a,(monster_colour)                   ; get the monster colour
+    ld b,6
+    ld c,64
+    add c                                   ; want this with black background, so add 64
+    ld de,22528+419                         ; attrs here 
+    call screen_setcolours
+    ld a,(monster_colour)                   ; get the monster colour
+    ld b,6
+    ld c,64
+    add c                                   ; want this with black background, so add 64
+    ld de,22528+451                         ; attrs here 
+    call screen_setcolours
+    ld a,(monster_colour)                   ; get the monster colour
+    or 96
+    ld b,6    
+    ld de,22528+483                         ; attrs here 
+    call screen_setcolours
     ret

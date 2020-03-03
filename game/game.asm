@@ -26,7 +26,7 @@ game_numberlives:
 ; The current difficulty
 ;
 game_difficulty:
-    defb 0
+    defb 1
 
 ;
 ; Control method: 0 for keyboard, 1 for kempston
@@ -34,6 +34,25 @@ game_difficulty:
 game_control:
     defb 0
 
+;
+; The current rocks used
+;
+game_current_rocks:
+    defb 0,0
+
+
+game_tankdifficulty:
+    defb 70,65,60,55,50,45,40,35,30,25,20,12
+game_pitdifficulty:
+    defb 7,5,5,4,4,4,2,2,2,2,2,2
+game_robotdifficulty:
+    defb 6,4,4,4,3,3,3,2,0,0,0,0
+game_digdifficulty:
+    defb 20,14,10,10,8,8,8,8,6,6,6,4
+game_rockdifficulty:
+    defb 40,28,20,20,16,16,16,16,16,16,16,16
+game_missiledifficulty:
+    defb 70,50,45,45,40,35,35,30,30,25,25,20
 ;
 ; Moves to the next player
 ;
@@ -65,6 +84,23 @@ game_init:
     ld (game_currentplayer),a
     ret
     
+;
+; Sets the current rock layout. Odd gets 1, even gets 2
+;
+game_setcurrentrocks:
+    ld a,(game_difficulty)
+    and 1
+    cp 0
+    jp z,game_setcurrentrocks0
+    ld de,level_rocks
+    ld hl,game_current_rocks
+    ld (hl),de
+    ret
+game_setcurrentrocks0:
+    ld de,level_rocks_alt
+    ld hl,game_current_rocks
+    ld (hl),de
+    ret
 
 ;
 ; Increment frame number by 1
@@ -103,3 +139,52 @@ game_increasedifficulty:
     ld a,(game_difficulty)
     inc a
     ld (game_difficulty),a
+
+;
+; Sets the various difficulties
+;
+game_setdifficulty:
+    ld a,(game_difficulty)
+    cp 13
+    jp nz,game_setdifficulty0
+    ld a,12                         ; limit difficulty to twelve
+game_setdifficulty0:
+    ld de,0
+    ld e,a                          ; keep the difficulty in de
+    ; Set the tank difficulty
+    ld hl,game_tankdifficulty
+    dec hl
+    add hl,de                       ; add the difficulty
+    ld a,(hl)                       ; get the value
+    ld (tank_speed),a               ; set the tank speed
+    ; Set the pit difficulty
+    ld hl,game_pitdifficulty
+    dec hl
+    add hl,de                       ; add the difficulty
+    ld a,(hl)                       ; get the value
+    ld (thepit_speed),a               ; set the pit speed
+    ; Set the robot difficulty
+    ld hl,game_robotdifficulty
+    dec hl
+    add hl,de                       ; add the difficulty
+    ld a,(hl)                       ; get the value
+    ld (robots_robotspeed),a        ; set the robot speed
+    ; Set the dig difficulty
+    ld hl,game_digdifficulty
+    dec hl
+    add hl,de                       ; add the difficulty
+    ld a,(hl)                       ; get the value
+    ld (movement_numberdigframes),a ; set the dig frames
+    ; Set the rock difficulty
+    ld hl,game_rockdifficulty
+    dec hl
+    add hl,de                       ; add the difficulty
+    ld a,(hl)                       ; get the value
+    ld (rocks_numberofframestowobble),a ; set the wobble frames
+    ; Set the missile difficulty
+    ld hl,game_missiledifficulty
+    dec hl
+    add hl,de                       ; add the difficulty
+    ld a,(hl)                       ; get the value
+    ld (missiles_speed),a           ; set the missile difficulty
+    ret

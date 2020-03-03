@@ -68,6 +68,7 @@ endlevel_init2:
     djnz endlevel_init2
     
     call game_increasedifficulty ; move the difficulty up a level
+    call player_recordcurrentstate
     
     ld a,100                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress

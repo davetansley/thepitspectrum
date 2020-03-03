@@ -25,6 +25,11 @@ thepit_init:
     ld hl,thepit_trapcount
     ld (hl),0
     ret
+;
+; The speed the pit will withdraw
+;
+thepit_speed:
+    defb 0
 
 ;
 ; Performs per frame processing on the pit room
@@ -44,7 +49,8 @@ thepit_process:
     ld a,(thepit_timer)             ; get the timer
     inc a
     ld (thepit_timer),a             ; store
-    cp 2                           ; have we reached the trigger?
+    ld de,(thepit_speed)            ; get the speed
+    cp e                           ; have we reached the trigger?
     jp nz, thepit_process0          ; no need to do anything
     ld a,0
     ld (thepit_timer),a             ; zero the timer and process

@@ -52,7 +52,7 @@ screen_draw0:
     jp nz,screen_draw0          ; if not, loop
     ld hl, screen_tmp
     ld (hl),9                   ; load the block number into memory
-    ld ix,level_rocks          ; rock memory
+    ld ix,(game_current_rocks)  ; current rock memory
     call screen_initobjects     ; draw rocks
     ld hl, screen_tmp
     ld (hl),12                  ; load the block number into memory
