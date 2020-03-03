@@ -123,13 +123,13 @@ diamonds_twinkle
     ld (hl),2         ; store the score we'll add   
     ld hl,diamonds_tmp
     ld (hl),64         ; store the location the diamond sprite
-    ld hl, level01diamonds
+    ld hl, level_diamonds
     call diamonds_twinkle_type
     ld hl,diamonds_score
     ld (hl),1         ; store the score we'll add
     ld hl,diamonds_tmp
     ld (hl),112         ; store the location the gem sprite
-    ld hl, level01gems
+    ld hl, level_gems
     call diamonds_twinkle_type
     ret
 
@@ -137,9 +137,9 @@ diamonds_twinkle
 ; Initialise diamonds and gems
 ; 
 diamonds_init:
-    ld hl, level01diamonds
+    ld hl, level_diamonds
     call diamonds_init_type
-    ld hl, level01gems
+    ld hl, level_gems
     call diamonds_init_type
     ret
 

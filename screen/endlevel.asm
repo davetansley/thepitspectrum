@@ -84,7 +84,7 @@ endlevel_init2:
 ; de - pointer to points text
 ;
 endlevel_workoutbonus:
-    ld hl,level01diamonds+2     ; location of state of first diamond
+    ld hl,level_diamonds+2     ; location of state of first diamond
     ld b,3                      ; number to check
     ld d,0                      ; zero diamond count
 endlevel_workoutbonus0:
@@ -100,7 +100,7 @@ endlevel_workoutbonus1:
     inc hl                      ; get to next state
     djnz endlevel_workoutbonus0
 
-    ld hl,level01gems+2     ; location of state of first gem
+    ld hl,level_gems+2     ; location of state of first gem
     ld b,4                      ; number to check
     ld e,0                      ; zero gem count
 endlevel_workoutbonus2:

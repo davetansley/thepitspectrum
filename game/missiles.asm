@@ -26,7 +26,7 @@ missiles_killermissile:
 ;
 missiles_init:
     ld b,12
-    ld ix,level01missiles
+    ld ix,level_missiles
 missiles_init0:
     ld (ix+2),0               ; set the state to zero
     ld de,5
@@ -78,7 +78,7 @@ missiles_process2:
     ld de,10
     call utilities_multiply                 ; multiple random number by 10
     ld de,hl                                ; this is the offset for the random missile
-    ld ix,level01missiles                   ; load the location of the missile definitions
+    ld ix,level_missiles                   ; load the location of the missile definitions
     add ix,de                               ; get to location of missile
     ld a,(ix+2)
     cp 0

@@ -143,7 +143,7 @@ main_endlevel:
 
     include "sound\sound.asm"
 
-    include "leveldata\level01.asm"
+    include "leveldata\level.asm"
     include "graphics\font.asm"
     include "graphics\graphics.asm"
 

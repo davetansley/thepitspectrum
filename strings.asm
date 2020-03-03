@@ -177,7 +177,7 @@ Print_Char:             LD HL,(23606)                    ; Address of character 
 Print_Char_1:           LD A,(HL)                       ; Get the byte from the ROM into A
                         LD (DE),A                       ; Stick A onto the screen
                         INC D                           ; Goto next line on screen
-                        INC L                           ; Goto next byte of character
+                        INC HL                           ; Goto next byte of character
                         DEC C                           ; Decrease the loop counter
                         JR NZ,Print_Char_1              ; Loop around whilst it is Not Zero (NZ)
                         POP DE

@@ -51,7 +51,7 @@ movement_spaceisempty1:
 ; e = 1 if gem
 movement_spaceisgem:
     call screen_getcharcoordsfromscreencoords   ; get the char coords we're checking into bc
-    ld hl,level01diamonds           ; check diamonds first
+    ld hl,level_diamonds           ; check diamonds first
 movement_spaceisgem0:
     ld de,(hl)                      ; get gem coords into de
     ld a,e                          ; check for end of data
@@ -74,7 +74,7 @@ movement_spaceisgem0:
     ld e,1                          ; otherwise, exit with e = 1
     ret
 movement_spaceisgem1:
-    ld hl,level01gems              ; check gems
+    ld hl,level_gems              ; check gems
 movement_spaceisgem2:
     ld de,(hl)                      ; get gem coords into de
     ld a,e                          ; check for end of data

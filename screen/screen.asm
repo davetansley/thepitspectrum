@@ -27,7 +27,7 @@ screen_draw:
     ;call clear_screen
     ld c,0                      ; horiz
     ld b,0                      ; vert, 0 at top
-    ld ix,level01               ; point ix at level data
+    ld ix,level_layout               ; point ix at level data
     ld iy,buffer_attr_buffer    ; point iy at attr data
 screen_draw0:
     ld a,(ix)                   ; load the block number
@@ -52,19 +52,19 @@ screen_draw0:
     jp nz,screen_draw0          ; if not, loop
     ld hl, screen_tmp
     ld (hl),9                   ; load the block number into memory
-    ld ix,level01rocks          ; rock memory
+    ld ix,level_rocks          ; rock memory
     call screen_initobjects     ; draw rocks
     ld hl, screen_tmp
     ld (hl),12                  ; load the block number into memory
-    ld ix,level01missiles       ; missile memory
+    ld ix,level_missiles       ; missile memory
     call screen_initobjects     ; draw missiles
     ld hl, screen_tmp
     ld (hl),08                  ; load the block number into memory
-    ld ix,level01diamonds       ; diamond memory
+    ld ix,level_diamonds       ; diamond memory
     call screen_initobjects     ; draw diamonds
     ld hl, screen_tmp
     ld (hl),14                  ; load the block number into memory
-    ld ix,level01gems           ; gems memory
+    ld ix,level_gems           ; gems memory
     call screen_initobjects     ; draw gems
     call screen_setuptext       ; draws text on the screen
     call scores_printscores     ; print the current scores
