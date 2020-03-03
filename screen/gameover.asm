@@ -64,7 +64,24 @@ gameover_enterhighscores:
     cp 0
     ret z
     call gameover_enterhighscores_init
-    ld a,(scores_highscoretmp)
+    ; Set the flash
+    ld a,(scores_highscoretmp)              ; scoretmp has the memory offset of the start of the number
+    ld e,5
+    sub e                                   ; get the score position back to coords
+    ld de,0
+    ld e,a                                  ; load into de
+    ld hl,scores_table
+    add hl,de                               ; get the memory location
+    ld bc,(hl)                              ; get the coords
+    call screen_getscreenattradress         ; get the memory location of the cell attr into de
+    ld a,(de)                               ; get the current attr
+    or 128                                  ; make it flash
+    ld (de),a
+    inc de
+    ld (de),a
+    inc de
+    ld (de),a                               ; make all three flash
+    ld a,(scores_highscoretmp)              ; get the score back again
     dec a
     dec a
     dec a                                   ; get high score location back to position of name
