@@ -76,10 +76,15 @@ gameover_enterhighscores:
     ld b,15
     call utilities_pauseforframes           ; pause for a little bit
     ld b,3                                  ; collect three chars
-gameover_draw2:
+gameover_enterhighscores2:
     push bc
     push hl
+gameover_enterhighscores3:
     call utilities_readkey               ; get key into a
+    cp 65
+    jp c,gameover_enterhighscores3
+    cp 91
+    jp nc,gameover_enterhighscores3      ; if not a letter, get another
     pop hl
     ld (hl),a 
     inc hl
@@ -89,7 +94,7 @@ gameover_draw2:
     ld b,15
     call utilities_pauseforframes
     pop bc
-    djnz gameover_draw2
+    djnz gameover_enterhighscores2
     ret
 
 ;

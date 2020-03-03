@@ -20,6 +20,8 @@
 ; banks and jumps to the start loop.
 ;===========================================================================
 main:
+    ld hl,font
+    ld (23606),hl
     call options_show
 
     ; Draw the title screen
@@ -142,6 +144,7 @@ main_endlevel:
     include "sound\sound.asm"
 
     include "leveldata\level01.asm"
+    include "graphics\font.asm"
     include "graphics\graphics.asm"
 
     include "game\control.asm"

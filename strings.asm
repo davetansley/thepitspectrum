@@ -161,7 +161,7 @@ string_getcharaddress:       LD A,D
 ; A:  Character to print
 ; DE: Screen address to print character at
 ;
-Print_Char:             LD HL,0x3C00                    ; Address of character set table in ROM
+Print_Char:             LD HL,(23606)                    ; Address of character set table in ROM
                         LD B,0                          ; Set BC to A
                         LD C,A
                         AND 0xFF                        ; Clear the carry bit
