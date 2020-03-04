@@ -41,6 +41,7 @@ lifescreen_draw1:
     ld b,50
     call utilities_pauseforframes         ; pause for a second if joystick
 lifescreen_draw2:
+    call sound_lifestart
     ld a,100                              ; wait for 200 frames
     call utilities_waitforkey_forframes   ; wait for keypress
 

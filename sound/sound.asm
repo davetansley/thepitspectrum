@@ -1,3 +1,28 @@
+
+
+;
+; Plays a note
+; Inputs:
+; d - border
+; e - pitch
+; bc - duration
+sound_play:
+    ld a,e
+    ld (sound_play2+1),a
+	ld a,d
+sound_play0:
+    out (254),a
+    dec e
+    jr nz,sound_play1
+sound_play2:
+    ld e,0
+    xor 24
+sound_play1:
+    djnz sound_play0
+    dec c
+    jr nz,sound_play0
+    ret
+
 sound_dig:
     exx
 	
@@ -9,21 +34,51 @@ sound_gamestart:
     ld b,3
 sound_gamestart0:
     push bc
-    ld hl,554 ; pitch.
-    ld de,150 ; duration.
-    ld a,16
-    and 248
-    call 949 ; ROM beeper routine.
-    ld hl,784 ; pitch.
-    ld de,150 ; duration.
-    ld a,16
-    and 248
-    call 949 ; ROM beeper routine.
+    ld e,54
+    ld bc,75
+    ld d,2
+    call sound_play
+    ld e,76
+    ld bc,75
+    ld d,2
+    call sound_play
     pop bc
     djnz sound_gamestart0
     ei
     ret
 
+sound_lifestart:
+    di
+    ld b,3
+sound_lifestart0:
+    push bc
+    ld e,54
+    ld bc,32
+    ld d,1
+    call sound_play
+    ld e,76
+    ld bc,32
+    ld d,1
+    call sound_play
+    ld e,54
+    ld bc,32
+    call sound_play
+    ld e,76
+    ld bc,32
+    call sound_play
+    pop bc
+    djnz sound_lifestart0
+    ei
+    ret
+
+sound_scoretick:
+    di
+    ld e,35
+    ld bc,24
+    ld d,0
+    call sound_play
+    ei
+    ret
 
 sound_laser:
 	ld d,16		            ;speaker = bit 4
@@ -116,7 +171,7 @@ sound_tankshoot:
     ld hl,0 ; start pointer in ROM.
 sound_tankshoot2 
     push de
-    ld b,8 ; length of step.
+    ld b,16 ; length of step.
 sound_tankshoot0 push bc
     ld a,(hl) ; next "random" number.
     inc hl ; pointer.
@@ -145,3 +200,56 @@ sound_tankshoot5
     ex af,af'
     ret
     
+; Call this every time you want to initialise a sound effect
+; A = Variable 1
+; B = Variable 2
+; C = Duration of overall sound effect
+; D = Duration of each step of the sound effect
+;
+soundfx_a_init:         
+    ld (soundfx_a_v2+1),a
+    ld a,b
+    ld (soundfx_a_v3+1),a
+    ld a,c
+    ld (soundfx_a_main+1),a
+    ld a,d
+    ld (soundfx_a_v1+1),a
+    xor a
+    ld (soundfx_a_v4),a
+    ret
+ 
+; Call this during your main loop
+; It will play one step of the sound effect each pass
+; until the complete sound effect has finished
+;
+soundfx_a_main:         
+    ld a,0
+    dec a
+    ret z
+    ld (soundfx_a_main+1),a
+soundfx_a_v1:           
+    ld b,0
+    ld hl,soundfx_a_v4
+soundfx_a_l1:           
+    ld c,b
+    ld a,%00001000
+    out (254),a
+    ld a,(hl)
+soundfx_a_v2:           
+    xor 0
+    ld b,a
+    djnz $
+    xor a
+    out (254),a
+    ld a,(hl)
+soundfx_a_v3:           
+    xor 0
+    ld b,a
+    djnz $
+    dec (hl)
+    ld b,c
+    djnz soundfx_a_l1
+    ret
+ 
+soundfx_a_v4:           
+    defb 0

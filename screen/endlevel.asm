@@ -60,6 +60,7 @@ endlevel_init2:
     push bc
     ld b,1
     call scores_addthousands
+    call sound_scoretick
     call player_recordcurrentstate
     call scores_printscore     ; print the current scores
     ld b,10
