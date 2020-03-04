@@ -204,7 +204,8 @@ tank_fire4:                     ; TIDY UP
     ld a,1
     call buffer_marklineforupdate 
     ld a,2
-    call buffer_marklineforupdate  
+    call buffer_marklineforupdate 
+    call sound_tankshoot 
     ret
 
 ;

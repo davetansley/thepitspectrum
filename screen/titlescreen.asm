@@ -3,6 +3,7 @@
 ;
 titlescreen_show:
     call titlescreen_preinit
+    call sound_gamestart
     ld b,60
     call utilities_pauseforframes         ; pause for a second
 titlescreen_show2:

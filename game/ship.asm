@@ -49,6 +49,13 @@ ship_land0:
     ld (ship_initpos2),bc
 ship_land1:
     call ship_draw_full         ; draw the ship
+    pop de
+    ld a,e
+    cp 0
+    jp nz,ship_land4
+    call sound_pitchbend        ; play sound if first frame
+ship_land4:
+    push de
     call ship_draw_screen
     pop de
     ld e,1

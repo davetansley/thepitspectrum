@@ -23,17 +23,18 @@ main:
     ld hl,font
     ld (23606),hl
     call options_show
-
+    
     ; Draw the title screen
 main_titlescreen:
     call titlescreen_show
-    call game_init
     call player_init_gamestart
 
 main_lifestart:
 
     call player_init_lifestart
     call game_setcurrentrocks   ; set the current rocks based on the level
+    ;ld a,12
+    ;ld (game_difficulty),a
     call game_setdifficulty     ; set the current difficulty
     
     call lifescreen_draw        ; show the lives remaining screen

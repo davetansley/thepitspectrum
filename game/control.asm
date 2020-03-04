@@ -454,6 +454,7 @@ control_pl_fire:
     ret z                   ; if currently firing, don't fire
     call bullet_init        ; initialise the bullet
     call bullet_shoot       ; shoot the bullet
+    call sound_laser
     ret
 
 ;
