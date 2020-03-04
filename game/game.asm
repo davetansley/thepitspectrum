@@ -50,7 +50,7 @@ game_robotdifficulty:
 game_digdifficulty:
     defb 20,14,10,10,8,8,8,8,6,6,6,4
 game_rockdifficulty:
-    defb 40,28,20,20,16,16,16,16,16,16,16,16
+    defb 40,28,20,20,18,18,18,18,18,18,18,18
 game_missiledifficulty:
     defb 70,50,45,45,40,35,35,30,30,25,25,20
 ;
