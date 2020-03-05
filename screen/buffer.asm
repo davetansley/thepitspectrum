@@ -8,6 +8,13 @@ buffer_tmp:
     defb 0,0                    ; temp area
 
 ;
+; If this is set to one, three lines will be refreshed for the screen coord redraw
+; This is used when digging to make sure that the above dug block gets redrawn
+;
+buffer_threelinerefresh:
+    defb 0
+
+;
 ; This list stores lines to be updated by the buffer.
 ; This is done by half line. Lines are encded with.
 ; 00hlllll
