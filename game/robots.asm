@@ -86,6 +86,8 @@ robots_init0:
     ld (robots_spawn+1),a
     ld (robots_process8+1),a
     ld (robots_process0+1),a
+    ld a,4
+    ld (robots_robotspawnspeed),a
     ld a,(robots_robotspawnspeed)
     ld (robots_process10+1),a
     ret
