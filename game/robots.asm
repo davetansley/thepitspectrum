@@ -454,12 +454,16 @@ robots_checkupandmove:
     cp 40
     ret c
     call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly above (subtract 32)
-    ld de,32
-    sbc hl,de                       ; memory location of line above now in hl
-    ld a,(hl)                       ; get the contents of the line
+    ld hl,de                        ; look at cell directly above (subtract 256)
+    dec h
+    ld a,c
+    ld c,8
+    sub c
+    ld c,a
+    call movement_spaceisempty       ; check space is empty
+    ld a,e                          ; check space empty flag
     cp 0
-    jp nz,robots_checkupandmove0    ; can't move here so return
+    jp z,robots_checkupandmove0    ; can't move here so return
     ld bc,(ix)                  ; load current coords into bc
     dec c                       ; move up
     dec c
@@ -480,11 +484,16 @@ robots_checkdownandmove:
     ; check below
     ld bc,(ix)                  ; load current coords into bc
     call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly underneath (add 256)
-    inc h                       ; memory location of cell beneath now in hl
-    ld a,(hl)                       ; get the contents of the line
+    ld hl,de                        ; look at cell directly above (add 256)
+    inc h
+    ld a,c
+    ld c,8
+    add c
+    ld c,a
+    call movement_spaceisempty       ; check space is empty
+    ld a,e                          ; check space empty flag
     cp 0
-    jp nz,robots_checkdownandmove0    ; can't move here so return
+    jp z,robots_checkdownandmove0    ; can't move here so return
     ld bc,(ix)                  ; load current coords into bc
     inc c                       ; move up
     inc c
@@ -505,7 +514,7 @@ robots_checkleftandmove:
     ; check below
     ld bc,(ix)                  ; load current coords into bc
     call sprites_scadd              ; get the memory location of cell into de
-    ld hl,de                        ; look at cell directly to the right (add 1)
+    ld hl,de                        ; look at cell directly to the left (sub 1)
     ld a,b
     ld b,8
     sub b                           ; move one cell left
