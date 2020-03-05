@@ -93,6 +93,7 @@ ship_land2:
 ;   Take off the ship
 ;
 ship_takeoff:
+    call sound_pitchbenddown
     ld e,1                      ; store a flag to track first time round
     ld b,8                      ; move up 8 pixels
 ship_takeoff0:

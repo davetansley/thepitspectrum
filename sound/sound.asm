@@ -23,12 +23,6 @@ sound_play1:
     jr nz,sound_play0
     ret
 
-sound_dig:
-    exx
-	
-    exx
-	ret
-
 sound_gamestart:
     di
     ld b,3
@@ -52,18 +46,18 @@ sound_lifestart:
     ld b,3
 sound_lifestart0:
     push bc
-    ld e,54
+    ld e,45
     ld bc,32
     ld d,1
     call sound_play
-    ld e,76
+    ld e,65
     ld bc,32
     ld d,1
     call sound_play
-    ld e,54
+    ld e,45
     ld bc,32
     call sound_play
-    ld e,76
+    ld e,65
     ld bc,32
     call sound_play
     pop bc
@@ -71,9 +65,40 @@ sound_lifestart0:
     ei
     ret
 
+sound_gameover:
+    di
+    ld b,10
+    ld e,40
+sound_gameover0:
+    push bc
+    push de
+    push af
+    ld bc,32
+    ld d,0
+    call sound_play
+    pop af
+    pop de
+    ld a,10
+    add e
+    ld e,a
+    add 4
+    pop bc
+    djnz sound_gameover0
+    ei
+    ret
+
 sound_scoretick:
     di
     ld e,35
+    ld bc,24
+    ld d,0
+    call sound_play
+    ei
+    ret
+
+sound_tankalarm:
+    di
+    ld e,25
     ld bc,24
     ld d,0
     call sound_play
@@ -128,6 +153,20 @@ sound_pitchbend0:
     inc hl ; pitch going up.
     pop bc
     djnz sound_pitchbend0 ; repeat.
+    ret
+
+sound_pitchbenddown:
+    ld hl,750 ; starting pitch.
+    ld b,250 ; length of pitch bend.
+sound_pitchbenddown0:
+    push bc
+    push hl ; store pitch.
+    ld de,1 ; very short duration.
+    call 949 ; ROM beeper routine.
+    pop hl ; restore pitch.
+    dec hl ; pitch going down.
+    pop bc
+    djnz sound_pitchbenddown0 ; repeat.
     ret
 
 sound_rockfell:

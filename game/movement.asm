@@ -192,7 +192,6 @@ movement_spaceisdiggable2:
     ld (hl),a                       ; set the number of frame to dig for
     inc hl
     ld (hl),8                       ; set the number of pixels to dig
-    call sound_dig
     ret
 movement_spaceisdiggable1:
     ld hl,player+6                  

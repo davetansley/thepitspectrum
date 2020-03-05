@@ -96,15 +96,15 @@ string_zonk:
 string_options_title:
     defb 13,3,'THE PIT',255
 string_options_1player:
-    defb 10,6,'1. ONE PLAYER',255
+    defb 9,6,'1. ONE PLAYER',255
 string_options_2player:
-    defb 10,7,'2. TWO PLAYER',255
+    defb 9,7,'2. TWO PLAYER',255
 string_options_keyboard:
-    defb 10,8,'3. KEYBOARD',255
+    defb 9,8,'3. KEYS (QAOPSp)',255
 string_options_joystick:
-    defb 10,9,'4. KEMPSTON',255
+    defb 9,9,'4. KEMPSTON',255
 string_options_start:
-    defb 10,10,'5. START',255
+    defb 9,10,'5. START',255
 string_options_vanity:
     defb 8,22,'Spectrum Conversion',254
     defb 7,23,'by Dave Tansley, 2020',255

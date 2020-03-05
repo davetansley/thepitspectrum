@@ -205,7 +205,14 @@ tank_fire4:                     ; TIDY UP
     call buffer_marklineforupdate 
     ld a,2
     call buffer_marklineforupdate 
+    ld bc,(tank_currentdamagecoord) ; get the current damage coord into bc
+    ld a,c
+    cp 13
+    jp c, tank_fire8                ; play alarm instead if getting close
     call sound_tankshoot 
+    ret
+tank_fire8:
+    call sound_tankalarm
     ret
 
 ;

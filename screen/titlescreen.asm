@@ -1,12 +1,14 @@
-;
-; Draws the title screen
-;
-titlescreen_show:
+titlescreen_preshow:
     call titlescreen_preinit
     call sound_gamestart
     ld b,60
     call utilities_pauseforframes         ; pause for a second
-titlescreen_show2:
+    ret
+
+;
+; Draws the title screen
+;
+titlescreen_show:
     call titlescreen_init
     call titlescreen_drawtitle
     ld a,(game_control)
@@ -33,7 +35,7 @@ titlescreen_show0:
     call utilities_waitforkey_forframes   ; wait for keypress
     ld a,e
     cp 1                                  ; was anything pressed?
-    jp nz,titlescreen_show2               ; start again if not
+    jp nz,titlescreen_show               ; start again if not
     ret
 
 ;

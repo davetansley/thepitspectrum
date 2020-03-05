@@ -22,24 +22,24 @@ options_show:
     ld a,(game_numberplayers)
     cp 1
     jp nz,options_show0
-    ld de,22528+202                         ; top row attrs here 
+    ld de,22528+201                         ; top row attrs here 
     jp options_show1
 options_show0:
-    ld de,22528+234                         ; top row attrs here 
+    ld de,22528+233                         ; top row attrs here 
 options_show1:
-    ld b,13
+    ld b,16
     ld a,199
     call screen_setcolours                  ; highlight current player
 
     ld a,(game_control)
     cp 0
     jp nz,options_show6
-    ld de,22528+266                         ; top row attrs here 
+    ld de,22528+265                         ; top row attrs here 
     jp options_show7
 options_show6:
-    ld de,22528+298                         ; top row attrs here 
+    ld de,22528+297                         ; top row attrs here 
 options_show7:
-    ld b,13
+    ld b,16
     ld a,199
     call screen_setcolours                  ; highlight current control
 options_show8:
@@ -48,30 +48,33 @@ options_show8:
     jp nz,options_show2
     ld hl,game_numberplayers
     ld (hl),1
-    jp options_show
+    jp options_show9
 options_show2:
     cp 50                                   ; was 2 pressed
     jp nz,options_show3
     ld hl,game_numberplayers
     ld (hl),2
-    jp options_show
+    jp options_show9
 options_show3:
     cp 51                                   ; was 3 pressed
     jp nz,options_show4
     ld hl,game_control
     ld (hl),0
-    jp options_show
+    jp options_show9
 options_show4:
     cp 52                                   ; was 4 pressed
     jp nz,options_show5
     ld hl,game_control
     ld (hl),1
-    jp options_show
+    jp options_show9
 options_show5:
     cp 53                                   ; was 5 pressed
     ret z                                   ; exit if so
     jp options_show8                         ; otherwise, jump to top
     ret
+options_show9:
+    call sound_gemcollected
+    jp options_show
 
 ;
 ; Initialise the options screen

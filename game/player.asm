@@ -39,7 +39,7 @@ player_getlocation0:            ; check for diamond cavern
     ld a,c                      ; get the horizontal next
     cp 11
     jp c,player_getlocation1    ; if less than 11 not in diamond cave
-    cp 22
+    cp 23
     jp nc,player_getlocation1    ; if less than 11 not in diamond cave
     ld hl,player_location
     ld (hl),1                   ; load location with 1, the cavern

@@ -50,6 +50,12 @@ robots_robotspeed:
     defb 2
 
 ;
+; The current robot spawn speed
+;
+robots_robotspawnspeed:
+    defb 4
+
+;
 ; The current max robots
 ;
 robots_robotsmax:
@@ -80,6 +86,8 @@ robots_init0:
     ld (robots_spawn+1),a
     ld (robots_process8+1),a
     ld (robots_process0+1),a
+    ld a,(robots_robotspawnspeed)
+    ld (robots_process10+1),a
     ret
 
 ;
@@ -137,6 +145,14 @@ robots_process:
 robots_process8:
     cp 3                                    ; 3 is the maximum
     jp z,robots_process0                    ; if already three, nothing to do
+    ld a,(robots_robotspawnspeed)                ; now check the spawn speed timer
+    dec a
+    ld (robots_robotspawnspeed),a           ; store the spawn speed timer
+    cp 0
+    jp nz,robots_process0                   ; if it hasn't reached zero yet, just move
+robots_process10:                           
+    ld a,4                                  ; SELF WRITING CODE
+    ld (robots_robotspawnspeed),a                ; reset the spawn speed timer
     ld a,(robots_spawntimer)                ; now check the spawn timer
     cp 0
     jp nz,robots_process1                   ; if it hasn't reached zero yet, just decrease

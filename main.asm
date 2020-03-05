@@ -23,6 +23,8 @@ main:
     ld hl,font
     ld (23606),hl
     call options_show
+    ; Show the red pre-title screen
+    call titlescreen_preshow
     
     ; Draw the title screen
 main_titlescreen:

@@ -2,6 +2,8 @@
 ; Draws the game over screen
 ;
 gameover_draw:
+    ld a,0
+    ld (gameover_soundplayed),a
     ld a,1
     ld (game_currentplayer),a               ; do the first player first    
     call player_init_lifestart              ; get the player config
@@ -24,7 +26,7 @@ gameover_draw0:
     call string_print
 
     call gameover_commontext
-
+    call gameover_playsound
     ld b,11
     ld a,66
     ld de,22528+43                         ; attrs here 
@@ -64,6 +66,7 @@ gameover_enterhighscores:
     cp 0
     ret z
     call gameover_enterhighscores_init
+    call gameover_playsound
     ; Set the flash
     ld a,(scores_highscoretmp)              ; scoretmp has the memory offset of the start of the number
     ld e,5
@@ -106,6 +109,7 @@ gameover_enterhighscores3:
     ld (hl),a 
     inc hl
     push hl
+    call sound_gemcollected
     call scores_showtable
     pop hl
     ld b,15
@@ -182,4 +186,19 @@ gameover_init:
     ld (23693),a        ; set our screen colours.
     ld a,0              ; 2 is the code for red.
     out (254),a         ; write to port 254.
+    ret
+
+gameover_soundplayed:
+    defb 0
+
+;
+; Plays the sound if it hasn't already been played
+;
+gameover_playsound:
+    ld a,(gameover_soundplayed)  
+    cp 1           
+    ret z
+    call sound_gameover
+    ld a,1
+    ld (gameover_soundplayed),a
     ret
