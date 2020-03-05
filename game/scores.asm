@@ -194,13 +194,15 @@ scores_processhighscores0:
     ld a,(de)                   ; get first current column
     cp c                        ; compare current with first
     jp c,scores_processhighscores4  ; if c is bigger, then this is not a higher score, so end
-    jp z,scores_processhighscores5  ; if c is equal, then this is not a higher score, so end
-    ld a,0
+    jp z,scores_processhighscores5  ; if c is equal, then don't clear the equality flag
+    ld a,0                      ; this must be bigger, so no need to check further
     ld (scores_highscoretmp2),a ; zero the equality indicator
+    jp scores_processhighscores6
 scores_processhighscores5:
     inc hl 
     inc de                      ; move to next column
     djnz scores_processhighscores0 ; loop
+scores_processhighscores6:    
     ld a,(scores_highscoretmp2)   ; get the equality indicator
     cp 1
     jp z,scores_processhighscores4 ; if it is equal, not a highscore

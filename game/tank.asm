@@ -82,7 +82,7 @@ tank_init:
 
 ;
 ;   Draw and move the tank
-;   Start processing at frame 200
+;   Start processing at frame 75
 ;   Don't move if anim is zero
 ;   Decrement frame if moved
 ;
@@ -95,11 +95,15 @@ tank_process:
 tank_process0:
     call game_getcurrentframe   ; get the current frame number into a
     cp 75
-    ret c                       ; return if the frame number is below 100
+    ret c                       ; return if the frame number is below 75
     call tank_move              ; move tank if not
     ld a,(tank_anim)
     dec a
     ld (tank_anim),a            ; decrease the anim count
+    cp 0
+    ret nz
+    ld a,1
+    ld (robots_spawntimer),a ; set the spawn speed low so that a robot spawns soon after the tank stops moving
     ret
 
 ;
