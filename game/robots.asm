@@ -376,7 +376,7 @@ robots_checkdirectionsandmove8:
 robots_checkdirectionsandmove2
     ; ALREADY MOVING DOWN
     ; random check
-    call game_getcurrentframe
+    call utilities_randomfromram
     and 1                       ; odd or even
     jp z,robots_checkdirectionsandmove9
     call robots_checkrightthenleft ; prefer right over left

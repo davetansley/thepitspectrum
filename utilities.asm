@@ -173,3 +173,21 @@ utilities_randomupper0:
     add hl,bc
     ld a,l
     ret
+
+;
+; A pointer to somewhere in the first 8k of ram
+;
+utilities_rampointer:
+    defb 64,31
+
+utilities_randomfromram:
+    ld hl,(utilities_rampointer)
+    dec hl
+    ld a,h
+    cp 0
+    jp nz,utilities_randomfromram0
+    ld hl,8000                        ; check if pointer high byte has reached zero, if so, set to 8000 
+utilities_randomfromram0:
+    ld (utilities_rampointer),hl
+    ld a,(hl)                         ; get a byte from here
+    ret 

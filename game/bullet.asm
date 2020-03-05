@@ -5,6 +5,12 @@ bullet_state:
     defb 0,0,0,0
 
 ;
+; Measures if bullet can be fired. Disabled if fire held down
+;
+bullet_enable:
+    defb 0
+
+;
 ; Initialise a the bullet
 ;
 bullet_init:
@@ -19,6 +25,8 @@ bullet_init:
 ; Shoots the bullet
 ;
 bullet_shoot:
+    ld a,1
+    ld (bullet_enable),a        ; disable the bullet until fire is release
     ld ix,bullet_state
     ld bc,(player)              ; get the player coords
     ld a,(player+2)             ; get the player direction
@@ -121,10 +129,10 @@ bullets_checkforrobot0:
     and 248                 ; get nearest multiple of 8
     ld d,a
     ld bc,(bullet_state)    ; get bullet coords
-    ld a,d               ; get the player horiz coord 
+    ld a,d               ; get the robot horiz coord 
     sub b                ; subtract robot coord 
     cp 0                ; should be the same
-    jp nz,bullets_checkforrobot2 ; if not, might have hit, so check the next char along... if matched, check vert
+    jp z,bullets_checkforrobot2 ; if not, might have hit, so check the next char along... if matched, check vert
     ld a,8
     add a,d
     sub b                ; check again for the next char along

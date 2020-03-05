@@ -58,6 +58,8 @@ control_keyboard:
     ld b,a              ; store result in b register.
     rr b                ; check outermost key (space).
     jp nc,control_keyboard5 
+    ld a,0
+    ld (bullet_enable),a ; if nothing has been pressed, reset the fire enabler
     ret
 control_keyboard1:
     call control_pl_moveup         ; player up.
@@ -95,6 +97,8 @@ control_joystick:
     in a,(c)                        ; read input.
     and 16                          ; try the fire bit.
     jp nz,control_joystick5       ; fire pressed.
+    ld a,0
+    ld (bullet_enable),a ; if nothing has been pressed, reset the fire enabler
     ret
 control_joystick1:
     call control_pl_moveup         ; player up.
@@ -446,6 +450,9 @@ control_pl_moveright0:
 ; Player fires
 ;
 control_pl_fire:
+    ld a,(bullet_enable)
+    cp 0
+    ret nz                      ; don't shoot if the bullet isn't enabled
     ld a,(player+2)         ; get player direction
     cp 0
     ret z
