@@ -21,7 +21,7 @@ monster_jumppos:
 ; The jump table for the monster. 
 ;
 monster_jumptable:
-    defb 255,3,2,2,2,2,2,2,2,2,1,1,1,1,1,1,255
+    defb 255,3,2,2,2,2,2,2,2,2,1,1,1,1,1,255
 
 ;
 ; The vertical direction: 0 up, 1 down

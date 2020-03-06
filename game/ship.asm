@@ -16,6 +16,9 @@ ship_current_sprite:
 ship_current_coords:
     defb 0,0
 
+ship_soundpitch:
+    defb 0
+
 ship_process:
     ld a,(player+11)
     cp 2                        ; has the player been killed by tank?
@@ -27,10 +30,38 @@ ship_process:
     call utilities_pauseforframes
     ret
 
+ship_sound:
+    ld d,0
+    ld a,(ship_soundpitch)
+    ld e,4
+    sub e
+    ld e,a    
+    ld (ship_soundpitch),a
+    ld bc,16
+    di
+    call sound_play
+    ei
+    ret
+
+ship_soundup:
+    ld d,0
+    ld a,(ship_soundpitch)
+    ld e,4
+    add e
+    ld e,a    
+    ld (ship_soundpitch),a
+    ld bc,16
+    di
+    call sound_play
+    ei
+    ret
+
 ;
 ;   Draw and land the ship - first move the ship down, then across, drawing the player in the middle
 ;
 ship_land:
+    ld a,150
+    ld (ship_soundpitch),a
     ld bc,(ship_initpos)
     ld (ship_initpos2),bc        ; save the initial position for later use
     ld e,0                      ; store a flag to track first time round
@@ -53,10 +84,11 @@ ship_land1:
     ld a,e
     cp 0
     jp nz,ship_land4
-    call sound_pitchbend        ; play sound if first frame
+    ;call sound_pitchbend        ; play sound if first frame
 ship_land4:
     push de
     call ship_draw_screen
+    call ship_sound
     pop de
     ld e,1
     pop bc
@@ -93,7 +125,7 @@ ship_land2:
 ;   Take off the ship
 ;
 ship_takeoff:
-    call sound_pitchbenddown
+    ;call sound_pitchbenddown
     ld e,1                      ; store a flag to track first time round
     ld b,8                      ; move up 8 pixels
 ship_takeoff0:
@@ -111,6 +143,7 @@ ship_takeoff0:
 ship_takeoff1:
     call ship_draw_full         ; draw the ship
     call ship_draw_screen
+    call ship_soundup
     pop de
     ld e,1
     pop bc
