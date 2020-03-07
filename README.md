@@ -8,6 +8,8 @@ Controls: QAOPSpace, Kempson
 
 Number of players: 1 or 2
 
+Download: http://tiny.cc/d41ykz
+
 The Legend
 ==========
 As the tale goes, a dazzling treasure lies underground a forbidden planet. The temptation of riches beyond belief is too enticing, you must go for it.
