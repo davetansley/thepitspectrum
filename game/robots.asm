@@ -90,6 +90,7 @@ robots_init0:
     ld (robots_robotspawnspeed),a
     ld a,(robots_robotspawnspeed)
     ld (robots_process10+1),a
+    call robots_zeromovecounters
     ret
 
 ;
@@ -275,14 +276,24 @@ robots_automove1:
 robots_automove3:
     dec c
     dec c
+    dec c
+    dec c
     jp robots_automove2
 robots_automove4:
     inc c 
+    inc c
+    inc c
     inc c     
     jp robots_automove2                     
 robots_automove2:
     ld (ix),bc
     ret
+
+;
+; Holds how many times moved in current direction
+;
+robots_alreadymoved:
+    defb 0,0,0,0
 
 ;
 ; Checks if a robot can move in all directions, then picks one and moves there.
@@ -298,6 +309,17 @@ robots_checkdirectionsandmove:
     ld a,(ix+6)                 ; get the direction
     cp 0                        ; left
     jp nz,robots_checkdirectionsandmove0
+    ;LEFT
+    ; check how many times we've moved left
+    ld hl,robots_alreadymoved+0
+    ld a,(hl)                               ; check how many times we've moved in this direction
+    cp 2                                    ; if less than two, try to go in this direction
+    jp nc,robots_checkdirectionsandmove11 
+    ; check left
+    call robots_checkleftandmove
+    cp 1
+    ret z                       ; if we moved, don't check again   
+robots_checkdirectionsandmove11:
     ; random check
     call game_getcurrentframe
     and 1                       ; odd or even
@@ -322,9 +344,20 @@ robots_checkdirectionsandmove4:
     ; if we're here and haven't moved...     
     ret
 robots_checkdirectionsandmove0  
+    ; RIGHT
     cp 1                        ; right
     jp nz,robots_checkdirectionsandmove1
     ; ALREADY MOVING RIGHT
+    ; check how many times we've moved right
+    ld hl,robots_alreadymoved+1
+    ld a,(hl)                               ; check how many times we've moved in this direction
+    cp 2                                    ; if less than two, try to go in this direction
+    jp nc,robots_checkdirectionsandmove12 
+    ; check left
+    call robots_checkrightandmove
+    cp 1
+    ret z                       ; if we moved, don't check again
+robots_checkdirectionsandmove12:
     ; random check
     call game_getcurrentframe
     and 1                       ; odd or even
@@ -349,6 +382,7 @@ robots_checkdirectionsandmove6:
     ; if we're here and haven't moved...     
     ret
 robots_checkdirectionsandmove1
+    ; UP
     cp 2                        ; up
     jp nz,robots_checkdirectionsandmove2
     ; ALREADY MOVING UP
@@ -376,7 +410,7 @@ robots_checkdirectionsandmove8:
     ; if we're here and haven't moved...     
     ret
 robots_checkdirectionsandmove2
-    ; ALREADY MOVING DOWN
+    ; DOWN
     ; random check
     call utilities_randomfromram
     and 1                       ; odd or even
@@ -469,9 +503,11 @@ robots_checkupandmove:
     ld bc,(ix)                  ; load current coords into bc
     dec c                       ; move up
     dec c
+    dec c
+    dec c
     ld (ix),bc
     ld (ix+6),2
-    ld (ix+5),3                 ; set the auto move frames
+    ld (ix+5),1                 ; set the auto move frames
     ld a,1
     ret
 robots_checkupandmove0:
@@ -499,9 +535,11 @@ robots_checkdownandmove:
     ld bc,(ix)                  ; load current coords into bc
     inc c                       ; move up
     inc c
+    inc c
+    inc c
     ld (ix),bc
     ld (ix+6),3
-    ld (ix+5),3                 ; set the auto move frames
+    ld (ix+5),1                 ; set the auto move frames
     ld a,1
     ret
 robots_checkdownandmove0:
@@ -531,7 +569,13 @@ robots_checkleftandmove:
     ld (ix),bc
     ld (ix+6),0
     ld (ix+5),7                 ; set the auto move frames
-    ld (ix+3),0                 ; set to right
+    ld (ix+3),0                 ; set to left
+    ld hl,robots_alreadymoved+0 ; increment the already moved flag
+    ld a,(hl)
+    inc a
+    call robots_zeromovecounters ; zero the move counters
+    ld hl,robots_alreadymoved+0 ; increment the already moved flag
+    ld (hl),a                   ; store the incremented counter
     ld a,1
     ret
 robots_checkleftandmove0:
@@ -564,6 +608,12 @@ robots_checkrightandmove:
     ld (ix+6),1
     ld (ix+5),7                 ; set the auto move frames
     ld (ix+3),1                 ; set to right
+    ld hl,robots_alreadymoved+1 ; increment the already moved flag
+    ld a,(hl)
+    inc a
+    call robots_zeromovecounters ; zero the move counters
+    ld hl,robots_alreadymoved+0 ; increment the already moved flag
+    ld (hl),a                   ; store the incremented counter
     ld a,1
     ret
 robots_checkrightandmove0:
@@ -635,4 +685,19 @@ robots_checkforplayer:
     ret nc
     ld (ix+2),0          ; mark as inactive
     call player_robotkillplayer ; mark the player as killed
+    ret
+
+;
+; Zeroes the already moved counter
+;
+robots_zeromovecounters:
+    ld b,4
+    ld hl,robots_alreadymoved
+    ex af,af'
+    ld a,0
+robots_zeromovecounters0:
+    ld (hl),a
+    inc hl
+    djnz robots_zeromovecounters0
+    ex af,af'
     ret

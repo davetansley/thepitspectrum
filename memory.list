@@ -53,7 +53,7 @@
  52   8033 CD 9C D1         call thepit_init
  53   8036 CD 37 D2         call monster_init
  54   8039 CD 87 D3         call robots_init
- 55   803C CD 40 D7         call bullet_init
+ 55   803C CD 93 D7         call bullet_init
  56   803F
  57   803F              mloop:
  58   803F                  ;halt
@@ -114,8 +114,8 @@
 113   80A1 CD A8 D1         call thepit_process         ; process the pit trap
 114   80A4 CD 0C D0         call missiles_process       ; process missiles
 115   80A7 CD 54 D2         call monster_process        ; process monster
-116   80AA CD 15 D4         call robots_process         ; process robots
-117   80AD CD 8C D7         call bullet_process         ; process the bullet
+116   80AA CD 18 D4         call robots_process         ; process robots
+117   80AD CD DF D7         call bullet_process         ; process the bullet
 118   80B0 CD 8A CF         call diamonds_twinkle       ; make the diamonds twinkle
 119   80B3 CD 99 CD         call scores_printscore      ; update the score on screen
 120   80B6 CD B3 C5         call game_incrementframe    ; increment the game frame
@@ -4009,7 +4009,7 @@
  59+  C073 CB 18            rr b                ; check outermost key (space).
  60+  C075 D2 8E C0         jp nc,control_keyboard5
  61+  C078 3E 00            ld a,0
- 62+  C07A 32 3F D7         ld (bullet_enable),a ; if nothing has been pressed, reset the fire enabler
+ 62+  C07A 32 92 D7         ld (bullet_enable),a ; if nothing has been pressed, reset the fire enabler
  63+  C07D C9               ret
  64+  C07E              control_keyboard1:
  65+  C07E CD 11 C2         call control_pl_moveup         ; player up.
@@ -4048,7 +4048,7 @@
  98+  C0B3 E6 10            and 16                          ; try the fire bit.
  99+  C0B5 C2 CE C0         jp nz,control_joystick5       ; fire pressed.
 100+  C0B8 3E 00            ld a,0
-101+  C0BA 32 3F D7         ld (bullet_enable),a ; if nothing has been pressed, reset the fire enabler
+101+  C0BA 32 92 D7         ld (bullet_enable),a ; if nothing has been pressed, reset the fire enabler
 102+  C0BD C9               ret
 103+  C0BE              control_joystick1:
 104+  C0BE CD 11 C2         call control_pl_moveup         ; player up.
@@ -4400,7 +4400,7 @@
 450+  C2C8              ; Player fires
 451+  C2C8              ;
 452+  C2C8              control_pl_fire:
-453+  C2C8 3A 3F D7         ld a,(bullet_enable)
+453+  C2C8 3A 92 D7         ld a,(bullet_enable)
 454+  C2CB FE 00            cp 0
 455+  C2CD C0               ret nz                      ; don't shoot if the bullet isn't enabled
 456+  C2CE 3A 1A C6         ld a,(player+2)         ; get player direction
@@ -4408,11 +4408,11 @@
 458+  C2D3 C8               ret z
 459+  C2D4 FE 03            cp 3
 460+  C2D6 C8               ret z                   ; if up or down, don't fire
-461+  C2D7 3A 3E D7         ld a,(bullet_state+3)       ; get the state
+461+  C2D7 3A 91 D7         ld a,(bullet_state+3)       ; get the state
 462+  C2DA FE 01            cp 1
 463+  C2DC C8               ret z                   ; if currently firing, don't fire
-464+  C2DD CD 40 D7         call bullet_init        ; initialise the bullet
-465+  C2E0 CD 55 D7         call bullet_shoot       ; shoot the bullet
+464+  C2DD CD 93 D7         call bullet_init        ; initialise the bullet
+465+  C2E0 CD A8 D7         call bullet_shoot       ; shoot the bullet
 466+  C2E3 CD F7 B1         call sound_laser
 467+  C2E6 C9               ret
 468+  C2E7
@@ -4944,25 +4944,25 @@
  45+  C533 32 2D 28 23
  45+  C537 1E 19 14 0C
  46+  C53B              game_pitdifficulty:
- 47+  C53B 07 05 05 04      defb 7,5,5,4,4,4,2,2,2,2,2,2
+ 47+  C53B 07 07 05 05      defb 7,7,5,5,4,4,2,2,2,2,2,2
  47+  C53F 04 04 02 02
  47+  C543 02 02 02 02
  48+  C547              game_robotdifficulty:
- 49+  C547 06 04 04 04      defb 6,4,4,4,3,3,3,2,0,0,0,0
- 49+  C54B 03 03 03 02
+ 49+  C547 06 06 04 04      defb 6,6,4,4,3,3,2,2,0,0,0,0
+ 49+  C54B 03 03 02 02
  49+  C54F 00 00 00 00
  50+  C553              game_digdifficulty:
- 51+  C553 14 0E 0A 0A      defb 20,14,10,10,8,8,8,8,6,6,6,4
+ 51+  C553 14 14 0A 0A      defb 20,20,10,10,8,8,8,8,6,6,6,4
  51+  C557 08 08 08 08
  51+  C55B 06 06 06 04
  52+  C55F              game_rockdifficulty:
- 53+  C55F 28 1C 14 14      defb 40,28,20,20,18,18,18,18,18,18,18,18
+ 53+  C55F 28 28 14 14      defb 40,40,20,20,18,18,18,18,18,18,18,18
  53+  C563 12 12 12 12
  53+  C567 12 12 12 12
  54+  C56B              game_missiledifficulty:
- 55+  C56B 46 32 2D 2D      defb 70,50,45,45,40,35,35,30,30,25,25,20
- 55+  C56F 28 23 23 1E
- 55+  C573 1E 19 19 14
+ 55+  C56B 46 46 3C 3C      defb 70,70,60,60,50,50,40,40,30,30,25,20
+ 55+  C56F 32 32 28 28
+ 55+  C573 1E 1E 19 14
  56+  C577              ;
  57+  C577              ; Moves to the next player
  58+  C577              ;
@@ -7453,765 +7453,831 @@
  78+  D39F                  ; Self writing code
  79+  D39F                  ; Robot speed
  80+  D39F 3A 84 D3         ld a,(robots_robotspeed)
- 81+  D3A2 32 58 D4         ld (robots_process7+1),a
+ 81+  D3A2 32 5B D4         ld (robots_process7+1),a
  82+  D3A5 3C               inc a
- 83+  D3A6 32 88 D4         ld (robots_process6+1),a
+ 83+  D3A6 32 8B D4         ld (robots_process6+1),a
  84+  D3A9                  ; Robots max
  85+  D3A9 3A 86 D3         ld a,(robots_robotsmax)
- 86+  D3AC 32 C2 D3         ld (robots_spawn+1),a
- 87+  D3AF 32 19 D4         ld (robots_process8+1),a
- 88+  D3B2 32 46 D4         ld (robots_process0+1),a
+ 86+  D3AC 32 C5 D3         ld (robots_spawn+1),a
+ 87+  D3AF 32 1C D4         ld (robots_process8+1),a
+ 88+  D3B2 32 49 D4         ld (robots_process0+1),a
  89+  D3B5 3E 04            ld a,4
  90+  D3B7 32 85 D3         ld (robots_robotspawnspeed),a
  91+  D3BA 3A 85 D3         ld a,(robots_robotspawnspeed)
- 92+  D3BD 32 2A D4         ld (robots_process10+1),a
- 93+  D3C0 C9               ret
- 94+  D3C1
- 95+  D3C1              ;
- 96+  D3C1              ; Spawns a new robot
- 97+  D3C1              ; Inputs:
- 98+  D3C1              ; ix - pointer to start of robot array entry
- 99+  D3C1              ;
-100+  D3C1              robots_spawn:
-101+  D3C1 06 03            ld b,3                      ;(SELF WRITING CODE)
-102+  D3C3 DD 21 57 D3      ld ix,robots_robots
-103+  D3C7              robots_spawn0:
-104+  D3C7 DD 7E 02         ld a,(ix+2)                 ; get the state
-105+  D3CA FE 00            cp 0
-106+  D3CC C2 F8 D3         jp nz,robots_spawn1         ; if already active, move on
-107+  D3CF ED 4B 7A D3      ld bc,(robots_initcoords)
-108+  D3D3 DD 71 00 DD      ld (ix),bc
-108+  D3D7 70 01
-109+  D3D9 DD 36 02 01      ld (ix+2),1
-110+  D3DD DD 36 03 00      ld (ix+3),0
-111+  D3E1 DD 36 04 00      ld (ix+4),0
-112+  D3E5 DD 36 05 00      ld (ix+5),0
-113+  D3E9 DD 36 06 00      ld (ix+6),0
-114+  D3ED 3A 7F D3         ld a,(robots_numberactive)
-115+  D3F0 3C               inc a
-116+  D3F1 32 7F D3         ld (robots_numberactive),a  ; increase the number active
-117+  D3F4 CD CC D6         call robots_draw            ; draw initial frame
-118+  D3F7 C9               ret
-119+  D3F8              robots_spawn1:
-120+  D3F8 11 07 00         ld de,7
-121+  D3FB DD 19            add ix,de
-122+  D3FD 10 C8            djnz robots_spawn0
-123+  D3FF C9               ret
-124+  D400              ;
-125+  D400              ; Kills robot
-126+  D400              ; Inputs:
-127+  D400              ; ix - pointer to start of robot array entry
-128+  D400              ;
-129+  D400              robots_kill:
-130+  D400 3A 7F D3         ld a,(robots_numberactive)
-131+  D403 3D               dec a
-132+  D404 32 7F D3         ld (robots_numberactive),a
-133+  D407 DD 36 02 00      ld (ix+2),0                     ; set to inactive
-134+  D40B C5               push bc
-135+  D40C E5               push hl
-136+  D40D 06 01            ld b,1
-137+  D40F CD 89 CD         call scores_addhundreds
-138+  D412 E1               pop hl
-139+  D413 C1               pop bc
-140+  D414 C9               ret
-141+  D415
-142+  D415              ;
-143+  D415              ; Processes the robots
-144+  D415              ;
-145+  D415              robots_process:
-146+  D415 3A 7F D3         ld a,(robots_numberactive)              ; first, check if we need to spawn a new robot
-147+  D418              robots_process8:
-148+  D418 FE 03            cp 3                                    ; 3 is the maximum
-149+  D41A CA 45 D4         jp z,robots_process0                    ; if already three, nothing to do
-150+  D41D 3A 85 D3         ld a,(robots_robotspawnspeed)                ; now check the spawn speed timer
-151+  D420 3D               dec a
-152+  D421 32 85 D3         ld (robots_robotspawnspeed),a           ; store the spawn speed timer
-153+  D424 FE 00            cp 0
-154+  D426 C2 45 D4         jp nz,robots_process0                   ; if it hasn't reached zero yet, just move
-155+  D429              robots_process10:
-156+  D429 3E 04            ld a,4                                  ; SELF WRITING CODE
-157+  D42B 32 85 D3         ld (robots_robotspawnspeed),a                ; reset the spawn speed timer
-158+  D42E 3A 7C D3         ld a,(robots_spawntimer)                ; now check the spawn timer
-159+  D431 FE 00            cp 0
-160+  D433 C2 41 D4         jp nz,robots_process1                   ; if it hasn't reached zero yet, just decrease
-161+  D436 3E FA            ld a,250
-162+  D438 32 7C D3         ld (robots_spawntimer),a                ; reset the spawn timer
-163+  D43B CD C1 D3         call robots_spawn                       ; spawn a robot
-164+  D43E C3 45 D4         jp robots_process0                      ; carry on
-165+  D441              robots_process1:
-166+  D441 3D               dec a
-167+  D442 32 7C D3         ld (robots_spawntimer),a                ; decrease the spawn timer and store
-168+  D445              robots_process0:
-169+  D445 06 03            ld b,3                                  ; max number of robots (SELF WRITING CODE)
-170+  D447 DD 21 57 D3      ld ix, robots_robots                    ; point ix at the robot array
-171+  D44B              robots_process2:
-172+  D44B C5               push bc
-173+  D44C DD 7E 02         ld a,(ix+2)                             ; check the state
-174+  D44F FE 00            cp 0
-175+  D451 CA 6D D4         jp z,robots_process3                    ; if not active, move on
-176+  D454 3A 7E D3         ld a,(robots_movetimer)
-177+  D457              robots_process7:                            ; self writing code - the number in the comparison will be ovewritten
-178+  D457 FE 04            cp 4
-179+  D459 C2 6D D4         jp nz,robots_process3                   ; can we move this frame
-180+  D45C CD CC D6         call robots_draw                        ; draw over existing
-181+  D45F CD 92 D4         call robots_move                        ; move the
-182+  D462 DD 7E 02         ld a,(ix+2)                             ; get the state again
-183+  D465 FE 00            cp 0
-184+  D467 CA 6D D4         jp z,robots_process3                    ; move to next if this robot has become inactive
-185+  D46A CD CC D6         call robots_draw                        ; draw the new robot
-186+  D46D              robots_process3:
-187+  D46D C1               pop bc
-188+  D46E 11 07 00         ld de,7
-189+  D471 DD 19            add ix,de
-190+  D473 10 D6            djnz robots_process2
-191+  D475 3A 7D D3         ld a,(robots_animtimer)
-192+  D478 3C               inc a
-193+  D479 FE 08            cp 8
-194+  D47B C2 80 D4         jp nz,robots_process4
-195+  D47E 3E 00            ld a,0                                  ; reset if we reached max
-196+  D480              robots_process4:
-197+  D480 32 7D D3         ld (robots_animtimer),a
-198+  D483 3A 7E D3         ld a,(robots_movetimer)                 ; increment the robot move timer
-199+  D486 3C               inc a
-200+  D487              robots_process6:                            ; self writing code - the number in the comparison will be ovewritten
-201+  D487 FE 05            cp 5                                    ; there is another reference to this number above
-202+  D489 C2 8E D4         jp nz,robots_process5
-203+  D48C 3E 00            ld a,0
-204+  D48E              robots_process5:
-205+  D48E 32 7E D3         ld (robots_movetimer),a
-206+  D491
-207+  D491 C9               ret
-208+  D492
-209+  D492
-210+  D492              ;
-211+  D492              ; Moves a robot
-212+  D492              ; Inputs:
-213+  D492              ; ix - points to first byte of robot in array
-214+  D492              robots_move:
-215+  D492 DD 7E 02         ld a,(ix+2)                             ; get the state
-216+  D495 FE 02            cp 2
-217+  D497 CA C8 D4         jp z,robots_move4                       ; don't move if shot, just change the anim
-218+  D49A 3A 7D D3         ld a,(robots_animtimer)                 ; get the anim timer
-219+  D49D FE 07            cp 7                                    ; compare with 8
-220+  D49F C2 B2 D4         jp nz,robots_move1                       ; if even, don't increment frame
-221+  D4A2 DD 7E 04         ld a,(ix+4)                             ; get the anim frame
-222+  D4A5 06 08            ld b,8
-223+  D4A7 80               add a,b                                 ; add to anim frame
-224+  D4A8 FE 20            cp 32
-225+  D4AA C2 AF D4         jp nz,robots_move0                      ; if not 32, then just store
-226+  D4AD 3E 00            ld a,0                                  ; otherwise, reset
-227+  D4AF              robots_move0:
-228+  D4AF DD 77 04         ld (ix+4),a                             ; store
-229+  D4B2              robots_move1:
-230+  D4B2 DD 7E 05         ld a,(ix+5)
-231+  D4B5 FE 00            cp 0                                    ; are we automoving
-232+  D4B7 CA C0 D4         jp z,robots_move2                       ; if not, keep directions
-233+  D4BA CD DC D4         call robots_automove
-234+  D4BD C3 C4 D4         jp robots_move3
-235+  D4C0              robots_move2:
-236+  D4C0 CD 11 D5         call robots_checkdirectionsandmove
-237+  D4C3 C9               ret
-238+  D4C4              robots_move3:
-239+  D4C4 CD 15 D7         call robots_checkforplayer              ; check to see if we collided with a player
-240+  D4C7 C9               ret
-241+  D4C8              robots_move4:
-242+  D4C8 DD 7E 04         ld a,(ix+4)
-243+  D4CB FE 48            cp 72
-244+  D4CD C2 D6 D4         jp nz,robots_move5
-245+  D4D0 3E 40            ld a,64
-246+  D4D2 DD 77 04         ld (ix+4),a
-247+  D4D5 C9               ret
-248+  D4D6              robots_move5:
-249+  D4D6 3E 48            ld a,72
-250+  D4D8 DD 77 04         ld (ix+4),a
-251+  D4DB C9               ret
-252+  D4DC
-253+  D4DC
-254+  D4DC              ;
-255+  D4DC              ; Processes automove
-256+  D4DC              ; Inputs:
-257+  D4DC              ; ix - points to the current robot
-258+  D4DC              ; a - number of frames left to move
-259+  D4DC              robots_automove:
-260+  D4DC 3D               dec a
-261+  D4DD DD 77 05         ld (ix+5),a                         ; store the decreased frames
-262+  D4E0 DD 4E 00 DD      ld bc,(ix)                          ; get coords
-262+  D4E4 46 01
-263+  D4E6 DD 7E 06         ld a,(ix+6)                         ; get the direction
-264+  D4E9 FE 00            cp 0                                ; left
-265+  D4EB CA FC D4         jp z,robots_automove1
-266+  D4EE FE 02            cp 2                                ; up
-267+  D4F0 CA 00 D5         jp z,robots_automove3
-268+  D4F3 FE 03            cp 3                                ; down
-269+  D4F5 CA 05 D5         jp z,robots_automove4
-270+  D4F8 04               inc b                               ; right
-271+  D4F9 C3 0A D5         jp robots_automove2
-272+  D4FC              robots_automove1:
-273+  D4FC 05               dec b
-274+  D4FD C3 0A D5         jp robots_automove2
-275+  D500              robots_automove3:
-276+  D500 0D               dec c
-277+  D501 0D               dec c
-278+  D502 C3 0A D5         jp robots_automove2
-279+  D505              robots_automove4:
-280+  D505 0C               inc c
-281+  D506 0C               inc c
-282+  D507 C3 0A D5         jp robots_automove2
-283+  D50A              robots_automove2:
-284+  D50A DD 71 00 DD      ld (ix),bc
-284+  D50E 70 01
-285+  D510 C9               ret
-286+  D511
-287+  D511              ;
-288+  D511              ; Checks if a robot can move in all directions, then picks one and moves there.
-289+  D511              ; This looks complicated, but really what it does is:
-290+  D511              ; 1) Look at the current direction
-291+  D511              ; 2) Randomly determine which orthoganal direction check first
-292+  D511              ; 3) If orthogonal can't be moved, keep going in direction we're going
-293+  D511              ; 4) Otherwise, back the way we came
-294+  D511              ; Inputs:
-295+  D511              ; ix - points to the current robot
-296+  D511              ;
-297+  D511              robots_checkdirectionsandmove:
-298+  D511 DD 7E 06         ld a,(ix+6)                 ; get the direction
-299+  D514 FE 00            cp 0                        ; left
-300+  D516 C2 3D D5         jp nz,robots_checkdirectionsandmove0
-301+  D519                  ; random check
-302+  D519 CD C2 C5         call game_getcurrentframe
-303+  D51C E6 01            and 1                       ; odd or even
-304+  D51E CA 2A D5         jp z,robots_checkdirectionsandmove3
-305+  D521 CD C3 D5         call robots_checkupthendown ; prefer up over down
-306+  D524 FE 01            cp 1
-307+  D526 C8               ret z
-308+  D527 C3 30 D5         jp robots_checkdirectionsandmove4
-309+  D52A              robots_checkdirectionsandmove3:
-310+  D52A CD B9 D5         call robots_checkdownthenup ; prefer down over up
-311+  D52D FE 01            cp 1
-312+  D52F C8               ret z
-313+  D530              robots_checkdirectionsandmove4:
-314+  D530                  ; check left
-315+  D530 CD 55 D6         call robots_checkleftandmove
-316+  D533 FE 01            cp 1
-317+  D535 C8               ret z                       ; if we moved, don't check again
-318+  D536                  ; check right
-319+  D536 CD 8E D6         call robots_checkrightandmove
-320+  D539 FE 01            cp 1
-321+  D53B C8               ret z                       ; if we moved, don't check again
-322+  D53C                  ; if we're here and haven't moved...
-323+  D53C C9               ret
-324+  D53D              robots_checkdirectionsandmove0
-325+  D53D FE 01            cp 1                        ; right
-326+  D53F C2 66 D5         jp nz,robots_checkdirectionsandmove1
-327+  D542                  ; ALREADY MOVING RIGHT
-328+  D542                  ; random check
-329+  D542 CD C2 C5         call game_getcurrentframe
-330+  D545 E6 01            and 1                       ; odd or even
-331+  D547 CA 53 D5         jp z,robots_checkdirectionsandmove5
-332+  D54A CD B9 D5         call robots_checkdownthenup ; prefer down over up
-333+  D54D FE 01            cp 1
-334+  D54F C8               ret z
-335+  D550 C3 59 D5         jp robots_checkdirectionsandmove6
-336+  D553              robots_checkdirectionsandmove5:
-337+  D553 CD C3 D5         call robots_checkupthendown ; prefer down over up
-338+  D556 FE 01            cp 1
-339+  D558 C8               ret z
-340+  D559              robots_checkdirectionsandmove6:
-341+  D559                  ; check right
-342+  D559 CD 8E D6         call robots_checkrightandmove
-343+  D55C FE 01            cp 1
-344+  D55E C8               ret z                       ; if we moved, don't check again
-345+  D55F                  ; check left
-346+  D55F CD 55 D6         call robots_checkleftandmove
-347+  D562 FE 01            cp 1
-348+  D564 C8               ret z                       ; if we moved, don't check again
-349+  D565                  ; if we're here and haven't moved...
-350+  D565 C9               ret
-351+  D566              robots_checkdirectionsandmove1
-352+  D566 FE 02            cp 2                        ; up
-353+  D568 C2 8F D5         jp nz,robots_checkdirectionsandmove2
-354+  D56B                  ; ALREADY MOVING UP
-355+  D56B                  ; random check
-356+  D56B CD C2 C5         call game_getcurrentframe
-357+  D56E E6 01            and 1                       ; odd or even
-358+  D570 CA 7C D5         jp z,robots_checkdirectionsandmove7
-359+  D573 CD D9 D5         call robots_checkleftthenright ; prefer left over right
-360+  D576 FE 01            cp 1
-361+  D578 C8               ret z
-362+  D579 C3 82 D5         jp robots_checkdirectionsandmove8
-363+  D57C              robots_checkdirectionsandmove7:
-364+  D57C CD CF D5         call robots_checkrightthenleft ; prefer right over left
-365+  D57F FE 01            cp 1
-366+  D581 C8               ret z
-367+  D582              robots_checkdirectionsandmove8:
-368+  D582                  ; check up
-369+  D582 CD E5 D5         call robots_checkupandmove
-370+  D585 FE 01            cp 1
-371+  D587 C8               ret z                       ; if we moved, don't check again
-372+  D588                  ; check down
-373+  D588 CD 1F D6         call robots_checkdownandmove
-374+  D58B FE 01            cp 1
-375+  D58D C8               ret z                       ; if we moved, don't check again
-376+  D58E                  ; if we're here and haven't moved...
-377+  D58E C9               ret
-378+  D58F              robots_checkdirectionsandmove2
-379+  D58F                  ; ALREADY MOVING DOWN
-380+  D58F                  ; random check
-381+  D58F CD D1 81         call utilities_randomfromram
-382+  D592 E6 01            and 1                       ; odd or even
-383+  D594 CA A0 D5         jp z,robots_checkdirectionsandmove9
-384+  D597 CD CF D5         call robots_checkrightthenleft ; prefer right over left
-385+  D59A FE 01            cp 1
-386+  D59C C8               ret z
-387+  D59D C3 A6 D5         jp robots_checkdirectionsandmove10
-388+  D5A0              robots_checkdirectionsandmove9:
-389+  D5A0 CD D9 D5         call robots_checkleftthenright ; prefer left over right
-390+  D5A3 FE 01            cp 1
-391+  D5A5 C8               ret z
-392+  D5A6              robots_checkdirectionsandmove10:
-393+  D5A6                  ; check down
-394+  D5A6 CD 1F D6         call robots_checkdownandmove
-395+  D5A9 FE 01            cp 1
-396+  D5AB C8               ret z                       ; if we moved, don't check again
-397+  D5AC                  ; check right first
-398+  D5AC CD 8E D6         call robots_checkrightandmove
-399+  D5AF FE 01            cp 1
-400+  D5B1 C8               ret z                       ; if we moved, don't check again
-401+  D5B2                  ; check up
-402+  D5B2 CD E5 D5         call robots_checkupandmove
-403+  D5B5 FE 01            cp 1
-404+  D5B7 C8               ret z                       ; if we moved, don't check again
-405+  D5B8                  ; if we're here and haven't moved...
-406+  D5B8 C9               ret
-407+  D5B9
-408+  D5B9              ;
-409+  D5B9              ; Different orders of checking directions, for pseudo random motion
-410+  D5B9              ;
-411+  D5B9              robots_checkdownthenup:
-412+  D5B9                  ; check down
-413+  D5B9 CD 1F D6         call robots_checkdownandmove
-414+  D5BC FE 01            cp 1
-415+  D5BE C8               ret z                       ; if we moved, don't check again
-416+  D5BF                  ; check up
-417+  D5BF CD E5 D5         call robots_checkupandmove
-418+  D5C2 C9               ret
-419+  D5C3
-420+  D5C3              robots_checkupthendown:
-421+  D5C3                  ; check up
-422+  D5C3 CD E5 D5         call robots_checkupandmove
-423+  D5C6 FE 01            cp 1
-424+  D5C8 C8               ret z
-425+  D5C9                  ; check down
-426+  D5C9 CD 1F D6         call robots_checkdownandmove
-427+  D5CC FE 01            cp 1
-428+  D5CE C9               ret
-429+  D5CF              robots_checkrightthenleft:
-430+  D5CF                  ; check right
-431+  D5CF CD 8E D6         call robots_checkrightandmove
-432+  D5D2 FE 01            cp 1
-433+  D5D4 C8               ret z                       ; if we moved, don't check again
-434+  D5D5                  ; check left
-435+  D5D5 CD 55 D6         call robots_checkleftandmove
-436+  D5D8 C9               ret
-437+  D5D9
-438+  D5D9              robots_checkleftthenright:
-439+  D5D9                  ; check left
-440+  D5D9 CD 55 D6         call robots_checkleftandmove
-441+  D5DC FE 01            cp 1
-442+  D5DE C8               ret z
-443+  D5DF                  ; check right
-444+  D5DF CD 8E D6         call robots_checkrightandmove
-445+  D5E2 FE 01            cp 1
-446+  D5E4 C9               ret
-447+  D5E5
-448+  D5E5              ;
-449+  D5E5              ; Checks up for movement
-450+  D5E5              ; Outputs:
-451+  D5E5              ; a - 1 if have moved
-452+  D5E5              robots_checkupandmove:
-453+  D5E5                  ; check above
-454+  D5E5 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-454+  D5E9 46 01
-455+  D5EB 79               ld a,c
-456+  D5EC FE 28            cp 40
-457+  D5EE D8               ret c
-458+  D5EF CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
-459+  D5F2 62 6B            ld hl,de                        ; look at cell directly above (subtract 256)
-460+  D5F4 25               dec h
-461+  D5F5 79               ld a,c
-462+  D5F6 0E 08            ld c,8
-463+  D5F8 91               sub c
-464+  D5F9 4F               ld c,a
-465+  D5FA CD 02 C3         call movement_spaceisempty       ; check space is empty
-466+  D5FD 7B               ld a,e                          ; check space empty flag
-467+  D5FE FE 00            cp 0
-468+  D600 CA 1C D6         jp z,robots_checkupandmove0    ; can't move here so return
-469+  D603 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-469+  D607 46 01
-470+  D609 0D               dec c                       ; move up
-471+  D60A 0D               dec c
-472+  D60B DD 71 00 DD      ld (ix),bc
-472+  D60F 70 01
-473+  D611 DD 36 06 02      ld (ix+6),2
-474+  D615 DD 36 05 03      ld (ix+5),3                 ; set the auto move frames
-475+  D619 3E 01            ld a,1
-476+  D61B C9               ret
-477+  D61C              robots_checkupandmove0:
-478+  D61C 3E 00            ld a,0
-479+  D61E C9               ret
-480+  D61F
-481+  D61F              ;
-482+  D61F              ; Checks down for movement
-483+  D61F              ; Outputs:
-484+  D61F              ; a - 1 if have moved
-485+  D61F              robots_checkdownandmove:
-486+  D61F                  ; check below
-487+  D61F DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-487+  D623 46 01
-488+  D625 CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
-489+  D628 62 6B            ld hl,de                        ; look at cell directly above (add 256)
-490+  D62A 24               inc h
-491+  D62B 79               ld a,c
-492+  D62C 0E 08            ld c,8
-493+  D62E 81               add c
-494+  D62F 4F               ld c,a
-495+  D630 CD 02 C3         call movement_spaceisempty       ; check space is empty
-496+  D633 7B               ld a,e                          ; check space empty flag
-497+  D634 FE 00            cp 0
-498+  D636 CA 52 D6         jp z,robots_checkdownandmove0    ; can't move here so return
-499+  D639 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-499+  D63D 46 01
-500+  D63F 0C               inc c                       ; move up
-501+  D640 0C               inc c
-502+  D641 DD 71 00 DD      ld (ix),bc
-502+  D645 70 01
-503+  D647 DD 36 06 03      ld (ix+6),3
-504+  D64B DD 36 05 03      ld (ix+5),3                 ; set the auto move frames
-505+  D64F 3E 01            ld a,1
-506+  D651 C9               ret
-507+  D652              robots_checkdownandmove0:
-508+  D652 3E 00            ld a,0
-509+  D654 C9               ret
-510+  D655
-511+  D655              ;
-512+  D655              ; Checks left for movement
-513+  D655              ; Outputs:
-514+  D655              ; a - 1 if have moved
-515+  D655              robots_checkleftandmove:
-516+  D655                  ; check below
-517+  D655 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-517+  D659 46 01
-518+  D65B CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
-519+  D65E 62 6B            ld hl,de                        ; look at cell directly to the left (sub 1)
-520+  D660 78               ld a,b
-521+  D661 06 08            ld b,8
-522+  D663 90               sub b                           ; move one cell left
-523+  D664 47               ld b,a
-524+  D665 2B               dec hl                          ; memory location of cell to the right now in hl
-525+  D666 CD 02 C3         call movement_spaceisempty       ; check space is empty
-526+  D669 7B               ld a,e                          ; check space empty flag
-527+  D66A FE 00            cp 0
-528+  D66C CA 8B D6         jp z,robots_checkleftandmove0    ; if zero can't move
-529+  D66F DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-529+  D673 46 01
-530+  D675 05               dec b
-531+  D676 DD 71 00 DD      ld (ix),bc
-531+  D67A 70 01
-532+  D67C DD 36 06 00      ld (ix+6),0
-533+  D680 DD 36 05 07      ld (ix+5),7                 ; set the auto move frames
-534+  D684 DD 36 03 00      ld (ix+3),0                 ; set to right
-535+  D688 3E 01            ld a,1
-536+  D68A C9               ret
-537+  D68B              robots_checkleftandmove0:
-538+  D68B 3E 00            ld a,0
-539+  D68D C9               ret
-540+  D68E
-541+  D68E              ;
-542+  D68E              ; Checks right for movement
-543+  D68E              ; Outputs:
-544+  D68E              ; a - 1 if have moved
-545+  D68E              robots_checkrightandmove:
-546+  D68E                  ; check below
-547+  D68E DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-547+  D692 46 01
-548+  D694 78               ld a,b
-549+  D695 FE E8            cp 232
-550+  D697 CA C9 D6         jp z,robots_checkrightandmove0  ; can't move if at edge
-551+  D69A CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
-552+  D69D 62 6B            ld hl,de                        ; look at cell directly to the right (add 1)
-553+  D69F 3E 08            ld a,8
-554+  D6A1 80               add b                           ; move one cell right
-555+  D6A2 47               ld b,a
-556+  D6A3 23               inc hl                          ; memory location of cell to the right now in hl
-557+  D6A4 CD 02 C3         call movement_spaceisempty       ; check space is empty
-558+  D6A7 7B               ld a,e                          ; check space empty flag
-559+  D6A8 FE 00            cp 0
-560+  D6AA CA C9 D6         jp z,robots_checkrightandmove0    ; if zero can't move
-561+  D6AD DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
-561+  D6B1 46 01
-562+  D6B3 04               inc b
-563+  D6B4 DD 71 00 DD      ld (ix),bc
-563+  D6B8 70 01
-564+  D6BA DD 36 06 01      ld (ix+6),1
-565+  D6BE DD 36 05 07      ld (ix+5),7                 ; set the auto move frames
-566+  D6C2 DD 36 03 01      ld (ix+3),1                 ; set to right
-567+  D6C6 3E 01            ld a,1
-568+  D6C8 C9               ret
-569+  D6C9              robots_checkrightandmove0:
-570+  D6C9 3E 00            ld a,0
-571+  D6CB C9               ret
-572+  D6CC
-573+  D6CC              ;
-574+  D6CC              ; Draws a robot
-575+  D6CC              ; Inputs:
-576+  D6CC              ; ix - points to first byte of robot in array
-577+  D6CC              robots_draw:
-578+  D6CC DD 4E 00 DD      ld bc,(ix)
-578+  D6D0 46 01
-579+  D6D2 21 BC BF         ld hl,robot_sprite                      ; set to the robot sprite
-580+  D6D5 DD 7E 02         ld a,(ix+2)                             ; get the state
-581+  D6D8 FE 02            cp 2                                    ; is this dying
-582+  D6DA CA F5 D6         jp z,robots_draw1
-583+  D6DD              robots_draw3:
-584+  D6DD DD 7E 03         ld a,(ix+3)                             ; get the direction
-585+  D6E0 FE 00            cp 0
-586+  D6E2 CA E9 D6         jp z,robots_draw0                       ; if left, nothing to do
-587+  D6E5 11 20 00         ld de,32
-588+  D6E8 19               add hl,de                               ; add four frames to sprite
-589+  D6E9              robots_draw0:
-590+  D6E9 DD 7E 04         ld a,(ix+4)                             ; get the anim frame
-591+  D6EC 11 00 00         ld de,0
-592+  D6EF 5F               ld e,a
-593+  D6F0 19               add hl,de                               ; add to base
-594+  D6F1 CD 29 AB         call sprites_drawsprite
-595+  D6F4 C9               ret
-596+  D6F5              ;
-597+  D6F5              ; Dying
-598+  D6F5              ;
-599+  D6F5              robots_draw1:
-600+  D6F5 DD 7E 05         ld a,(ix+5)                             ; get anim frames
-601+  D6F8 FE 00            cp 0                                    ; if zero this is the first time around
-602+  D6FA C2 05 D7         jp nz,robots_draw2
-603+  D6FD 3E 18            ld a,24
-604+  D6FF DD 77 05         ld (ix+5),a                             ; load up the anim frames
-605+  D702 C3 DD D6         jp robots_draw3                         ; return to main loop to draw as normal
-606+  D705              robots_draw2:
-607+  D705 3D               dec a
-608+  D706 DD 77 05         ld (ix+5),a
-609+  D709 FE 00            cp 0                                    ; have we reached the end yet
-610+  D70B C2 11 D7         jp nz, robots_draw4
-611+  D70E CD 00 D4         call robots_kill
-612+  D711              robots_draw4:
-613+  D711 C3 E9 D6         jp robots_draw0
-614+  D714 C9               ret
-615+  D715
-616+  D715              ;
-617+  D715              ; Checks to see if the robot is hitting a player
-618+  D715              ; Inputs:
-619+  D715              ; ix - memory location of robot we're checking
-620+  D715              robots_checkforplayer:
-621+  D715 3A 23 C6         ld a,(player+11)     ; get player state
-622+  D718 FE 00            cp 0
-623+  D71A C0               ret nz               ; if already dying, don't kill again
-624+  D71B DD 4E 00 DD      ld bc,(ix)           ; get coords
-624+  D71F 46 01
-625+  D721 ED 5B 18 C6      ld de,(player)       ; get the player coords
-626+  D725 7B               ld a,e               ; get the vert coord first
-627+  D726 91               sub c                ; subtract the diamond vertical coord from players
-628+  D727 C6 08            add 8                ; add the max distance
-629+  D729 FE 11            cp 17                ; compare to max*2+1? if carry flag set, they've hit
-630+  D72B D0               ret nc               ; if not, hasn't hit
-631+  D72C 7A               ld a,d               ; get the player horiz coord
-632+  D72D 90               sub b                ; subtract rock coord
-633+  D72E C6 08            add 8                ; add max distance
-634+  D730 FE 11            cp 17                ; compare to max*2+1? if carry flag set, they've hit
-635+  D732 D0               ret nc
-636+  D733 DD 36 02 00      ld (ix+2),0          ; mark as inactive
-637+  D737 CD 53 C7         call player_robotkillplayer ; mark the player as killed
-638+  D73A C9               ret
+ 92+  D3BD 32 2D D4         ld (robots_process10+1),a
+ 93+  D3C0 CD 80 D7         call robots_zeromovecounters
+ 94+  D3C3 C9               ret
+ 95+  D3C4
+ 96+  D3C4              ;
+ 97+  D3C4              ; Spawns a new robot
+ 98+  D3C4              ; Inputs:
+ 99+  D3C4              ; ix - pointer to start of robot array entry
+100+  D3C4              ;
+101+  D3C4              robots_spawn:
+102+  D3C4 06 03            ld b,3                      ;(SELF WRITING CODE)
+103+  D3C6 DD 21 57 D3      ld ix,robots_robots
+104+  D3CA              robots_spawn0:
+105+  D3CA DD 7E 02         ld a,(ix+2)                 ; get the state
+106+  D3CD FE 00            cp 0
+107+  D3CF C2 FB D3         jp nz,robots_spawn1         ; if already active, move on
+108+  D3D2 ED 4B 7A D3      ld bc,(robots_initcoords)
+109+  D3D6 DD 71 00 DD      ld (ix),bc
+109+  D3DA 70 01
+110+  D3DC DD 36 02 01      ld (ix+2),1
+111+  D3E0 DD 36 03 00      ld (ix+3),0
+112+  D3E4 DD 36 04 00      ld (ix+4),0
+113+  D3E8 DD 36 05 00      ld (ix+5),0
+114+  D3EC DD 36 06 00      ld (ix+6),0
+115+  D3F0 3A 7F D3         ld a,(robots_numberactive)
+116+  D3F3 3C               inc a
+117+  D3F4 32 7F D3         ld (robots_numberactive),a  ; increase the number active
+118+  D3F7 CD 11 D7         call robots_draw            ; draw initial frame
+119+  D3FA C9               ret
+120+  D3FB              robots_spawn1:
+121+  D3FB 11 07 00         ld de,7
+122+  D3FE DD 19            add ix,de
+123+  D400 10 C8            djnz robots_spawn0
+124+  D402 C9               ret
+125+  D403              ;
+126+  D403              ; Kills robot
+127+  D403              ; Inputs:
+128+  D403              ; ix - pointer to start of robot array entry
+129+  D403              ;
+130+  D403              robots_kill:
+131+  D403 3A 7F D3         ld a,(robots_numberactive)
+132+  D406 3D               dec a
+133+  D407 32 7F D3         ld (robots_numberactive),a
+134+  D40A DD 36 02 00      ld (ix+2),0                     ; set to inactive
+135+  D40E C5               push bc
+136+  D40F E5               push hl
+137+  D410 06 01            ld b,1
+138+  D412 CD 89 CD         call scores_addhundreds
+139+  D415 E1               pop hl
+140+  D416 C1               pop bc
+141+  D417 C9               ret
+142+  D418
+143+  D418              ;
+144+  D418              ; Processes the robots
+145+  D418              ;
+146+  D418              robots_process:
+147+  D418 3A 7F D3         ld a,(robots_numberactive)              ; first, check if we need to spawn a new robot
+148+  D41B              robots_process8:
+149+  D41B FE 03            cp 3                                    ; 3 is the maximum
+150+  D41D CA 48 D4         jp z,robots_process0                    ; if already three, nothing to do
+151+  D420 3A 85 D3         ld a,(robots_robotspawnspeed)                ; now check the spawn speed timer
+152+  D423 3D               dec a
+153+  D424 32 85 D3         ld (robots_robotspawnspeed),a           ; store the spawn speed timer
+154+  D427 FE 00            cp 0
+155+  D429 C2 48 D4         jp nz,robots_process0                   ; if it hasn't reached zero yet, just move
+156+  D42C              robots_process10:
+157+  D42C 3E 04            ld a,4                                  ; SELF WRITING CODE
+158+  D42E 32 85 D3         ld (robots_robotspawnspeed),a                ; reset the spawn speed timer
+159+  D431 3A 7C D3         ld a,(robots_spawntimer)                ; now check the spawn timer
+160+  D434 FE 00            cp 0
+161+  D436 C2 44 D4         jp nz,robots_process1                   ; if it hasn't reached zero yet, just decrease
+162+  D439 3E FA            ld a,250
+163+  D43B 32 7C D3         ld (robots_spawntimer),a                ; reset the spawn timer
+164+  D43E CD C4 D3         call robots_spawn                       ; spawn a robot
+165+  D441 C3 48 D4         jp robots_process0                      ; carry on
+166+  D444              robots_process1:
+167+  D444 3D               dec a
+168+  D445 32 7C D3         ld (robots_spawntimer),a                ; decrease the spawn timer and store
+169+  D448              robots_process0:
+170+  D448 06 03            ld b,3                                  ; max number of robots (SELF WRITING CODE)
+171+  D44A DD 21 57 D3      ld ix, robots_robots                    ; point ix at the robot array
+172+  D44E              robots_process2:
+173+  D44E C5               push bc
+174+  D44F DD 7E 02         ld a,(ix+2)                             ; check the state
+175+  D452 FE 00            cp 0
+176+  D454 CA 70 D4         jp z,robots_process3                    ; if not active, move on
+177+  D457 3A 7E D3         ld a,(robots_movetimer)
+178+  D45A              robots_process7:                            ; self writing code - the number in the comparison will be ovewritten
+179+  D45A FE 04            cp 4
+180+  D45C C2 70 D4         jp nz,robots_process3                   ; can we move this frame
+181+  D45F CD 11 D7         call robots_draw                        ; draw over existing
+182+  D462 CD 95 D4         call robots_move                        ; move the
+183+  D465 DD 7E 02         ld a,(ix+2)                             ; get the state again
+184+  D468 FE 00            cp 0
+185+  D46A CA 70 D4         jp z,robots_process3                    ; move to next if this robot has become inactive
+186+  D46D CD 11 D7         call robots_draw                        ; draw the new robot
+187+  D470              robots_process3:
+188+  D470 C1               pop bc
+189+  D471 11 07 00         ld de,7
+190+  D474 DD 19            add ix,de
+191+  D476 10 D6            djnz robots_process2
+192+  D478 3A 7D D3         ld a,(robots_animtimer)
+193+  D47B 3C               inc a
+194+  D47C FE 08            cp 8
+195+  D47E C2 83 D4         jp nz,robots_process4
+196+  D481 3E 00            ld a,0                                  ; reset if we reached max
+197+  D483              robots_process4:
+198+  D483 32 7D D3         ld (robots_animtimer),a
+199+  D486 3A 7E D3         ld a,(robots_movetimer)                 ; increment the robot move timer
+200+  D489 3C               inc a
+201+  D48A              robots_process6:                            ; self writing code - the number in the comparison will be ovewritten
+202+  D48A FE 05            cp 5                                    ; there is another reference to this number above
+203+  D48C C2 91 D4         jp nz,robots_process5
+204+  D48F 3E 00            ld a,0
+205+  D491              robots_process5:
+206+  D491 32 7E D3         ld (robots_movetimer),a
+207+  D494
+208+  D494 C9               ret
+209+  D495
+210+  D495
+211+  D495              ;
+212+  D495              ; Moves a robot
+213+  D495              ; Inputs:
+214+  D495              ; ix - points to first byte of robot in array
+215+  D495              robots_move:
+216+  D495 DD 7E 02         ld a,(ix+2)                             ; get the state
+217+  D498 FE 02            cp 2
+218+  D49A CA CB D4         jp z,robots_move4                       ; don't move if shot, just change the anim
+219+  D49D 3A 7D D3         ld a,(robots_animtimer)                 ; get the anim timer
+220+  D4A0 FE 07            cp 7                                    ; compare with 8
+221+  D4A2 C2 B5 D4         jp nz,robots_move1                       ; if even, don't increment frame
+222+  D4A5 DD 7E 04         ld a,(ix+4)                             ; get the anim frame
+223+  D4A8 06 08            ld b,8
+224+  D4AA 80               add a,b                                 ; add to anim frame
+225+  D4AB FE 20            cp 32
+226+  D4AD C2 B2 D4         jp nz,robots_move0                      ; if not 32, then just store
+227+  D4B0 3E 00            ld a,0                                  ; otherwise, reset
+228+  D4B2              robots_move0:
+229+  D4B2 DD 77 04         ld (ix+4),a                             ; store
+230+  D4B5              robots_move1:
+231+  D4B5 DD 7E 05         ld a,(ix+5)
+232+  D4B8 FE 00            cp 0                                    ; are we automoving
+233+  D4BA CA C3 D4         jp z,robots_move2                       ; if not, keep directions
+234+  D4BD CD DF D4         call robots_automove
+235+  D4C0 C3 C7 D4         jp robots_move3
+236+  D4C3              robots_move2:
+237+  D4C3 CD 1C D5         call robots_checkdirectionsandmove
+238+  D4C6 C9               ret
+239+  D4C7              robots_move3:
+240+  D4C7 CD 5A D7         call robots_checkforplayer              ; check to see if we collided with a player
+241+  D4CA C9               ret
+242+  D4CB              robots_move4:
+243+  D4CB DD 7E 04         ld a,(ix+4)
+244+  D4CE FE 48            cp 72
+245+  D4D0 C2 D9 D4         jp nz,robots_move5
+246+  D4D3 3E 40            ld a,64
+247+  D4D5 DD 77 04         ld (ix+4),a
+248+  D4D8 C9               ret
+249+  D4D9              robots_move5:
+250+  D4D9 3E 48            ld a,72
+251+  D4DB DD 77 04         ld (ix+4),a
+252+  D4DE C9               ret
+253+  D4DF
+254+  D4DF
+255+  D4DF              ;
+256+  D4DF              ; Processes automove
+257+  D4DF              ; Inputs:
+258+  D4DF              ; ix - points to the current robot
+259+  D4DF              ; a - number of frames left to move
+260+  D4DF              robots_automove:
+261+  D4DF 3D               dec a
+262+  D4E0 DD 77 05         ld (ix+5),a                         ; store the decreased frames
+263+  D4E3 DD 4E 00 DD      ld bc,(ix)                          ; get coords
+263+  D4E7 46 01
+264+  D4E9 DD 7E 06         ld a,(ix+6)                         ; get the direction
+265+  D4EC FE 00            cp 0                                ; left
+266+  D4EE CA FF D4         jp z,robots_automove1
+267+  D4F1 FE 02            cp 2                                ; up
+268+  D4F3 CA 03 D5         jp z,robots_automove3
+269+  D4F6 FE 03            cp 3                                ; down
+270+  D4F8 CA 0A D5         jp z,robots_automove4
+271+  D4FB 04               inc b                               ; right
+272+  D4FC C3 11 D5         jp robots_automove2
+273+  D4FF              robots_automove1:
+274+  D4FF 05               dec b
+275+  D500 C3 11 D5         jp robots_automove2
+276+  D503              robots_automove3:
+277+  D503 0D               dec c
+278+  D504 0D               dec c
+279+  D505 0D               dec c
+280+  D506 0D               dec c
+281+  D507 C3 11 D5         jp robots_automove2
+282+  D50A              robots_automove4:
+283+  D50A 0C               inc c
+284+  D50B 0C               inc c
+285+  D50C 0C               inc c
+286+  D50D 0C               inc c
+287+  D50E C3 11 D5         jp robots_automove2
+288+  D511              robots_automove2:
+289+  D511 DD 71 00 DD      ld (ix),bc
+289+  D515 70 01
+290+  D517 C9               ret
+291+  D518
+292+  D518              ;
+293+  D518              ; Holds how many times moved in current direction
+294+  D518              ;
+295+  D518              robots_alreadymoved:
+296+  D518 00 00 00 00      defb 0,0,0,0
+297+  D51C
+298+  D51C              ;
+299+  D51C              ; Checks if a robot can move in all directions, then picks one and moves there.
+300+  D51C              ; This looks complicated, but really what it does is:
+301+  D51C              ; 1) Look at the current direction
+302+  D51C              ; 2) Randomly determine which orthoganal direction check first
+303+  D51C              ; 3) If orthogonal can't be moved, keep going in direction we're going
+304+  D51C              ; 4) Otherwise, back the way we came
+305+  D51C              ; Inputs:
+306+  D51C              ; ix - points to the current robot
+307+  D51C              ;
+308+  D51C              robots_checkdirectionsandmove:
+309+  D51C DD 7E 06         ld a,(ix+6)                 ; get the direction
+310+  D51F FE 00            cp 0                        ; left
+311+  D521 C2 57 D5         jp nz,robots_checkdirectionsandmove0
+312+  D524                  ;LEFT
+313+  D524                  ; check how many times we've moved left
+314+  D524 21 18 D5         ld hl,robots_alreadymoved+0
+315+  D527 7E               ld a,(hl)                               ; check how many times we've moved in this direction
+316+  D528 FE 02            cp 2                                    ; if less than two, try to go in this direction
+317+  D52A D2 33 D5         jp nc,robots_checkdirectionsandmove11
+318+  D52D                  ; check left
+319+  D52D CD 82 D6         call robots_checkleftandmove
+320+  D530 FE 01            cp 1
+321+  D532 C8               ret z                       ; if we moved, don't check again
+322+  D533              robots_checkdirectionsandmove11:
+323+  D533                  ; random check
+324+  D533 CD C2 C5         call game_getcurrentframe
+325+  D536 E6 01            and 1                       ; odd or even
+326+  D538 CA 44 D5         jp z,robots_checkdirectionsandmove3
+327+  D53B CD EC D5         call robots_checkupthendown ; prefer up over down
+328+  D53E FE 01            cp 1
+329+  D540 C8               ret z
+330+  D541 C3 4A D5         jp robots_checkdirectionsandmove4
+331+  D544              robots_checkdirectionsandmove3:
+332+  D544 CD E2 D5         call robots_checkdownthenup ; prefer down over up
+333+  D547 FE 01            cp 1
+334+  D549 C8               ret z
+335+  D54A              robots_checkdirectionsandmove4:
+336+  D54A                  ; check left
+337+  D54A CD 82 D6         call robots_checkleftandmove
+338+  D54D FE 01            cp 1
+339+  D54F C8               ret z                       ; if we moved, don't check again
+340+  D550                  ; check right
+341+  D550 CD C7 D6         call robots_checkrightandmove
+342+  D553 FE 01            cp 1
+343+  D555 C8               ret z                       ; if we moved, don't check again
+344+  D556                  ; if we're here and haven't moved...
+345+  D556 C9               ret
+346+  D557              robots_checkdirectionsandmove0
+347+  D557                  ; RIGHT
+348+  D557 FE 01            cp 1                        ; right
+349+  D559 C2 8F D5         jp nz,robots_checkdirectionsandmove1
+350+  D55C                  ; ALREADY MOVING RIGHT
+351+  D55C                  ; check how many times we've moved right
+352+  D55C 21 19 D5         ld hl,robots_alreadymoved+1
+353+  D55F 7E               ld a,(hl)                               ; check how many times we've moved in this direction
+354+  D560 FE 02            cp 2                                    ; if less than two, try to go in this direction
+355+  D562 D2 6B D5         jp nc,robots_checkdirectionsandmove12
+356+  D565                  ; check left
+357+  D565 CD C7 D6         call robots_checkrightandmove
+358+  D568 FE 01            cp 1
+359+  D56A C8               ret z                       ; if we moved, don't check again
+360+  D56B              robots_checkdirectionsandmove12:
+361+  D56B                  ; random check
+362+  D56B CD C2 C5         call game_getcurrentframe
+363+  D56E E6 01            and 1                       ; odd or even
+364+  D570 CA 7C D5         jp z,robots_checkdirectionsandmove5
+365+  D573 CD E2 D5         call robots_checkdownthenup ; prefer down over up
+366+  D576 FE 01            cp 1
+367+  D578 C8               ret z
+368+  D579 C3 82 D5         jp robots_checkdirectionsandmove6
+369+  D57C              robots_checkdirectionsandmove5:
+370+  D57C CD EC D5         call robots_checkupthendown ; prefer down over up
+371+  D57F FE 01            cp 1
+372+  D581 C8               ret z
+373+  D582              robots_checkdirectionsandmove6:
+374+  D582                  ; check right
+375+  D582 CD C7 D6         call robots_checkrightandmove
+376+  D585 FE 01            cp 1
+377+  D587 C8               ret z                       ; if we moved, don't check again
+378+  D588                  ; check left
+379+  D588 CD 82 D6         call robots_checkleftandmove
+380+  D58B FE 01            cp 1
+381+  D58D C8               ret z                       ; if we moved, don't check again
+382+  D58E                  ; if we're here and haven't moved...
+383+  D58E C9               ret
+384+  D58F              robots_checkdirectionsandmove1
+385+  D58F                  ; UP
+386+  D58F FE 02            cp 2                        ; up
+387+  D591 C2 B8 D5         jp nz,robots_checkdirectionsandmove2
+388+  D594                  ; ALREADY MOVING UP
+389+  D594                  ; random check
+390+  D594 CD C2 C5         call game_getcurrentframe
+391+  D597 E6 01            and 1                       ; odd or even
+392+  D599 CA A5 D5         jp z,robots_checkdirectionsandmove7
+393+  D59C CD 02 D6         call robots_checkleftthenright ; prefer left over right
+394+  D59F FE 01            cp 1
+395+  D5A1 C8               ret z
+396+  D5A2 C3 AB D5         jp robots_checkdirectionsandmove8
+397+  D5A5              robots_checkdirectionsandmove7:
+398+  D5A5 CD F8 D5         call robots_checkrightthenleft ; prefer right over left
+399+  D5A8 FE 01            cp 1
+400+  D5AA C8               ret z
+401+  D5AB              robots_checkdirectionsandmove8:
+402+  D5AB                  ; check up
+403+  D5AB CD 0E D6         call robots_checkupandmove
+404+  D5AE FE 01            cp 1
+405+  D5B0 C8               ret z                       ; if we moved, don't check again
+406+  D5B1                  ; check down
+407+  D5B1 CD 4A D6         call robots_checkdownandmove
+408+  D5B4 FE 01            cp 1
+409+  D5B6 C8               ret z                       ; if we moved, don't check again
+410+  D5B7                  ; if we're here and haven't moved...
+411+  D5B7 C9               ret
+412+  D5B8              robots_checkdirectionsandmove2
+413+  D5B8                  ; DOWN
+414+  D5B8                  ; random check
+415+  D5B8 CD D1 81         call utilities_randomfromram
+416+  D5BB E6 01            and 1                       ; odd or even
+417+  D5BD CA C9 D5         jp z,robots_checkdirectionsandmove9
+418+  D5C0 CD F8 D5         call robots_checkrightthenleft ; prefer right over left
+419+  D5C3 FE 01            cp 1
+420+  D5C5 C8               ret z
+421+  D5C6 C3 CF D5         jp robots_checkdirectionsandmove10
+422+  D5C9              robots_checkdirectionsandmove9:
+423+  D5C9 CD 02 D6         call robots_checkleftthenright ; prefer left over right
+424+  D5CC FE 01            cp 1
+425+  D5CE C8               ret z
+426+  D5CF              robots_checkdirectionsandmove10:
+427+  D5CF                  ; check down
+428+  D5CF CD 4A D6         call robots_checkdownandmove
+429+  D5D2 FE 01            cp 1
+430+  D5D4 C8               ret z                       ; if we moved, don't check again
+431+  D5D5                  ; check right first
+432+  D5D5 CD C7 D6         call robots_checkrightandmove
+433+  D5D8 FE 01            cp 1
+434+  D5DA C8               ret z                       ; if we moved, don't check again
+435+  D5DB                  ; check up
+436+  D5DB CD 0E D6         call robots_checkupandmove
+437+  D5DE FE 01            cp 1
+438+  D5E0 C8               ret z                       ; if we moved, don't check again
+439+  D5E1                  ; if we're here and haven't moved...
+440+  D5E1 C9               ret
+441+  D5E2
+442+  D5E2              ;
+443+  D5E2              ; Different orders of checking directions, for pseudo random motion
+444+  D5E2              ;
+445+  D5E2              robots_checkdownthenup:
+446+  D5E2                  ; check down
+447+  D5E2 CD 4A D6         call robots_checkdownandmove
+448+  D5E5 FE 01            cp 1
+449+  D5E7 C8               ret z                       ; if we moved, don't check again
+450+  D5E8                  ; check up
+451+  D5E8 CD 0E D6         call robots_checkupandmove
+452+  D5EB C9               ret
+453+  D5EC
+454+  D5EC              robots_checkupthendown:
+455+  D5EC                  ; check up
+456+  D5EC CD 0E D6         call robots_checkupandmove
+457+  D5EF FE 01            cp 1
+458+  D5F1 C8               ret z
+459+  D5F2                  ; check down
+460+  D5F2 CD 4A D6         call robots_checkdownandmove
+461+  D5F5 FE 01            cp 1
+462+  D5F7 C9               ret
+463+  D5F8              robots_checkrightthenleft:
+464+  D5F8                  ; check right
+465+  D5F8 CD C7 D6         call robots_checkrightandmove
+466+  D5FB FE 01            cp 1
+467+  D5FD C8               ret z                       ; if we moved, don't check again
+468+  D5FE                  ; check left
+469+  D5FE CD 82 D6         call robots_checkleftandmove
+470+  D601 C9               ret
+471+  D602
+472+  D602              robots_checkleftthenright:
+473+  D602                  ; check left
+474+  D602 CD 82 D6         call robots_checkleftandmove
+475+  D605 FE 01            cp 1
+476+  D607 C8               ret z
+477+  D608                  ; check right
+478+  D608 CD C7 D6         call robots_checkrightandmove
+479+  D60B FE 01            cp 1
+480+  D60D C9               ret
+481+  D60E
+482+  D60E              ;
+483+  D60E              ; Checks up for movement
+484+  D60E              ; Outputs:
+485+  D60E              ; a - 1 if have moved
+486+  D60E              robots_checkupandmove:
+487+  D60E                  ; check above
+488+  D60E DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+488+  D612 46 01
+489+  D614 79               ld a,c
+490+  D615 FE 28            cp 40
+491+  D617 D8               ret c
+492+  D618 CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
+493+  D61B 62 6B            ld hl,de                        ; look at cell directly above (subtract 256)
+494+  D61D 25               dec h
+495+  D61E 79               ld a,c
+496+  D61F 0E 08            ld c,8
+497+  D621 91               sub c
+498+  D622 4F               ld c,a
+499+  D623 CD 02 C3         call movement_spaceisempty       ; check space is empty
+500+  D626 7B               ld a,e                          ; check space empty flag
+501+  D627 FE 00            cp 0
+502+  D629 CA 47 D6         jp z,robots_checkupandmove0    ; can't move here so return
+503+  D62C DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+503+  D630 46 01
+504+  D632 0D               dec c                       ; move up
+505+  D633 0D               dec c
+506+  D634 0D               dec c
+507+  D635 0D               dec c
+508+  D636 DD 71 00 DD      ld (ix),bc
+508+  D63A 70 01
+509+  D63C DD 36 06 02      ld (ix+6),2
+510+  D640 DD 36 05 01      ld (ix+5),1                 ; set the auto move frames
+511+  D644 3E 01            ld a,1
+512+  D646 C9               ret
+513+  D647              robots_checkupandmove0:
+514+  D647 3E 00            ld a,0
+515+  D649 C9               ret
+516+  D64A
+517+  D64A              ;
+518+  D64A              ; Checks down for movement
+519+  D64A              ; Outputs:
+520+  D64A              ; a - 1 if have moved
+521+  D64A              robots_checkdownandmove:
+522+  D64A                  ; check below
+523+  D64A DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+523+  D64E 46 01
+524+  D650 CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
+525+  D653 62 6B            ld hl,de                        ; look at cell directly above (add 256)
+526+  D655 24               inc h
+527+  D656 79               ld a,c
+528+  D657 0E 08            ld c,8
+529+  D659 81               add c
+530+  D65A 4F               ld c,a
+531+  D65B CD 02 C3         call movement_spaceisempty       ; check space is empty
+532+  D65E 7B               ld a,e                          ; check space empty flag
+533+  D65F FE 00            cp 0
+534+  D661 CA 7F D6         jp z,robots_checkdownandmove0    ; can't move here so return
+535+  D664 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+535+  D668 46 01
+536+  D66A 0C               inc c                       ; move up
+537+  D66B 0C               inc c
+538+  D66C 0C               inc c
+539+  D66D 0C               inc c
+540+  D66E DD 71 00 DD      ld (ix),bc
+540+  D672 70 01
+541+  D674 DD 36 06 03      ld (ix+6),3
+542+  D678 DD 36 05 01      ld (ix+5),1                 ; set the auto move frames
+543+  D67C 3E 01            ld a,1
+544+  D67E C9               ret
+545+  D67F              robots_checkdownandmove0:
+546+  D67F 3E 00            ld a,0
+547+  D681 C9               ret
+548+  D682
+549+  D682              ;
+550+  D682              ; Checks left for movement
+551+  D682              ; Outputs:
+552+  D682              ; a - 1 if have moved
+553+  D682              robots_checkleftandmove:
+554+  D682                  ; check below
+555+  D682 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+555+  D686 46 01
+556+  D688 CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
+557+  D68B 62 6B            ld hl,de                        ; look at cell directly to the left (sub 1)
+558+  D68D 78               ld a,b
+559+  D68E 06 08            ld b,8
+560+  D690 90               sub b                           ; move one cell left
+561+  D691 47               ld b,a
+562+  D692 2B               dec hl                          ; memory location of cell to the right now in hl
+563+  D693 CD 02 C3         call movement_spaceisempty       ; check space is empty
+564+  D696 7B               ld a,e                          ; check space empty flag
+565+  D697 FE 00            cp 0
+566+  D699 CA C4 D6         jp z,robots_checkleftandmove0    ; if zero can't move
+567+  D69C DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+567+  D6A0 46 01
+568+  D6A2 05               dec b
+569+  D6A3 DD 71 00 DD      ld (ix),bc
+569+  D6A7 70 01
+570+  D6A9 DD 36 06 00      ld (ix+6),0
+571+  D6AD DD 36 05 07      ld (ix+5),7                 ; set the auto move frames
+572+  D6B1 DD 36 03 00      ld (ix+3),0                 ; set to left
+573+  D6B5 21 18 D5         ld hl,robots_alreadymoved+0 ; increment the already moved flag
+574+  D6B8 7E               ld a,(hl)
+575+  D6B9 3C               inc a
+576+  D6BA CD 80 D7         call robots_zeromovecounters ; zero the move counters
+577+  D6BD 21 18 D5         ld hl,robots_alreadymoved+0 ; increment the already moved flag
+578+  D6C0 77               ld (hl),a                   ; store the incremented counter
+579+  D6C1 3E 01            ld a,1
+580+  D6C3 C9               ret
+581+  D6C4              robots_checkleftandmove0:
+582+  D6C4 3E 00            ld a,0
+583+  D6C6 C9               ret
+584+  D6C7
+585+  D6C7              ;
+586+  D6C7              ; Checks right for movement
+587+  D6C7              ; Outputs:
+588+  D6C7              ; a - 1 if have moved
+589+  D6C7              robots_checkrightandmove:
+590+  D6C7                  ; check below
+591+  D6C7 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+591+  D6CB 46 01
+592+  D6CD 78               ld a,b
+593+  D6CE FE E8            cp 232
+594+  D6D0 CA 0E D7         jp z,robots_checkrightandmove0  ; can't move if at edge
+595+  D6D3 CD 31 AC         call sprites_scadd              ; get the memory location of cell into de
+596+  D6D6 62 6B            ld hl,de                        ; look at cell directly to the right (add 1)
+597+  D6D8 3E 08            ld a,8
+598+  D6DA 80               add b                           ; move one cell right
+599+  D6DB 47               ld b,a
+600+  D6DC 23               inc hl                          ; memory location of cell to the right now in hl
+601+  D6DD CD 02 C3         call movement_spaceisempty       ; check space is empty
+602+  D6E0 7B               ld a,e                          ; check space empty flag
+603+  D6E1 FE 00            cp 0
+604+  D6E3 CA 0E D7         jp z,robots_checkrightandmove0    ; if zero can't move
+605+  D6E6 DD 4E 00 DD      ld bc,(ix)                  ; load current coords into bc
+605+  D6EA 46 01
+606+  D6EC 04               inc b
+607+  D6ED DD 71 00 DD      ld (ix),bc
+607+  D6F1 70 01
+608+  D6F3 DD 36 06 01      ld (ix+6),1
+609+  D6F7 DD 36 05 07      ld (ix+5),7                 ; set the auto move frames
+610+  D6FB DD 36 03 01      ld (ix+3),1                 ; set to right
+611+  D6FF 21 19 D5         ld hl,robots_alreadymoved+1 ; increment the already moved flag
+612+  D702 7E               ld a,(hl)
+613+  D703 3C               inc a
+614+  D704 CD 80 D7         call robots_zeromovecounters ; zero the move counters
+615+  D707 21 18 D5         ld hl,robots_alreadymoved+0 ; increment the already moved flag
+616+  D70A 77               ld (hl),a                   ; store the incremented counter
+617+  D70B 3E 01            ld a,1
+618+  D70D C9               ret
+619+  D70E              robots_checkrightandmove0:
+620+  D70E 3E 00            ld a,0
+621+  D710 C9               ret
+622+  D711
+623+  D711              ;
+624+  D711              ; Draws a robot
+625+  D711              ; Inputs:
+626+  D711              ; ix - points to first byte of robot in array
+627+  D711              robots_draw:
+628+  D711 DD 4E 00 DD      ld bc,(ix)
+628+  D715 46 01
+629+  D717 21 BC BF         ld hl,robot_sprite                      ; set to the robot sprite
+630+  D71A DD 7E 02         ld a,(ix+2)                             ; get the state
+631+  D71D FE 02            cp 2                                    ; is this dying
+632+  D71F CA 3A D7         jp z,robots_draw1
+633+  D722              robots_draw3:
+634+  D722 DD 7E 03         ld a,(ix+3)                             ; get the direction
+635+  D725 FE 00            cp 0
+636+  D727 CA 2E D7         jp z,robots_draw0                       ; if left, nothing to do
+637+  D72A 11 20 00         ld de,32
+638+  D72D 19               add hl,de                               ; add four frames to sprite
+639+  D72E              robots_draw0:
+640+  D72E DD 7E 04         ld a,(ix+4)                             ; get the anim frame
+641+  D731 11 00 00         ld de,0
+642+  D734 5F               ld e,a
+643+  D735 19               add hl,de                               ; add to base
+644+  D736 CD 29 AB         call sprites_drawsprite
+645+  D739 C9               ret
+646+  D73A              ;
+647+  D73A              ; Dying
+648+  D73A              ;
+649+  D73A              robots_draw1:
+650+  D73A DD 7E 05         ld a,(ix+5)                             ; get anim frames
+651+  D73D FE 00            cp 0                                    ; if zero this is the first time around
+652+  D73F C2 4A D7         jp nz,robots_draw2
+653+  D742 3E 18            ld a,24
+654+  D744 DD 77 05         ld (ix+5),a                             ; load up the anim frames
+655+  D747 C3 22 D7         jp robots_draw3                         ; return to main loop to draw as normal
+656+  D74A              robots_draw2:
+657+  D74A 3D               dec a
+658+  D74B DD 77 05         ld (ix+5),a
+659+  D74E FE 00            cp 0                                    ; have we reached the end yet
+660+  D750 C2 56 D7         jp nz, robots_draw4
+661+  D753 CD 03 D4         call robots_kill
+662+  D756              robots_draw4:
+663+  D756 C3 2E D7         jp robots_draw0
+664+  D759 C9               ret
+665+  D75A
+666+  D75A              ;
+667+  D75A              ; Checks to see if the robot is hitting a player
+668+  D75A              ; Inputs:
+669+  D75A              ; ix - memory location of robot we're checking
+670+  D75A              robots_checkforplayer:
+671+  D75A 3A 23 C6         ld a,(player+11)     ; get player state
+672+  D75D FE 00            cp 0
+673+  D75F C0               ret nz               ; if already dying, don't kill again
+674+  D760 DD 4E 00 DD      ld bc,(ix)           ; get coords
+674+  D764 46 01
+675+  D766 ED 5B 18 C6      ld de,(player)       ; get the player coords
+676+  D76A 7B               ld a,e               ; get the vert coord first
+677+  D76B 91               sub c                ; subtract the diamond vertical coord from players
+678+  D76C C6 08            add 8                ; add the max distance
+679+  D76E FE 11            cp 17                ; compare to max*2+1? if carry flag set, they've hit
+680+  D770 D0               ret nc               ; if not, hasn't hit
+681+  D771 7A               ld a,d               ; get the player horiz coord
+682+  D772 90               sub b                ; subtract rock coord
+683+  D773 C6 08            add 8                ; add max distance
+684+  D775 FE 11            cp 17                ; compare to max*2+1? if carry flag set, they've hit
+685+  D777 D0               ret nc
+686+  D778 DD 36 02 00      ld (ix+2),0          ; mark as inactive
+687+  D77C CD 53 C7         call player_robotkillplayer ; mark the player as killed
+688+  D77F C9               ret
+689+  D780
+690+  D780              ;
+691+  D780              ; Zeroes the already moved counter
+692+  D780              ;
+693+  D780              robots_zeromovecounters:
+694+  D780 06 04            ld b,4
+695+  D782 21 18 D5         ld hl,robots_alreadymoved
+696+  D785 08               ex af,af'
+697+  D786 3E 00            ld a,0
+698+  D788              robots_zeromovecounters0:
+699+  D788 77               ld (hl),a
+700+  D789 23               inc hl
+701+  D78A 10 FC            djnz robots_zeromovecounters0
+702+  D78C 08               ex af,af'
+703+  D78D C9               ret
+704+  D78E
 # file closed: game/robots.asm
-168   D73B                  include "game\bullet.asm"
+168   D78E                  include "game\bullet.asm"
 # file opened: game/bullet.asm
-  1+  D73B              ;
-  2+  D73B              ; Current state: x & y coords (screen), direction (0 left, 1 right), state
-  3+  D73B              ;
-  4+  D73B              bullet_state:
-  5+  D73B 00 00 00 00      defb 0,0,0,0
-  6+  D73F
-  7+  D73F              ;
-  8+  D73F              ; Measures if bullet can be fired. Disabled if fire held down
-  9+  D73F              ;
- 10+  D73F              bullet_enable:
- 11+  D73F 00               defb 0
- 12+  D740
- 13+  D740              ;
- 14+  D740              ; Initialise a the bullet
- 15+  D740              ;
- 16+  D740              bullet_init:
- 17+  D740 DD 21 3B D7      ld ix,bullet_state
- 18+  D744 DD 36 00 00      ld (ix),0
- 19+  D748 DD 36 01 00      ld (ix+1),0
- 20+  D74C DD 36 02 00      ld (ix+2),0
- 21+  D750 DD 36 03 00      ld (ix+3),0
- 22+  D754 C9               ret
- 23+  D755
- 24+  D755              ;
- 25+  D755              ; Shoots the bullet
- 26+  D755              ;
- 27+  D755              bullet_shoot:
- 28+  D755 3E 01            ld a,1
- 29+  D757 32 3F D7         ld (bullet_enable),a        ; disable the bullet until fire is release
- 30+  D75A DD 21 3B D7      ld ix,bullet_state
- 31+  D75E ED 4B 18 C6      ld bc,(player)              ; get the player coords
- 32+  D762 3A 1A C6         ld a,(player+2)             ; get the player direction
- 33+  D765 FE 01            cp 1                        ; going left?
- 34+  D767 CA 75 D7         jp z,bullet_shoot0
- 35+  D76A 3E 08            ld a,8
- 36+  D76C 80               add a,b                     ; going right so add eight to start coords
- 37+  D76D 47               ld b,a
- 38+  D76E DD 36 02 01      ld (ix+2),1                 ; set right
- 39+  D772 C3 7E D7         jp bullet_shoot1
- 40+  D775              bullet_shoot0:
- 41+  D775 78               ld a,b
- 42+  D776 06 08            ld b,8
- 43+  D778 90               sub b
- 44+  D779 47               ld b,a                      ; going left so subtract eight to start coords
- 45+  D77A DD 36 02 00      ld (ix+2),0                 ; set right
- 46+  D77E              bullet_shoot1:
- 47+  D77E DD 71 00 DD      ld (ix),bc        ; store coords
- 47+  D782 70 01
- 48+  D784 DD 36 03 01      ld (ix+3),1       ; set state to 1
- 49+  D788 CD DE D7         call bullet_draw ; draw the initial frame
- 50+  D78B C9               ret
- 51+  D78C
- 52+  D78C              ;
- 53+  D78C              ; Performs bullet processing
- 54+  D78C              ;
- 55+  D78C              bullet_process:
- 56+  D78C 3A 3E D7         ld a,(bullet_state+3)       ; get the state
- 57+  D78F FE 00            cp 0
- 58+  D791 C8               ret z                       ; don't draw if this has become inactive
- 59+  D792 CD DE D7         call bullet_draw            ; delete current frame
- 60+  D795 CD A2 D7         call bullet_move            ; move the bullet
- 61+  D798 3A 3E D7         ld a,(bullet_state+3)       ; get the state
- 62+  D79B FE 00            cp 0
- 63+  D79D C8               ret z                       ; don't draw if this has become inactive
- 64+  D79E CD DE D7         call bullet_draw            ; draw new frame
- 65+  D7A1 C9               ret
- 66+  D7A2
- 67+  D7A2              ;
- 68+  D7A2              ; Moves the bullet, checking for collisions
- 69+  D7A2              ;
- 70+  D7A2              bullet_move:
- 71+  D7A2 DD 21 3B D7      ld ix,bullet_state
- 72+  D7A6 DD 4E 00 DD      ld bc,(ix)
- 72+  D7AA 46 01
- 73+  D7AC DD 7E 02         ld a,(ix+2)                 ; get the direction
- 74+  D7AF FE 00            cp 0                        ; going left?
- 75+  D7B1 CA BB D7         jp z,bullet_move0
- 76+  D7B4 3E 08            ld a,8
- 77+  D7B6 80               add b
- 78+  D7B7 47               ld b,a                      ; add 8 since going right
- 79+  D7B8 C3 C0 D7         jp bullet_move1
- 80+  D7BB              bullet_move0:
- 81+  D7BB 78               ld a,b
- 82+  D7BC 06 08            ld b,8
- 83+  D7BE 90               sub b
- 84+  D7BF 47               ld b,a                      ; subtract 8 since going left
- 85+  D7C0              bullet_move1:
- 86+  D7C0 DD 71 00 DD      ld (ix),bc                  ; store new coords
- 86+  D7C4 70 01
- 87+  D7C6 C5               push bc
- 88+  D7C7 CD EB D7         call bullets_checkforrobot
- 89+  D7CA C1               pop bc
- 90+  D7CB FE 01            cp 1                        ; if we hit a robot, keep moving
- 91+  D7CD C8               ret z
- 92+  D7CE CD 31 AC         call sprites_scadd          ; get memory loc of this block into de
- 93+  D7D1 21 60 00         ld hl,96
- 94+  D7D4 19               add hl,de
- 95+  D7D5 7E               ld a,(hl)                   ; get the content
- 96+  D7D6 FE 00            cp 0
- 97+  D7D8 C8               ret z                       ; if empty, continue
- 98+  D7D9 DD 36 03 00      ld (ix+3),0                 ; otherwise, mark bullet as inactive
- 99+  D7DD C9               ret
-100+  D7DE
-101+  D7DE              ;
-102+  D7DE              ; Draw the bullet
-103+  D7DE              ;
-104+  D7DE              bullet_draw:
-105+  D7DE ED 4B 3B D7      ld bc,(bullet_state)        ; get coords
-106+  D7E2 3E 1B            ld a,27
-107+  D7E4 CD A4 AA         call screen_getblock        ; get the block address
-108+  D7E7 CD 29 AB         call sprites_drawsprite     ; draw the sprite
-109+  D7EA C9               ret
-110+  D7EB
-111+  D7EB              ;
-112+  D7EB              ; Checks to see if the robot is hitting a bullet
-113+  D7EB              ; Outputs:
-114+  D7EB              ; a = 0 if not robot hit
-115+  D7EB              ; a = 1 if robot not hit
-116+  D7EB              bullets_checkforrobot:
-117+  D7EB 3E 00            ld a,0
-118+  D7ED 32 41 D8         ld (bullets_tmp),a
-119+  D7F0 3A 86 D3         ld a,(robots_robotsmax) ; robots to check
-120+  D7F3 47               ld b,a
-121+  D7F4 FD 21 57 D3      ld iy,robots_robots   ; start of robot array
-122+  D7F8              bullets_checkforrobot0:
-123+  D7F8 C5               push bc
-124+  D7F9 FD 7E 02         ld a,(iy+2)             ; get the state
-125+  D7FC FE 01            cp 1
-126+  D7FE C2 35 D8         jp nz,bullets_checkforrobot1 ; if not active, don't check
-127+  D801 FD 5E 00 FD      ld de,(iy)              ; get robot coords
-127+  D805 56 01
-128+  D807 7A               ld a,d
-129+  D808 E6 F8            and 248                 ; get nearest multiple of 8
-130+  D80A 57               ld d,a
-131+  D80B ED 4B 3B D7      ld bc,(bullet_state)    ; get bullet coords
-132+  D80F 7A               ld a,d               ; get the robot horiz coord
-133+  D810 90               sub b                ; subtract robot coord
-134+  D811 FE 00            cp 0                ; should be the same
-135+  D813 CA 1F D8         jp z,bullets_checkforrobot2 ; if not, might have hit, so check the next char along... if matched, check vert
-136+  D816 3E 08            ld a,8
-137+  D818 82               add a,d
-138+  D819 90               sub b                ; check again for the next char along
-139+  D81A FE 00            cp 0
-140+  D81C C2 35 D8         jp nz,bullets_checkforrobot1 ; if not, haven't hit
-141+  D81F              bullets_checkforrobot2:
-142+  D81F 7B               ld a,e               ; get the vert coord
-143+  D820 91               sub c                ; subtract the bullet vertical coord from robots
-144+  D821 C6 04            add 4                ; add the max distance
-145+  D823 FE 09            cp 9                ; compare to max*2+1? if carry flag set, they've hit
-146+  D825 D2 35 D8         jp nc,bullets_checkforrobot1   ; if not, hasn't hit
-147+  D828 FD 36 02 02      ld (iy+2),2             ; mark the robot as killed
-148+  D82C FD 36 05 00      ld (iy+5),0             ; mark the anim frames as zero
-149+  D830 3E 01            ld a,1
-150+  D832 32 41 D8         ld (bullets_tmp),a      ; hit the flag to say we killed a robot
-151+  D835              bullets_checkforrobot1:
-152+  D835 11 07 00         ld de,7
-153+  D838 FD 19            add iy,de              ; move to next robot
-154+  D83A C1               pop bc
-155+  D83B 10 BB            djnz bullets_checkforrobot0
-156+  D83D 3A 41 D8         ld a,(bullets_tmp)
-157+  D840 C9               ret
-158+  D841
-159+  D841              bullets_tmp:
-160+  D841 00               defb 0
-161+  D842
+  1+  D78E              ;
+  2+  D78E              ; Current state: x & y coords (screen), direction (0 left, 1 right), state
+  3+  D78E              ;
+  4+  D78E              bullet_state:
+  5+  D78E 00 00 00 00      defb 0,0,0,0
+  6+  D792
+  7+  D792              ;
+  8+  D792              ; Measures if bullet can be fired. Disabled if fire held down
+  9+  D792              ;
+ 10+  D792              bullet_enable:
+ 11+  D792 00               defb 0
+ 12+  D793
+ 13+  D793              ;
+ 14+  D793              ; Initialise a the bullet
+ 15+  D793              ;
+ 16+  D793              bullet_init:
+ 17+  D793 DD 21 8E D7      ld ix,bullet_state
+ 18+  D797 DD 36 00 00      ld (ix),0
+ 19+  D79B DD 36 01 00      ld (ix+1),0
+ 20+  D79F DD 36 02 00      ld (ix+2),0
+ 21+  D7A3 DD 36 03 00      ld (ix+3),0
+ 22+  D7A7 C9               ret
+ 23+  D7A8
+ 24+  D7A8              ;
+ 25+  D7A8              ; Shoots the bullet
+ 26+  D7A8              ;
+ 27+  D7A8              bullet_shoot:
+ 28+  D7A8 3E 01            ld a,1
+ 29+  D7AA 32 92 D7         ld (bullet_enable),a        ; disable the bullet until fire is release
+ 30+  D7AD DD 21 8E D7      ld ix,bullet_state
+ 31+  D7B1 ED 4B 18 C6      ld bc,(player)              ; get the player coords
+ 32+  D7B5 3A 1A C6         ld a,(player+2)             ; get the player direction
+ 33+  D7B8 FE 01            cp 1                        ; going left?
+ 34+  D7BA CA C8 D7         jp z,bullet_shoot0
+ 35+  D7BD 3E 08            ld a,8
+ 36+  D7BF 80               add a,b                     ; going right so add eight to start coords
+ 37+  D7C0 47               ld b,a
+ 38+  D7C1 DD 36 02 01      ld (ix+2),1                 ; set right
+ 39+  D7C5 C3 D1 D7         jp bullet_shoot1
+ 40+  D7C8              bullet_shoot0:
+ 41+  D7C8 78               ld a,b
+ 42+  D7C9 06 08            ld b,8
+ 43+  D7CB 90               sub b
+ 44+  D7CC 47               ld b,a                      ; going left so subtract eight to start coords
+ 45+  D7CD DD 36 02 00      ld (ix+2),0                 ; set right
+ 46+  D7D1              bullet_shoot1:
+ 47+  D7D1 DD 71 00 DD      ld (ix),bc        ; store coords
+ 47+  D7D5 70 01
+ 48+  D7D7 DD 36 03 01      ld (ix+3),1       ; set state to 1
+ 49+  D7DB CD 31 D8         call bullet_draw ; draw the initial frame
+ 50+  D7DE C9               ret
+ 51+  D7DF
+ 52+  D7DF              ;
+ 53+  D7DF              ; Performs bullet processing
+ 54+  D7DF              ;
+ 55+  D7DF              bullet_process:
+ 56+  D7DF 3A 91 D7         ld a,(bullet_state+3)       ; get the state
+ 57+  D7E2 FE 00            cp 0
+ 58+  D7E4 C8               ret z                       ; don't draw if this has become inactive
+ 59+  D7E5 CD 31 D8         call bullet_draw            ; delete current frame
+ 60+  D7E8 CD F5 D7         call bullet_move            ; move the bullet
+ 61+  D7EB 3A 91 D7         ld a,(bullet_state+3)       ; get the state
+ 62+  D7EE FE 00            cp 0
+ 63+  D7F0 C8               ret z                       ; don't draw if this has become inactive
+ 64+  D7F1 CD 31 D8         call bullet_draw            ; draw new frame
+ 65+  D7F4 C9               ret
+ 66+  D7F5
+ 67+  D7F5              ;
+ 68+  D7F5              ; Moves the bullet, checking for collisions
+ 69+  D7F5              ;
+ 70+  D7F5              bullet_move:
+ 71+  D7F5 DD 21 8E D7      ld ix,bullet_state
+ 72+  D7F9 DD 4E 00 DD      ld bc,(ix)
+ 72+  D7FD 46 01
+ 73+  D7FF DD 7E 02         ld a,(ix+2)                 ; get the direction
+ 74+  D802 FE 00            cp 0                        ; going left?
+ 75+  D804 CA 0E D8         jp z,bullet_move0
+ 76+  D807 3E 08            ld a,8
+ 77+  D809 80               add b
+ 78+  D80A 47               ld b,a                      ; add 8 since going right
+ 79+  D80B C3 13 D8         jp bullet_move1
+ 80+  D80E              bullet_move0:
+ 81+  D80E 78               ld a,b
+ 82+  D80F 06 08            ld b,8
+ 83+  D811 90               sub b
+ 84+  D812 47               ld b,a                      ; subtract 8 since going left
+ 85+  D813              bullet_move1:
+ 86+  D813 DD 71 00 DD      ld (ix),bc                  ; store new coords
+ 86+  D817 70 01
+ 87+  D819 C5               push bc
+ 88+  D81A CD 3E D8         call bullets_checkforrobot
+ 89+  D81D C1               pop bc
+ 90+  D81E FE 01            cp 1                        ; if we hit a robot, keep moving
+ 91+  D820 C8               ret z
+ 92+  D821 CD 31 AC         call sprites_scadd          ; get memory loc of this block into de
+ 93+  D824 21 60 00         ld hl,96
+ 94+  D827 19               add hl,de
+ 95+  D828 7E               ld a,(hl)                   ; get the content
+ 96+  D829 FE 00            cp 0
+ 97+  D82B C8               ret z                       ; if empty, continue
+ 98+  D82C DD 36 03 00      ld (ix+3),0                 ; otherwise, mark bullet as inactive
+ 99+  D830 C9               ret
+100+  D831
+101+  D831              ;
+102+  D831              ; Draw the bullet
+103+  D831              ;
+104+  D831              bullet_draw:
+105+  D831 ED 4B 8E D7      ld bc,(bullet_state)        ; get coords
+106+  D835 3E 1B            ld a,27
+107+  D837 CD A4 AA         call screen_getblock        ; get the block address
+108+  D83A CD 29 AB         call sprites_drawsprite     ; draw the sprite
+109+  D83D C9               ret
+110+  D83E
+111+  D83E              ;
+112+  D83E              ; Checks to see if the robot is hitting a bullet
+113+  D83E              ; Outputs:
+114+  D83E              ; a = 0 if not robot hit
+115+  D83E              ; a = 1 if robot not hit
+116+  D83E              bullets_checkforrobot:
+117+  D83E 3E 00            ld a,0
+118+  D840 32 94 D8         ld (bullets_tmp),a
+119+  D843 3A 86 D3         ld a,(robots_robotsmax) ; robots to check
+120+  D846 47               ld b,a
+121+  D847 FD 21 57 D3      ld iy,robots_robots   ; start of robot array
+122+  D84B              bullets_checkforrobot0:
+123+  D84B C5               push bc
+124+  D84C FD 7E 02         ld a,(iy+2)             ; get the state
+125+  D84F FE 01            cp 1
+126+  D851 C2 88 D8         jp nz,bullets_checkforrobot1 ; if not active, don't check
+127+  D854 FD 5E 00 FD      ld de,(iy)              ; get robot coords
+127+  D858 56 01
+128+  D85A 7A               ld a,d
+129+  D85B E6 F8            and 248                 ; get nearest multiple of 8
+130+  D85D 57               ld d,a
+131+  D85E ED 4B 8E D7      ld bc,(bullet_state)    ; get bullet coords
+132+  D862 7A               ld a,d               ; get the robot horiz coord
+133+  D863 90               sub b                ; subtract robot coord
+134+  D864 FE 00            cp 0                ; should be the same
+135+  D866 CA 72 D8         jp z,bullets_checkforrobot2 ; if not, might have hit, so check the next char along... if matched, check vert
+136+  D869 3E 08            ld a,8
+137+  D86B 82               add a,d
+138+  D86C 90               sub b                ; check again for the next char along
+139+  D86D FE 00            cp 0
+140+  D86F C2 88 D8         jp nz,bullets_checkforrobot1 ; if not, haven't hit
+141+  D872              bullets_checkforrobot2:
+142+  D872 7B               ld a,e               ; get the vert coord
+143+  D873 91               sub c                ; subtract the bullet vertical coord from robots
+144+  D874 C6 04            add 4                ; add the max distance
+145+  D876 FE 09            cp 9                ; compare to max*2+1? if carry flag set, they've hit
+146+  D878 D2 88 D8         jp nc,bullets_checkforrobot1   ; if not, hasn't hit
+147+  D87B FD 36 02 02      ld (iy+2),2             ; mark the robot as killed
+148+  D87F FD 36 05 00      ld (iy+5),0             ; mark the anim frames as zero
+149+  D883 3E 01            ld a,1
+150+  D885 32 94 D8         ld (bullets_tmp),a      ; hit the flag to say we killed a robot
+151+  D888              bullets_checkforrobot1:
+152+  D888 11 07 00         ld de,7
+153+  D88B FD 19            add iy,de              ; move to next robot
+154+  D88D C1               pop bc
+155+  D88E 10 BB            djnz bullets_checkforrobot0
+156+  D890 3A 94 D8         ld a,(bullets_tmp)
+157+  D893 C9               ret
+158+  D894
+159+  D894              bullets_tmp:
+160+  D894 00               defb 0
+161+  D895
 # file closed: game/bullet.asm
-169   D842
-170   D842              ;===========================================================================
-171   D842              ; Stack.
-172   D842              ;===========================================================================
-173   D842
-174   D842              ; Stack: this area is reserved for the stack
-175   D842              STACK_SIZE: equ 100    ; in words
-176   D842
-177   D842              ; Reserve stack space
-178   D842 00 00            defw 0  ; WPMEM, 2
-179   D844              stack_bottom:
-180   D844 00 00 00...      defs    STACK_SIZE*2, 0
-181   D90C              stack_top:
-182   D90C 00 00            defw 0  ; WPMEM, 2
-183   D90E
-184   D90E                     SAVESNA "./dist/ThePit.sna", main
-185   D90E                     ;SAVETAP "./dist/ThePit.tap", main
+169   D895
+170   D895              ;===========================================================================
+171   D895              ; Stack.
+172   D895              ;===========================================================================
+173   D895
+174   D895              ; Stack: this area is reserved for the stack
+175   D895              STACK_SIZE: equ 100    ; in words
+176   D895
+177   D895              ; Reserve stack space
+178   D895 00 00            defw 0  ; WPMEM, 2
+179   D897              stack_bottom:
+180   D897 00 00 00...      defs    STACK_SIZE*2, 0
+181   D95F              stack_top:
+182   D95F 00 00            defw 0  ; WPMEM, 2
+183   D961
+184   D961                     SAVESNA "./dist/ThePit.sna", main
+185   D961                     ;SAVETAP "./dist/ThePit.tap", main
 # file closed: main.asm
