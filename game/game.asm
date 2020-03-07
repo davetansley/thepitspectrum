@@ -44,15 +44,15 @@ game_current_rocks:
 game_tankdifficulty:
     defb 70,65,60,55,50,45,40,35,30,25,20,12
 game_pitdifficulty:
-    defb 7,7,5,5,4,4,2,2,2,2,2,2
+    defb 7,7,6,6,5,5,5,5,4,4,3,3
 game_robotdifficulty:
     defb 6,6,4,4,3,3,2,2,0,0,0,0
 game_digdifficulty:
     defb 20,20,10,10,8,8,8,8,6,6,6,4
 game_rockdifficulty:
-    defb 40,40,20,20,18,18,18,18,18,18,18,18
+    defb 40,40,30,30,26,26,26,26,26,26,26,26
 game_missiledifficulty:
-    defb 70,70,60,60,50,50,40,40,30,30,25,20
+    defb 40,40,35,35,32,32,30,30,25,25,23,20
 ;
 ; Moves to the next player
 ;

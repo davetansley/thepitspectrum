@@ -35,7 +35,7 @@ main_lifestart:
 
     call player_init_lifestart
     call game_setcurrentrocks   ; set the current rocks based on the level
-    ;ld a,12
+    ;ld a,6
     ;ld (game_difficulty),a
     call game_setdifficulty     ; set the current difficulty
     

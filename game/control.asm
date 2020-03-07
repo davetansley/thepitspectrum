@@ -294,7 +294,6 @@ control_automove:
     jp z,control_automove0
     ld a,b
     inc a               ; if we're going right, increment a twice for two pixels
-    inc a
     ld b,a 
     jp control_automove1
 control_automove3:
@@ -316,7 +315,6 @@ control_automove2:
 control_automove0:
     ld a,b
     dec a               ; if we're going left, decrement a twice
-    dec a
     ld b,a 
 control_automove1:
     ld (player),bc      ; and back to player
@@ -400,12 +398,11 @@ control_pl_moveleft:
     cp 0
     jp z,control_pl_moveleft1 ; don't move if we can't
     ld hl,player+5          ; need to store the amount of pixels still left to move in the player status
-    ld a,3
+    ld a,7
     ld (hl),a   
     pop af
-    sub 1                    ; subtract 2
-    sub 1
-    ld b,a                  ; load back to c
+    sub 1                    ; subtract 1
+   ld b,a                  ; load back to c
     ld (player),bc          ; load back to player
     jp control_pl_moveleft0
 control_pl_moveleft1:
@@ -430,11 +427,10 @@ control_pl_moveright:
     cp 0
     jp z,control_pl_moveright1 ; don't move if we can't
     ld hl,player+5          ; need to store the amount of pixels still left to move in the player status
-    ld a,3
+    ld a,7
     ld (hl),a
     pop af
-    inc a                   ; add 2
-    inc a
+    inc a                   ; add 1
     ld b,a                  ; load back to b
     ld (player),bc          ; load back to player
     jp control_pl_moveright0
