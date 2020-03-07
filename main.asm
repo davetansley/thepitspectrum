@@ -2,23 +2,9 @@
 
     ORG $8000    
 
-;===========================================================================
-; Persistent watchpoint.
-; Change WPMEMx (remove the 'x' from WPMEMx) below to activate.
-; If you do so the program will hit a breakpoint when it tries to
-; write to the first byte of the 3rd line.
-; When program breaks in the fill_memory sub routine please hover over hl
-; to see that it contains 0x5804 or COLOR_SCREEN+64.
-;===========================================================================
-
-; WPMEMx 0x5840, 1, w
-
-
-;===========================================================================
-; main routine - the code execution starts here.
-; Sets up the new interrupt routine, the memory
-; banks and jumps to the start loop.
-;===========================================================================
+;
+; Main entry point
+;
 main:
     ld hl,font
     ld (23606),hl
