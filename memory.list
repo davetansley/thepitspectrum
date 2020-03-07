@@ -8279,5 +8279,6 @@
 182   D95F 00 00            defw 0  ; WPMEM, 2
 183   D961
 184   D961                     SAVESNA "./dist/ThePit.sna", main
-185   D961                     ;SAVETAP "./dist/ThePit.tap", main
+main.asm(185): error: [SAVETAP] Values higher than FFFFh are not allowed: SAVETAP "./dist/ThePit.tap", CODE, "game","main"
+185   D961                     SAVETAP "./dist/ThePit.tap", CODE, "game","main"
 # file closed: main.asm

@@ -182,4 +182,4 @@ stack_top:
     defw 0  ; WPMEM, 2
 
        SAVESNA "./dist/ThePit.sna", main
-       ;SAVETAP "./dist/ThePit.tap", main
+       SAVETAP "./dist/ThePit.tap", CODE, "game","main"
