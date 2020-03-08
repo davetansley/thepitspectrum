@@ -163,10 +163,13 @@ sprites_marklinesforupdatescreen:
     call screen_getcharcoordsfromscreencoords
     ld (origcoords),bc
     ld a,(buffer_threelinerefresh)              ; check the three line update flag
-    cp 1
-    jp nz,sprites_marklinesforupdatescreen0
+    cp 0
+    jp z,sprites_marklinesforupdatescreen0      ; if not set, don't do anything
+    cp 2
+    jp z,sprites_marklinesforupdatescreen1      ; if set to below, increase number of lines to three, but don't look above
+    dec b                                       ; digging up, so dec vertical coord by one to render one extra above
+sprites_marklinesforupdatescreen1:   
     inc l                                       ; increase number to 3
-    dec b 
     ld (origcoords),bc                           ; decrease vertical coord
     ld a,0
     ld (buffer_threelinerefresh),a              ; reset the flag

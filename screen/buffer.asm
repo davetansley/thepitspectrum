@@ -9,7 +9,9 @@ buffer_tmp:
 
 ;
 ; If this is set to one, three lines will be refreshed for the screen coord redraw
-; This is used when digging to make sure that the above dug block gets redrawn
+; This is used when digging to make sure that the above/below dug block gets redrawn
+; 1 - above
+; 2 - below
 ;
 buffer_threelinerefresh:
     defb 0

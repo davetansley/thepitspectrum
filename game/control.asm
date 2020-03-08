@@ -208,6 +208,8 @@ control_dig4:
     push bc
     jp control_dig6
 control_dig5:
+    ld a,2
+    ld (buffer_threelinerefresh),a  ; set the three line update flag, since we're digging up
     call sprites_scadd  ; get the current coord 
     ld hl,de 
     inc h              ; move one down
