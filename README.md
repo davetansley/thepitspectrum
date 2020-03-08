@@ -4,7 +4,7 @@ A conversion of the 1982 coin-op The Pit for Sinclair computers.
 
 Platform: Spectrum 48/128/Next
 
-Controls: QAOPSpace, Kempson
+Controls: QAOPSpace, Kempston
 
 Number of players: 1 or 2
 
