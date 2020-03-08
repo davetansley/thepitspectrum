@@ -132,7 +132,7 @@ gameover_enterhighscores_init:
     ld a,(game_currentplayer)
     cp 1
     ld hl,string_highscore_player1
-    jp gameover_enterhighscores_init1
+    jp z, gameover_enterhighscores_init1
 gameover_enterhighscores_init0:
     ld hl,string_highscore_player2
 gameover_enterhighscores_init1:

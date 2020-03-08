@@ -11,7 +11,7 @@ endlevel_draw:
     ld a,(game_currentplayer)
     cp 1
     ld hl,string_highscore_player1
-    jp endlevel_init1
+    jp z, endlevel_init1
 endlevel_init0:
     ld hl,string_highscore_player2
 endlevel_init1:

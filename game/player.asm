@@ -55,6 +55,8 @@ player_getlocation1:
 ; Copy initial coords, copy lives, copy score
 ;
 player_init_gamestart:
+    ld a,1
+    ld (game_currentplayer),a
     ld a,(game_numberlives)
     ld (player1_lives),a
     ld (player2_lives),a                        ; set the initial number of lives at game start
