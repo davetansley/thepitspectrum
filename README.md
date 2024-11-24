@@ -8,7 +8,7 @@ Controls: QAOPSpace, Kempston
 
 Number of players: 1 or 2
 
-Download: http://tiny.cc/d41ykz
+Download: https://github.com/davetansley/thepitspectrum/blob/master/release/ThePit.tap
 
 The Legend
 ==========
